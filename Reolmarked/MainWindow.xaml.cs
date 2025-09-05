@@ -19,6 +19,9 @@ namespace Reolmarked
         public MainWindow()
         {
             InitializeComponent();
+            var addRenterView = new Reolmarked.View.AddRenterView();
+            addRenterView.Show();
+            this.Close();
         }
     }
 }

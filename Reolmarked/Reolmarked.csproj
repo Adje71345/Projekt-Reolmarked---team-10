@@ -11,7 +11,7 @@
   <ItemGroup>
     <Folder Include="Model\" />
     <Folder Include="Repositories\" />
-    <Folder Include="ViewModel\" />
+    <Folder Include="View\" />
   </ItemGroup>
 
 </Project>

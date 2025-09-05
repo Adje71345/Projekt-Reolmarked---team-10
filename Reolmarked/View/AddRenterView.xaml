@@ -5,44 +5,49 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Reolmarked.View"
         mc:Ignorable="d"
-        Title="Tilføj lejer" Height="300" Width="400">
+        Title="Tilføj lejer" Height="350" Width="450">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"/>
-            <ColumnDefinition Width="105"/>
+            <ColumnDefinition Width="110"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="20"/>
         </Grid.ColumnDefinitions>
 
         <!-- row 1 -->
-        <TextBox Text="Fornavn:" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
-        <TextBox Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" TextChanged="TextBox_TextChanged_1" TextWrapping="Wrap" Width="250" Height="20"/>
+        <TextBlock Text="Fornavn:" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
+        <TextBox Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center"
+                 Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" Width="250" Height="20"/>
 
         <!-- row 2 -->
-        <TextBox Text="Efternavn:" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
-        <TextBox Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" TextChanged="TextBox_TextChanged_1" TextWrapping="Wrap" Width="250" Height="20"/>
+        <TextBlock Text="Efternavn:" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
+        <TextBox Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center"
+                 Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}" Width="250" Height="20"/>
 
         <!-- row 3 -->
-        <TextBox Text="Telefonnummer:" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
-        <TextBox Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" TextChanged="TextBox_TextChanged_1" TextWrapping="Wrap" Width="250" Height="20"/>
+        <TextBlock Text="Telefonnummer:" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
+        <TextBox Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center"
+                 Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}" Width="250" Height="20"/>
 
         <!-- row 4 -->
-        <TextBox Text="Email:" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
-        <TextBox Grid.Row="4" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" TextChanged="TextBox_TextChanged_1" TextWrapping="Wrap" Width="250" Height="20"/>
+        <TextBlock Text="Email:" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
+        <TextBox Grid.Row="4" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center"
+                 Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}" Width="250" Height="20"/>
 
         <!-- row 5 -->
-        <TextBox Text="Betalingsmetode:" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
-        <ComboBox Grid.Row="5" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Width="250" Height="20">
+        <TextBlock Text="Betalingsmetode:" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
+        <ComboBox Grid.Row="5" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Width="250" Height="20"
+                  SelectedItem="{Binding PaymentMethod, UpdateSourceTrigger=PropertyChanged}">
             <ComboBoxItem Content="MobilePay"/>
             <ComboBoxItem Content="Bankoverførsel"/>
             <ComboBoxItem Content="Kontant"/>
@@ -54,7 +59,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Content="Annuller" Grid.Column="0" Margin="5"Margin="5,10,5,0" Padding="5"/>
+            <Button Content="Annuller" Grid.Column="0" Margin="10,10,0,0" Padding="5"/>
             <Button Content="Tilføj lejer" Grid.Column="1" Margin="10,10,0,0" Padding="5"/>
         </Grid>
     </Grid>
