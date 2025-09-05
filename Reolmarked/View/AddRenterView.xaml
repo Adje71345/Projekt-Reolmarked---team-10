@@ -1,0 +1,61 @@
+﻿<Window x:Class="Reolmarked.View.AddRenterView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Reolmarked.View"
+        mc:Ignorable="d"
+        Title="Tilføj lejer" Height="300" Width="400">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="105"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="20"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- row 1 -->
+        <TextBox Text="Fornavn:" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
+        <TextBox Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" TextChanged="TextBox_TextChanged_1" TextWrapping="Wrap" Width="250" Height="20"/>
+
+        <!-- row 2 -->
+        <TextBox Text="Efternavn:" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
+        <TextBox Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" TextChanged="TextBox_TextChanged_1" TextWrapping="Wrap" Width="250" Height="20"/>
+
+        <!-- row 3 -->
+        <TextBox Text="Telefonnummer:" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
+        <TextBox Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" TextChanged="TextBox_TextChanged_1" TextWrapping="Wrap" Width="250" Height="20"/>
+
+        <!-- row 4 -->
+        <TextBox Text="Email:" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
+        <TextBox Grid.Row="4" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" TextChanged="TextBox_TextChanged_1" TextWrapping="Wrap" Width="250" Height="20"/>
+
+        <!-- row 5 -->
+        <TextBox Text="Betalingsmetode:" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
+        <ComboBox Grid.Row="5" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Width="250" Height="20">
+            <ComboBoxItem Content="MobilePay"/>
+            <ComboBoxItem Content="Bankoverførsel"/>
+            <ComboBoxItem Content="Kontant"/>
+        </ComboBox>
+
+        <!-- row 6 -->
+        <Grid Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Right" VerticalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Content="Annuller" Grid.Column="0" Margin="5"Margin="5,10,5,0" Padding="5"/>
+            <Button Content="Tilføj lejer" Grid.Column="1" Margin="10,10,0,0" Padding="5"/>
+        </Grid>
+    </Grid>
+</Window>
