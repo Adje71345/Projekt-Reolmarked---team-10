@@ -9,22 +9,54 @@
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="600">
 
+    <!-- Style til DataGrid-rækker-->
+    <UserControl.Resources>
+        <Style x:Key="RenterRowStyle" TargetType="DataGridRow">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="Black"/>
+            
+            <Style.Triggers>
+                <!-- Hver anden række får lys baggrund -->
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(ItemsControl.AlternationIndex)}" Value="1">
+                    <Setter Property="Background" Value="#F9F9F9"/>
+                </DataTrigger>
+
+                <!-- Hover-effekt: Rækken bliver mørkeblå med hvid tekst -->
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1976D2"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+
+                <!-- Markering: Række bliver lysere blå med hvid tekst -->
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#3399FF"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+
+    <!-- Layout: Grid med to rækker-->
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <!-- Søgefelt og knap til at tilføje lejer -->
         <DockPanel Grid.Row="0" Margin="0,0,0,15">
+            <!-- Søg efter lejer-felt-->
             <TextBox Width="250"
              Margin="0,0,10,0"
              Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
              Controls:TextBoxHelper.Watermark="Søg efter lejer..."
              Controls:TextBoxHelper.ClearTextButton="True" />
-
+            
+            <!-- Tilføj ny lejer-knap-->
             <Button Content="Tilføj lejer"
                      Width="120"
-                     Command="{Binding OpenAddRenterWindowCommand}" />
+                     Click="AddRenterButton_Click"/>
         </DockPanel>
 
         <!-- Liste over lejere -->
@@ -46,14 +78,16 @@
                       ColumnHeaderHeight="30"
                       RowHeight="28"
                       FontSize="13"
-                      AlternatingRowBackground="#F9F9F9">
+                      AlternationCount="2"
+                      RowStyle="{StaticResource RenterRowStyle}">
+                
+                <!-- Kolonner i tabellen-->
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Binding="{Binding RenterId}" SortMemberPath="RenterId" Width="50"/>
                     <DataGridTextColumn Header="Fornavn" Binding="{Binding FirstName}" SortMemberPath="FirstName" Width="*"/>
                     <DataGridTextColumn Header="Efternavn" Binding="{Binding LastName}" SortMemberPath="LastName" Width="*"/>
                     <DataGridTextColumn Header="Email" Binding="{Binding Email}" SortMemberPath="Email" Width="*"/>
                     <DataGridTextColumn Header="Telefon" Binding="{Binding Phone}" SortMemberPath="Phone" Width="*"/>
-                    <DataGridTextColumn Header="Bankinfo" Binding="{Binding Bankinfo}" SortMemberPath="Bankinfo" Width="*"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Border>

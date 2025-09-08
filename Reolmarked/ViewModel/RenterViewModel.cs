@@ -39,8 +39,6 @@ namespace Reolmarked.ViewModel
             }
         }
 
-        // Kommando til at åbne vinduet for at tilføje en ny lejer
-        public ICommand OpenAddRenterWindowCommand { get; }
 
         // Constructor hvor repository injiceres og data initialiseres
         public RenterViewModel(IRenterRepository renterRepository)
@@ -53,10 +51,7 @@ namespace Reolmarked.ViewModel
             // Opret en CollectionView til filtrering og sortering
             RentersView = CollectionViewSource.GetDefaultView(Renters);
             RentersView.Filter = FilterRenters; // Sæt filterfunktion
-            RentersView.SortDescriptions.Add(new SortDescription("LastName", ListSortDirection.Ascending)); // Sortér efter efternavn
-
-            // Initialisér kommandoen til at åbne AddRenterView
-            OpenAddRenterWindowCommand = new RelayCommand(OpenAddRenterWindow);
+            RentersView.SortDescriptions.Add(new SortDescription("RenterId", ListSortDirection.Ascending)); // Sortér efter Id
         }
 
         // Filterfunktion som anvendes på RentersView
@@ -74,22 +69,15 @@ namespace Reolmarked.ViewModel
             return false;
         }
 
-        // Åbner vinduet for at tilføje en ny lejer og opdaterer listen hvis en lejer blev tilføjet
-        private void OpenAddRenterWindow()
+        // Metode til at opdatere listen af lejere fra databasen
+        public void RefreshRenters()
         {
-            var addWindow = new AddRenterView();
-            var result = addWindow.ShowDialog();
-
-            if (result == true)
+            Renters.Clear();
+            foreach (var renter in _renterRepository.GetAllRenters())
             {
-                // Genindlæs alle lejere fra databasen og opdater listen
-                Renters.Clear();
-                foreach (var renter in _renterRepository.GetAllRenters())
-                {
-                    Renters.Add(renter);
-                }
-                RentersView.Refresh(); // Genanvend filter og sortering
+                Renters.Add(renter);
             }
+            RentersView.Refresh();
         }
 
         // Event til at informere UI om ændringer i ViewModel
