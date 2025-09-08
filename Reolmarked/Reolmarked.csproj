@@ -13,6 +13,8 @@
     <Folder Include="Repositories\" />
     <Folder Include="View\" />
     <Folder Include="ViewModel\" />
+>>>>>>>>> Temporary merge branch 2
+    <Folder Include="ViewModel\" />
   </ItemGroup>
 
 </Project>
