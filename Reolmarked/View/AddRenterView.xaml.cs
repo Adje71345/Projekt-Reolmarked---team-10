@@ -22,7 +22,9 @@ namespace Reolmarked.View
         public AddRenterView()
         {
             InitializeComponent();
-            DataContext = new Reolmarked.ViewModel.AddRenterViewModel();
+            var vm = new Reolmarked.ViewModel.AddRenterViewModel();
+            vm.RequestClose += (s, e) => this.Close();
+            DataContext = vm;
         }
     }
 }

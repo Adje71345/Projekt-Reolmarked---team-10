@@ -59,8 +59,16 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Content="Annuller" Grid.Column="0" Margin="10,10,0,0" Padding="5"/>
-            <Button Content="Tilføj lejer" Grid.Column="1" Margin="10,10,0,0" Padding="5"/>
+            <Button Content="Annuller"
+                    Grid.Column="0"
+                    Margin="10,10,0,0"
+                    Padding="5"
+                    Command="{Binding CancelCommand}"/>
+            <Button Content="Tilføj lejer"
+                    Grid.Column="1"
+                    Margin="10,10,0,0"
+                    Padding="5"
+                    Command="{Binding AddRenterCommand}"/>
         </Grid>
     </Grid>
 </Window>

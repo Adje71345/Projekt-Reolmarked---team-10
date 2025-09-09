@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Windows.Input;
 
 namespace Reolmarked.ViewModel
 {
@@ -80,5 +81,86 @@ namespace Reolmarked.ViewModel
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        public ICommand AddRenterCommand { get; }
+        public ICommand CancelCommand { get; }
+
+        public AddRenterViewModel()
+        {
+            AddRenterCommand = new RelayCommand(AddRenter, CanAddRenter);
+            CancelCommand = new RelayCommand(Cancel);
+        }
+
+        public event EventHandler RequestClose;
+
+        private void Cancel(object parameter)
+        {
+            // Her kan du gemme data hvis nødvendigt
+            // Fx: SaveDraft(); eller lignende
+
+            // Signalér til View at vinduet skal lukkes
+            RequestClose?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void AddRenter(object parameter)
+        {
+            var renter = new Renter
+            {
+                FirstName = this.FirstName,
+                LastName = this.LastName,
+                PhoneNumber = this.PhoneNumber,
+                Email = this.Email,
+                PaymentMethod = this.PaymentMethod
+            };
+            RenterList.Add(renter);
+
+            // Evt. ryd felterne:
+            FirstName = "";
+            LastName = "";
+            PhoneNumber = "";
+            Email = "";
+            PaymentMethod = "";
+        }
+
+        private bool CanAddRenter(object parameter)
+        {
+            return !string.IsNullOrWhiteSpace(FirstName)
+                && !string.IsNullOrWhiteSpace(LastName)
+                && !string.IsNullOrWhiteSpace(PhoneNumber)
+                && !string.IsNullOrWhiteSpace(Email)
+                && !string.IsNullOrWhiteSpace(PaymentMethod);
+        }
+
+        // RelayCommand implementation
+        public class RelayCommand : ICommand
+        {
+            private readonly Action<object> _execute;
+            private readonly Func<object, bool> _canExecute;
+
+            public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
+            {
+                _execute = execute;
+                _canExecute = canExecute;
+            }
+
+            public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
+            public void Execute(object parameter) => _execute(parameter);
+            public event EventHandler CanExecuteChanged
+            {
+                add => CommandManager.RequerySuggested += value;
+                remove => CommandManager.RequerySuggested -= value;
+            }
+        }
+
+        public class Renter
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string PhoneNumber { get; set; }
+            public string Email { get; set; }
+            public string PaymentMethod { get; set; }
+        }
+
+        public BindingList<Renter> RenterList { get; } = new();
     }
 }
