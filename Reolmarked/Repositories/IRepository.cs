@@ -8,12 +8,12 @@ using Reolmarked.Model;
 namespace Reolmarked.Repositories
 {
     
-    public interface IRepository<Renter> where Renter : class
+    public interface IRepository<T> where T : class
     {
-        IEnumerable<Renter> GetAll();
-        Renter GetById(int id);
-        void Add(Renter entity);
-        void Update(Renter entity);
+        IEnumerable<T> GetAll();
+        T GetById(int id);
+        void Add(T entity);
+        void Update(T entity);
         void Delete(int id);
     }
 }
