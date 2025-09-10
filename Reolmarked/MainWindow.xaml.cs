@@ -8,6 +8,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Extensions.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+
 
 namespace Reolmarked
 {
@@ -19,6 +23,11 @@ namespace Reolmarked
         public MainWindow()
         {
             InitializeComponent();
+
+            IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+
+            string? ConnectionString = config.GetConnectionString("DefaultConnection");
+
             var addRenterView = new Reolmarked.View.AddRenterView();
             addRenterView.Show();
             this.Close();
