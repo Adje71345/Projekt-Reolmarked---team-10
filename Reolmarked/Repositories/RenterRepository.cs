@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Reolmarked.Model;
-
 using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -26,7 +25,10 @@ namespace Reolmarked.Repositories
         public IEnumerable<Renter> GetAll()
         {
             var renters = new List<Renter>();
-            string query = "SELECT * FROM RENTER";
+            string query = @"
+                SELECT r.RenterID, r.FirstName, r.LastName, r.Email, r.Phone, b.BankInfo
+                FROM Renter r
+                LEFT JOIN RenterBankInfo b ON r.RenterID = b.RenterID";
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 SqlCommand command = new SqlCommand(query, connection);
@@ -37,11 +39,12 @@ namespace Reolmarked.Repositories
                     {
                         renters.Add(new Renter
                         {
-                            RenterID = (int)reader["RenterID"],
+                            RenterId = (int)reader["RenterID"],
                             FirstName = (string)reader["FirstName"],
                             LastName = (string)reader["LastName"],
                             Email = (string)reader["Email"],
-                            Phone = (string)reader["Phone"]
+                            Phone = (string)reader["Phone"],
+                            BankInfo = reader["BankInfo"] as string
                         });
                     }
                 }
@@ -52,7 +55,12 @@ namespace Reolmarked.Repositories
         public Renter GetById(int id)
         {
             Renter renter = null;
-            string query = "SELECT * FROM RENTER WHERE RenterID = @RenterID";
+            string query = @"
+                SELECT r.RenterID, r.FirstName, r.LastName, r.Email, r.Phone, b.BankInfo
+                FROM Renter r
+                LEFT JOIN RenterBankInfo b ON r.RenterID = b.RenterID
+                WHERE r.RenterID = @RenterID";
+
             using SqlConnection connection = new SqlConnection(_connectionString);
             {
                 SqlCommand command = new SqlCommand(query, connection);
@@ -64,11 +72,12 @@ namespace Reolmarked.Repositories
                     {
                         renter = new Renter
                         {
-                            RenterID = (int)reader["RenterID"],
+                            RenterId = (int)reader["RenterID"],
                             FirstName = (string)reader["FirstName"],
                             LastName = (string)reader["LastName"],
                             Email = (string)reader["Email"],
-                            Phone = (string)reader["Phone"]
+                            Phone = (string)reader["Phone"],
+                            BankInfo = reader["BankInfo"] as string
                         };
                     }
                 }
@@ -79,43 +88,108 @@ namespace Reolmarked.Repositories
 
         public void Add(Renter renter)
         {
-            string query = "INSERT INTO RENTER (FirstName) VALUES (@FirstName)" +
-                "INSERT INTO RENTER (LastName) VALUES (@LastName)" +
-                "INSERT INTO RENTER (Email) VALUES (@Email)" +
-                "INSERT INTO RENTER (Phone) VALUES (@Phone)";
-
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@FirstName", renter.FirstName);
-                command.Parameters.AddWithValue("@LastName", renter.LastName);
-                command.Parameters.AddWithValue("@Email", renter.Email);
-                command.Parameters.AddWithValue("@Phone", renter.Phone);
                 connection.Open();
-                command.ExecuteNonQuery();
+
+                // Start en transaktion, så begge indsættelser sker atomisk. Hvis én indsættelse fejler, rulles begge tilbage.
+                using (SqlTransaction transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // Indsæt i Renter-tabellen
+                        string renterQuery = @"
+                            INSERT INTO Renter (FirstName, LastName, Email, Phone)
+                            VALUES (@FirstName, @LastName, @Email, @Phone);
+                            SELECT SCOPE_IDENTITY();";
+
+                        SqlCommand renterCommand = new SqlCommand(renterQuery, connection, transaction);
+                        renterCommand.Parameters.AddWithValue("@FirstName", renter.FirstName);
+                        renterCommand.Parameters.AddWithValue("@LastName", renter.LastName);
+                        renterCommand.Parameters.AddWithValue("@Email", renter.Email ?? (object)DBNull.Value);
+                        renterCommand.Parameters.AddWithValue("@Phone", renter.Phone ?? (object)DBNull.Value);
+
+                        renter.RenterId = Convert.ToInt32(renterCommand.ExecuteScalar());
+
+                        // Indsæt i RenterBankInfo-tabellen
+                        string bankQuery = @"
+                            INSERT INTO RenterBankInfo (RenterID, BankInfo)
+                            VALUES (@RenterID, @BankInfo);";
+
+                        SqlCommand bankCommand = new SqlCommand(bankQuery, connection, transaction);
+                        bankCommand.Parameters.AddWithValue("@RenterID", renter.RenterId);
+                        bankCommand.Parameters.AddWithValue("@BankInfo", renter.BankInfo ?? (object)DBNull.Value);
+
+                        bankCommand.ExecuteNonQuery();
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
             }
         }
+
 
         public void Update(Renter renter)
         {
-            string query = "UPDATE RENTER SET FirstName = @FirstName WHERE RenterID = @RenterID";
-
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@FirstName", renter.FirstName);
-                command.Parameters.AddWithValue("@LastName", renter.FirstName);
-                command.Parameters.AddWithValue("@Email", renter.FirstName);
-                command.Parameters.AddWithValue("@Phone", renter.FirstName);
-                command.Parameters.AddWithValue("@RenterID", renter.RenterID);
                 connection.Open();
-                command.ExecuteNonQuery();
+
+                // Start en transaktion
+                using (SqlTransaction transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // Opdater Renter-tabellen
+                        string renterQuery = @"
+                    UPDATE Renter
+                    SET FirstName = @FirstName,
+                        LastName = @LastName,
+                        Email = @Email,
+                        Phone = @Phone
+                    WHERE RenterID = @RenterID";
+
+                        SqlCommand renterCommand = new SqlCommand(renterQuery, connection, transaction);
+                        renterCommand.Parameters.AddWithValue("@FirstName", renter.FirstName);
+                        renterCommand.Parameters.AddWithValue("@LastName", renter.LastName);
+                        renterCommand.Parameters.AddWithValue("@Email", renter.Email ?? (object)DBNull.Value);
+                        renterCommand.Parameters.AddWithValue("@Phone", renter.Phone ?? (object)DBNull.Value);
+                        renterCommand.Parameters.AddWithValue("@RenterID", renter.RenterId);
+
+                        renterCommand.ExecuteNonQuery();
+
+                        // Opdater RenterBankInfo-tabellen
+                        string bankQuery = @"
+                    UPDATE RenterBankInfo
+                    SET BankInfo = @BankInfo
+                    WHERE RenterID = @RenterID";
+
+                        SqlCommand bankCommand = new SqlCommand(bankQuery, connection, transaction);
+                        bankCommand.Parameters.AddWithValue("@BankInfo", renter.BankInfo ?? (object)DBNull.Value);
+                        bankCommand.Parameters.AddWithValue("@RenterID", renter.RenterId);
+
+                        bankCommand.ExecuteNonQuery();
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
             }
         }
 
+
         public void Delete(int id)
         {
-            string query = "DELETE FROM RENTER WHERE RenterID = @RenterID";
+            string query = "DELETE FROM Renter WHERE RenterID = @RenterID";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {

@@ -28,8 +28,6 @@ namespace Reolmarked
 
             string? ConnectionString = config.GetConnectionString("DefaultConnection");
 
-            var addRenterView = new Reolmarked.View.AddRenterView();
-            addRenterView.Show();
             this.Close();
         }
     }

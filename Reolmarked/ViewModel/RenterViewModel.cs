@@ -7,13 +7,16 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using Reolmarked.Commands;
+using Reolmarked.Model;
+using Reolmarked.Repositories;
 
 namespace Reolmarked.ViewModel
 {
-    public class RenterViewModel : INotifyPropertyChanged
+    public class RenterViewModel : ViewModelBase 
     {
         // Repository til kommunikation med databasen
-        private readonly IRenterRepository _renterRepository;
+        private readonly IRepository<Renter> _renterRepository;
 
 
         // Samling af alle lejere hentet fra databasen
@@ -31,20 +34,21 @@ namespace Reolmarked.ViewModel
             get => _searchText;
             set
             {
-                _searchText = value;
-                OnPropertyChanged(nameof(SearchText)); // Opdater UI
-                RentersView.Refresh(); // Genanvend filteret på listen
+                if (SetProperty(ref _searchText, value))
+                {
+                    RentersView.Refresh(); // kun opdater view, hvis værdien faktisk ændres
+                }
             }
         }
 
 
         // Constructor hvor repository injiceres og data initialiseres
-        public RenterViewModel(IRenterRepository renterRepository)
+        public RenterViewModel(IRepository<Renter> renterRepository)
         {
             _renterRepository = renterRepository;
 
             // Hent alle lejere fra databasen og opret ObservableCollection
-            Renters = new ObservableCollection<Renter>(_renterRepository.GetAllRenters());
+            Renters = new ObservableCollection<Renter>(_renterRepository.GetAll());
 
             // Opret en CollectionView til filtrering og sortering
             RentersView = CollectionViewSource.GetDefaultView(Renters);
@@ -71,18 +75,11 @@ namespace Reolmarked.ViewModel
         public void RefreshRenters()
         {
             Renters.Clear();
-            foreach (var renter in _renterRepository.GetAllRenters())
+            foreach (var renter in _renterRepository.GetAll())
             {
                 Renters.Add(renter);
             }
             RentersView.Refresh();
         }
-
-        // Event til at informere UI om ændringer i ViewModel
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        // Metode til at udløse PropertyChanged-event
-        protected void OnPropertyChanged(string name) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }
