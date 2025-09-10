@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Reolmarked.MVVM
+namespace Reolmarked.Commands
 {
     public class ViewModelBase : INotifyPropertyChanged
     {

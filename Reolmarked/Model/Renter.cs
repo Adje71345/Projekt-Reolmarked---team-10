@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Reolmarked
+namespace Reolmarked.Model
 {
     public class Renter
     {
@@ -17,6 +17,7 @@ namespace Reolmarked
         public string BankInfo { get; set; }
 
         // --- Constructor (fra DCD) ---
+        public Renter() { }
         public Renter(string firstName, string lastName, string email, string phone)
         {
             FirstName = firstName;

@@ -10,10 +10,10 @@ namespace Reolmarked.Repositories
     
     public interface IRepository<Renter> where Renter : class
     {
-        IEnumerable<Renter> GetAll();
+        IEnumerable<Renter> GetAllRenters();
         Renter GetById(int id);
-        void Add(Renter entity);
-        void Update(Renter entity);
-        void Delete(int id);
+        void AddRenter(Renter entity);
+        void UpdateRenter(Renter entity);
+        void DeleteRenter(int id);
     }
 }

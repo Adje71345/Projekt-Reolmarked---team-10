@@ -7,13 +7,17 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using Reolmarked.Repositories;
+using Reolmarked.Model;
 
 namespace Reolmarked.ViewModel
 {
     public class RenterViewModel : INotifyPropertyChanged
     {
+        private readonly string _connectionString = "Server=DESKTOP-LC20V6E;Database=ReolMarked;Trusted_Connection=True;";
+
         // Repository til kommunikation med databasen
-        private readonly IRenterRepository _renterRepository;
+        private readonly IRepository<Renter> _renterRepository;
 
 
         // Samling af alle lejere hentet fra databasen
@@ -39,9 +43,9 @@ namespace Reolmarked.ViewModel
 
 
         // Constructor hvor repository injiceres og data initialiseres
-        public RenterViewModel(IRenterRepository renterRepository)
+        public RenterViewModel()
         {
-            _renterRepository = renterRepository;
+            _renterRepository = new RenterRepository(_connectionString);
 
             // Hent alle lejere fra databasen og opret ObservableCollection
             Renters = new ObservableCollection<Renter>(_renterRepository.GetAllRenters());

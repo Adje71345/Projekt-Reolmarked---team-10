@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Reolmarked.Model;
-
 using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -23,7 +22,7 @@ namespace Reolmarked.Repositories
             _connectionString = connectionString;
         }
 
-        public IEnumerable<Renter> GetAll()
+        public IEnumerable<Renter> GetAllRenters()
         {
             var renters = new List<Renter>();
             string query = "SELECT * FROM RENTER";
@@ -37,7 +36,7 @@ namespace Reolmarked.Repositories
                     {
                         renters.Add(new Renter
                         {
-                            RenterID = (int)reader["RenterID"],
+                            RenterId = (int)reader["RenterId"],
                             FirstName = (string)reader["FirstName"],
                             LastName = (string)reader["LastName"],
                             Email = (string)reader["Email"],
@@ -52,11 +51,11 @@ namespace Reolmarked.Repositories
         public Renter GetById(int id)
         {
             Renter renter = null;
-            string query = "SELECT * FROM RENTER WHERE RenterID = @RenterID";
+            string query = "SELECT * FROM RENTER WHERE RenterId = @RenterId";
             using SqlConnection connection = new SqlConnection(_connectionString);
             {
                 SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@RenterID", id);
+                command.Parameters.AddWithValue("@RenterId", id);
                 connection.Open();
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
@@ -64,7 +63,7 @@ namespace Reolmarked.Repositories
                     {
                         renter = new Renter
                         {
-                            RenterID = (int)reader["RenterID"],
+                            RenterId = (int)reader["RenterId"],
                             FirstName = (string)reader["FirstName"],
                             LastName = (string)reader["LastName"],
                             Email = (string)reader["Email"],
@@ -77,7 +76,7 @@ namespace Reolmarked.Repositories
         }
 
 
-        public void Add(Renter renter)
+        public void AddRenter(Renter renter)
         {
             string query = "INSERT INTO RENTER (FirstName) VALUES (@FirstName)" +
                 "INSERT INTO RENTER (LastName) VALUES (@LastName)" +
@@ -96,9 +95,9 @@ namespace Reolmarked.Repositories
             }
         }
 
-        public void Update(Renter renter)
+        public void UpdateRenter(Renter renter)
         {
-            string query = "UPDATE RENTER SET FirstName = @FirstName WHERE RenterID = @RenterID";
+            string query = "UPDATE RENTER SET FirstName = @FirstName WHERE RenterId = @RenterId";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -107,20 +106,20 @@ namespace Reolmarked.Repositories
                 command.Parameters.AddWithValue("@LastName", renter.FirstName);
                 command.Parameters.AddWithValue("@Email", renter.FirstName);
                 command.Parameters.AddWithValue("@Phone", renter.FirstName);
-                command.Parameters.AddWithValue("@RenterID", renter.RenterID);
+                command.Parameters.AddWithValue("@RenterId", renter.RenterId);
                 connection.Open();
                 command.ExecuteNonQuery();
             }
         }
 
-        public void Delete(int id)
+        public void DeleteRenter(int id)
         {
-            string query = "DELETE FROM RENTER WHERE RenterID = @RenterID";
+            string query = "DELETE FROM RENTER WHERE RenterId = @RenterId";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@RenterID", id);
+                command.Parameters.AddWithValue("@RenterId", id);
                 connection.Open();
                 command.ExecuteNonQuery();
             }
