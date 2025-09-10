@@ -13,7 +13,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Extensions.Configuration;
+using Reolmarked.Repositories;
 using Reolmarked.ViewModel;
+using Reolmarked.Model;
 
 namespace Reolmarked.View
 {
@@ -22,22 +25,41 @@ namespace Reolmarked.View
     /// </summary>
     public partial class RenterView : UserControl
     {
+        private readonly IRepository<Renter> _renterRepository;
+        private readonly RenterViewModel _viewModel;
+
         public RenterView()
         {
             InitializeComponent();
-            DataContext = new RenterViewModel(new DataRenterRepository(connectionString));
+
+            // Læs connection string fra appsettings.json
+            IConfigurationRoot config = new ConfigurationBuilder()
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+
+            string connectionString = config.GetConnectionString("DefaultConnection");
+
+            // Opret repository
+            _renterRepository = new RenterRepository(connectionString);
+
+            // Opret ViewModel og sæt som DataContext
+            _viewModel = new RenterViewModel(_renterRepository);
+            DataContext = _viewModel;
         }
 
-        //Click-eventhandler til AddRenterButton
+        // Click-eventhandler til AddRenterButton
         private void AddRenterButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new AddRenterView();
-            var result = dialog.ShowDialog();
+            var dialog = new AddRenterView(_renterRepository);
 
-            if (result == true && DataContext is RenterViewModel vm)
+            // Abonner på RenterAdded event
+            dialog.RenterAdded += (s, args) =>
             {
-                vm.RefreshRenters();
-            }
+                _viewModel.RefreshRenters();
+            };
+
+            dialog.ShowDialog();
         }
 
         //Eventhandler som håndterer UI specifik sortering

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Reolmarked
+namespace Reolmarked.Model
 {
     public class Renter
     {
@@ -25,6 +25,9 @@ namespace Reolmarked
             Phone = phone;
             BankInfo = string.Empty;
         }
+
+        // Parameterløs constructor til data fra DB
+        public Renter() { }
 
         // --- Operations (fra DCD) ---
         public override string ToString()

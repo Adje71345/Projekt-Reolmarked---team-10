@@ -47,10 +47,7 @@
         <!-- row 5 -->
         <TextBlock Text="Betalingsmetode:" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
         <ComboBox Grid.Row="5" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Width="250" Height="20"
-                  SelectedItem="{Binding PaymentMethod, UpdateSourceTrigger=PropertyChanged}">
-            <ComboBoxItem Content="MobilePay"/>
-            <ComboBoxItem Content="Bankoverførsel"/>
-            <ComboBoxItem Content="Kontant"/>
+                  ItemsSource="{Binding PaymentMethods}" SelectedItem="{Binding PaymentMethod, UpdateSourceTrigger=PropertyChanged}">
         </ComboBox>
 
         <!-- row 6 -->
