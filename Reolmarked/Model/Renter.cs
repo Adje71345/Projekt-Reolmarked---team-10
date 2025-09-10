@@ -4,34 +4,50 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Reolmarked.Model
+namespace Reolmarked
 {
     public class Renter
     {
-        public int RenterID { get; set; }
+        // --- Attributes (fra DCD) ---
+        public int RenterId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
-        public string Phone {  get; set; }
+        public string Phone { get; set; }
+        public string BankInfo { get; set; }
 
-        public Renter() { }
-
-        Renter(int RenterID, string firstName, string lastName, string email, string phone)
+        // --- Constructor (fra DCD) ---
+        public Renter(string firstName, string lastName, string email, string phone)
         {
-            this.RenterID = RenterID;
             FirstName = firstName;
             LastName = lastName;
             Email = email;
             Phone = phone;
+            BankInfo = string.Empty;
         }
 
-        public override string ToString ()
+        // --- Operations (fra DCD) ---
+        public override string ToString()
         {
-            throw new NotImplementedException ();
+            // Format: RenterId;FirstName;LastName;Email;Phone;BankInfo
+            return $"{RenterId};{FirstName};{LastName};{Email};{Phone};{BankInfo}";
         }
-        public Renter FromString ()
+
+        public static Renter FromString(string data)
         {
-            throw new NotImplementedException () ;
+            if (data == null) throw new ArgumentNullException(nameof(data));
+            var parts = data.Split(';');
+            if (parts.Length < 6) throw new FormatException("Invalid Renter data");
+
+            var renter = new Renter(parts[1], parts[2], parts[3], parts[4])
+            {
+                BankInfo = parts[5]
+            };
+
+            if (int.TryParse(parts[0], out var id))
+                renter.RenterId = id;
+
+            return renter;
         }
     }
 }

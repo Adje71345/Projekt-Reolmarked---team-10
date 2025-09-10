@@ -27,6 +27,10 @@ namespace Reolmarked
             IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
 
             string? ConnectionString = config.GetConnectionString("DefaultConnection");
+
+            var addRenterView = new Reolmarked.View.AddRenterView();
+            addRenterView.Show();
+            this.Close();
         }
     }
 }

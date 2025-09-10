@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Repositories\" />
     <Folder Include="View\" />
     <Folder Include="View\" />
   </ItemGroup>
@@ -28,6 +29,10 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MahApps.Metro" Version="2.4.10" />
   </ItemGroup>
 
 </Project>

@@ -1,34 +1,88 @@
-﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics.Metrics;
 using System.Linq;
-using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
-using Reolmarked.Model;
-using Reolmarked.MVVM;
-using Reolmarked.Repositories;
+using System.Windows;
+using System.Windows.Data;
+using System.Windows.Input;
 
 namespace Reolmarked.ViewModel
 {
-    public class RenterViewModel : ViewModelBase
+    public class RenterViewModel : INotifyPropertyChanged
     {
-        private static Renter selectedRenter;
-        string connectionString = "Server=DESKTOP-LC20V6E;Database=ReolMarked;Trusted_Connection=True;";
-        IRepository<Renter> renterRepository;
+        // Repository til kommunikation med databasen
+        private readonly IRenterRepository _renterRepository;
 
-        public RenterViewModel ()
+
+        // Samling af alle lejere hentet fra databasen
+        public ObservableCollection<Renter> Renters { get; set; }
+
+
+        // Filtreret og sorteret visning af lejere, som bindes til UI
+        public ICollectionView RentersView { get; set; }
+
+
+        // Søgetekst som brugeren indtaster i søgefeltet
+        private string _searchText;
+        public string SearchText
         {
-            renterRepository = new RenterRepository (connectionString);
+            get => _searchText;
+            set
+            {
+                _searchText = value;
+                OnPropertyChanged(nameof(SearchText)); // Opdater UI
+                RentersView.Refresh(); // Genanvend filteret på listen
+            }
         }
 
-        public Renter SelectedRenter
+
+        // Constructor hvor repository injiceres og data initialiseres
+        public RenterViewModel(IRenterRepository renterRepository)
         {
-            get { return selectedRenter; }
-            set { selectedRenter = value; OnPropertyChanged(); }
+            _renterRepository = renterRepository;
+
+            // Hent alle lejere fra databasen og opret ObservableCollection
+            Renters = new ObservableCollection<Renter>(_renterRepository.GetAllRenters());
+
+            // Opret en CollectionView til filtrering og sortering
+            RentersView = CollectionViewSource.GetDefaultView(Renters);
+            RentersView.Filter = FilterRenters; // Sæt filterfunktion
+            RentersView.SortDescriptions.Add(new SortDescription("RenterId", ListSortDirection.Ascending)); // Sortér efter Id
         }
 
-        public RelayCommand AddRenter = new RelayCommand(execute => renterRepository.Add(selectedRenter));
+        // Filterfunktion som anvendes på RentersView
+        private bool FilterRenters(object obj)
+        {
+            if (obj is Renter renter)
+            {
+                // Returnér true hvis søgeteksten matcher nogen af felterne
+                return string.IsNullOrWhiteSpace(SearchText) ||
+                       renter.FirstName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                       renter.LastName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                       renter.Email.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                       renter.Phone.Contains(SearchText, StringComparison.OrdinalIgnoreCase);
+            }
+            return false;
+        }
 
+        // Metode til at opdatere listen af lejere fra databasen
+        public void RefreshRenters()
+        {
+            Renters.Clear();
+            foreach (var renter in _renterRepository.GetAllRenters())
+            {
+                Renters.Add(renter);
+            }
+            RentersView.Refresh();
+        }
 
+        // Event til at informere UI om ændringer i ViewModel
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        // Metode til at udløse PropertyChanged-event
+        protected void OnPropertyChanged(string name) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }
