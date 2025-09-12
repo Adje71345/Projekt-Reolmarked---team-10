@@ -14,7 +14,7 @@ namespace Reolmarked.Model
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
-        public string BankInfo { get; set; }
+        public int PaymentmethodId { get; set; }
 
         // --- Constructor (fra DCD) ---
         public Renter(string firstName, string lastName, string email, string phone)
@@ -23,20 +23,19 @@ namespace Reolmarked.Model
             LastName = lastName;
             Email = email;
             Phone = phone;
-            BankInfo = string.Empty;
         }
 
         // Parameterløs constructor til data fra DB
         public Renter() { }
 
         // --- Operations (fra DCD) ---
-        public override string ToString()
+        /*public override string ToString()
         {
             // Format: RenterId;FirstName;LastName;Email;Phone;BankInfo
             return $"{RenterId};{FirstName};{LastName};{Email};{Phone};{BankInfo}";
-        }
+        }*/
 
-        public static Renter FromString(string data)
+        /*public static Renter FromString(string data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
             var parts = data.Split(';');
@@ -51,6 +50,6 @@ namespace Reolmarked.Model
                 renter.RenterId = id;
 
             return renter;
-        }
+        }*/
     }
 }

@@ -25,7 +25,8 @@ namespace Reolmarked.View
     /// </summary>
     public partial class RenterView : UserControl
     {
-        private readonly IRepository<Renter> _renterRepository;
+        private readonly IRenterRepository _renterRepository;
+        private readonly IRepository<Paymentmethod> _paymentmethodRepository;
         private readonly RenterViewModel _viewModel;
 
         public RenterView()
@@ -40,8 +41,10 @@ namespace Reolmarked.View
 
             string connectionString = config.GetConnectionString("DefaultConnection");
 
-            // Opret repository
+            // Opret repositories
             _renterRepository = new RenterRepository(connectionString);
+            _paymentmethodRepository = new PaymentmethodRepository(connectionString);
+
 
             // Opret ViewModel og sæt som DataContext
             _viewModel = new RenterViewModel(_renterRepository);
@@ -51,9 +54,8 @@ namespace Reolmarked.View
         // Click-eventhandler til AddRenterButton
         private void AddRenterButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new AddRenterView(_renterRepository);
+            var dialog = new AddRenterView(_renterRepository, _paymentmethodRepository);
 
-            // Abonner på RenterAdded event
             dialog.RenterAdded += (s, args) =>
             {
                 _viewModel.RefreshRenters();
@@ -61,6 +63,7 @@ namespace Reolmarked.View
 
             dialog.ShowDialog();
         }
+
 
         //Eventhandler som håndterer UI specifik sortering
         private void DataGrid_Sorting(object sender, DataGridSortingEventArgs e)

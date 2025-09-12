@@ -47,8 +47,8 @@
         <!-- row 5 -->
         <TextBlock Text="Betalingsmetode:" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
         <ComboBox Grid.Row="5" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Width="250" Height="20"
-                  ItemsSource="{Binding PaymentMethods}" SelectedItem="{Binding PaymentMethod, UpdateSourceTrigger=PropertyChanged}">
-        </ComboBox>
+          ItemsSource="{Binding PaymentMethods}" SelectedValue="{Binding PaymentmethodId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="PaymentmethodId" DisplayMemberPath="Name" />
+
 
         <!-- row 6 -->
         <Grid Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Right" VerticalAlignment="Center">
