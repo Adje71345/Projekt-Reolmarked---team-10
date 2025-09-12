@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Reolmarked.Model;
-using Microsoft.Extensions.Configuration;
-using System.Data;
-using System.Data.SqlClient;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using Reolmarked.Model;
+using Reolmarked.Model.DTO;
 
 
 namespace Reolmarked.Repositories
 {
-    public class RenterRepository : IRepository <Renter>
+    public class RenterRepository : IRenterRepository
     {
         
         private readonly string _connectionString;
@@ -26,9 +27,10 @@ namespace Reolmarked.Repositories
         {
             var renters = new List<Renter>();
             string query = @"
-                SELECT r.RenterID, r.FirstName, r.LastName, r.Email, r.Phone, b.BankInfo
+                SELECT r.RenterID, r.FirstName, r.LastName, r.Email, r.Phone, r.PaymentmethodID, p.Paymentmethod
                 FROM Renter r
-                LEFT JOIN RenterBankInfo b ON r.RenterID = b.RenterID";
+                JOIN Paymentmethod p ON r.PaymentmethodID = p.PaymentmethodID";
+
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 SqlCommand command = new SqlCommand(query, connection);
@@ -44,7 +46,7 @@ namespace Reolmarked.Repositories
                             LastName = (string)reader["LastName"],
                             Email = (string)reader["Email"],
                             Phone = (string)reader["Phone"],
-                            BankInfo = reader["BankInfo"] as string
+                            PaymentmethodId = (int)reader["PaymentmethodID"],
                         });
                     }
                 }
@@ -56,9 +58,9 @@ namespace Reolmarked.Repositories
         {
             Renter renter = null;
             string query = @"
-                SELECT r.RenterID, r.FirstName, r.LastName, r.Email, r.Phone, b.BankInfo
+                SELECT r.RenterID, r.FirstName, r.LastName, r.Email, r.Phone, r.PaymentmethodID, p.Paymentmethod
                 FROM Renter r
-                LEFT JOIN RenterBankInfo b ON r.RenterID = b.RenterID
+                JOIN Paymentmethod p ON r.PaymentmethodID = p.PaymentmethodID
                 WHERE r.RenterID = @RenterID";
 
             using SqlConnection connection = new SqlConnection(_connectionString);
@@ -77,7 +79,7 @@ namespace Reolmarked.Repositories
                             LastName = (string)reader["LastName"],
                             Email = (string)reader["Email"],
                             Phone = (string)reader["Phone"],
-                            BankInfo = reader["BankInfo"] as string
+                            PaymentmethodId = (int)reader["PaymentmethodID"],
                         };
                     }
                 }
@@ -85,53 +87,93 @@ namespace Reolmarked.Repositories
             return renter;
         }
 
+        // Metoder til at hente data til visning med Paymentmethod navn inkluderet
+        public IEnumerable<RenterDisplayDTO> GetAllDisplay()
+        {
+            var renters = new List<RenterDisplayDTO>();
+            string query = @"
+            SELECT r.RenterID, r.FirstName, r.LastName, r.Email, r.Phone, p.Paymentmethod
+            FROM Renter r
+            JOIN Paymentmethod p ON r.PaymentmethodID = p.PaymentmethodID";
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                SqlCommand command = new SqlCommand(query, connection);
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        renters.Add(new RenterDisplayDTO
+                        {
+                            RenterId = (int)reader["RenterID"],
+                            FirstName = (string)reader["FirstName"],
+                            LastName = (string)reader["LastName"],
+                            Email = (string)reader["Email"],
+                            Phone = (string)reader["Phone"],
+                            PaymentmethodName = reader["Paymentmethod"] as string
+                        });
+                    }
+                }
+            }
+            return renters;
+        }
+
+        // Hent en enkelt Renter med Paymentmethod navn til visning
+        public RenterDisplayDTO GetByIdDisplay(int id)
+        {
+            RenterDisplayDTO renter = null;
+            string query = @"
+            SELECT r.RenterID, r.FirstName, r.LastName, r.Email, r.Phone, p.Paymentmethod
+            FROM Renter r
+            JOIN Paymentmethod p ON r.PaymentmethodID = p.PaymentmethodID
+            WHERE r.RenterID = @RenterID";
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@RenterID", id);
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        renter = new RenterDisplayDTO
+                        {
+                            RenterId = (int)reader["RenterID"],
+                            FirstName = (string)reader["FirstName"],
+                            LastName = (string)reader["LastName"],
+                            Email = (string)reader["Email"],
+                            Phone = (string)reader["Phone"],
+                            PaymentmethodName = reader["Paymentmethod"] as string
+                        };
+                    }
+                }
+            }
+            return renter;
+        }
 
         public void Add(Renter renter)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
+                string query = @"
+                INSERT INTO Renter (FirstName, LastName, Email, Phone, PaymentmethodID)
+                VALUES (@FirstName, @LastName, @Email, @Phone, @PaymentmethodID);
+                SELECT SCOPE_IDENTITY();";
 
-                // Start en transaktion, så begge indsættelser sker atomisk. Hvis én indsættelse fejler, rulles begge tilbage.
-                using (SqlTransaction transaction = connection.BeginTransaction())
-                {
-                    try
-                    {
-                        // Indsæt i Renter-tabellen
-                        string renterQuery = @"
-                            INSERT INTO Renter (FirstName, LastName, Email, Phone)
-                            VALUES (@FirstName, @LastName, @Email, @Phone);
-                            SELECT SCOPE_IDENTITY();";
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@FirstName", renter.FirstName);
+                command.Parameters.AddWithValue("@LastName", renter.LastName);
+                command.Parameters.AddWithValue("@Email", renter.Email ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@Phone", renter.Phone ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@PaymentmethodID", renter.PaymentmethodId);
 
-                        SqlCommand renterCommand = new SqlCommand(renterQuery, connection, transaction);
-                        renterCommand.Parameters.AddWithValue("@FirstName", renter.FirstName);
-                        renterCommand.Parameters.AddWithValue("@LastName", renter.LastName);
-                        renterCommand.Parameters.AddWithValue("@Email", renter.Email ?? (object)DBNull.Value);
-                        renterCommand.Parameters.AddWithValue("@Phone", renter.Phone ?? (object)DBNull.Value);
-
-                        renter.RenterId = Convert.ToInt32(renterCommand.ExecuteScalar());
-
-                        // Indsæt i RenterBankInfo-tabellen
-                        string bankQuery = @"
-                            INSERT INTO RenterBankInfo (RenterID, BankInfo)
-                            VALUES (@RenterID, @BankInfo);";
-
-                        SqlCommand bankCommand = new SqlCommand(bankQuery, connection, transaction);
-                        bankCommand.Parameters.AddWithValue("@RenterID", renter.RenterId);
-                        bankCommand.Parameters.AddWithValue("@BankInfo", renter.BankInfo ?? (object)DBNull.Value);
-
-                        bankCommand.ExecuteNonQuery();
-
-                        transaction.Commit();
-                    }
-                    catch
-                    {
-                        transaction.Rollback();
-                        throw;
-                    }
-                }
+                renter.RenterId = Convert.ToInt32(command.ExecuteScalar());
             }
         }
+        
 
 
         public void Update(Renter renter)
@@ -139,52 +181,27 @@ namespace Reolmarked.Repositories
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
+                string query = @"
+                UPDATE Renter
+                SET FirstName = @FirstName,
+                    LastName = @LastName,
+                    Email = @Email,
+                    Phone = @Phone,
+                    PaymentmethodID = @PaymentmethodID
+                WHERE RenterID = @RenterID";
 
-                // Start en transaktion
-                using (SqlTransaction transaction = connection.BeginTransaction())
-                {
-                    try
-                    {
-                        // Opdater Renter-tabellen
-                        string renterQuery = @"
-                    UPDATE Renter
-                    SET FirstName = @FirstName,
-                        LastName = @LastName,
-                        Email = @Email,
-                        Phone = @Phone
-                    WHERE RenterID = @RenterID";
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@FirstName", renter.FirstName);
+                command.Parameters.AddWithValue("@LastName", renter.LastName);
+                command.Parameters.AddWithValue("@Email", renter.Email ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@Phone", renter.Phone ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@PaymentmethodID", renter.PaymentmethodId);
+                command.Parameters.AddWithValue("@RenterID", renter.RenterId);
 
-                        SqlCommand renterCommand = new SqlCommand(renterQuery, connection, transaction);
-                        renterCommand.Parameters.AddWithValue("@FirstName", renter.FirstName);
-                        renterCommand.Parameters.AddWithValue("@LastName", renter.LastName);
-                        renterCommand.Parameters.AddWithValue("@Email", renter.Email ?? (object)DBNull.Value);
-                        renterCommand.Parameters.AddWithValue("@Phone", renter.Phone ?? (object)DBNull.Value);
-                        renterCommand.Parameters.AddWithValue("@RenterID", renter.RenterId);
-
-                        renterCommand.ExecuteNonQuery();
-
-                        // Opdater RenterBankInfo-tabellen
-                        string bankQuery = @"
-                    UPDATE RenterBankInfo
-                    SET BankInfo = @BankInfo
-                    WHERE RenterID = @RenterID";
-
-                        SqlCommand bankCommand = new SqlCommand(bankQuery, connection, transaction);
-                        bankCommand.Parameters.AddWithValue("@BankInfo", renter.BankInfo ?? (object)DBNull.Value);
-                        bankCommand.Parameters.AddWithValue("@RenterID", renter.RenterId);
-
-                        bankCommand.ExecuteNonQuery();
-
-                        transaction.Commit();
-                    }
-                    catch
-                    {
-                        transaction.Rollback();
-                        throw;
-                    }
-                }
+                command.ExecuteNonQuery();
             }
         }
+
 
 
         public void Delete(int id)
@@ -199,6 +216,5 @@ namespace Reolmarked.Repositories
                 command.ExecuteNonQuery();
             }
         }
-
     }
 }

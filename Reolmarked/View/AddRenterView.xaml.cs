@@ -26,21 +26,18 @@ namespace Reolmarked.View
     {
         public event EventHandler RenterAdded;
 
-        public AddRenterView(IRepository<Renter> renterRepository)
+        public AddRenterView(IRenterRepository renterRepository, IRepository<Paymentmethod> paymentmethodRepository)
         {
             InitializeComponent();
 
-            // Opret ViewModel og sæt som DataContext
-            var vm = new Reolmarked.ViewModel.AddRenterViewModel(renterRepository);
+            var vm = new AddRenterViewModel(renterRepository, paymentmethodRepository);
 
-            // Når ViewModel lukker, luk vinduet og trig event
             vm.RequestClose += (s, e) =>
             {
                 RenterAdded?.Invoke(this, EventArgs.Empty);
                 this.Close();
             };
 
-            //Sæt DataContext
             DataContext = vm;
         }
     }
