@@ -11,15 +11,16 @@ namespace Reolmarked.Model
         //Attributter
         public int RentalId { get; set; }
         public int RenterId { get; set; } //-----skal den ikke hente RenterId fra Renter klassen???
+        public int RackId { get; set; }
         public DateOnly StartDate { get; set; }
-        public DateOnly EndDate { get; set; }
+        public DateOnly? EndDate { get; set; }
 
         //Constructor
-        public RentalContract(int rentalId, int renterId, DateOnly starDate, DateOnly endDate)
+        public RentalContract(int rentalId, int renterId, DateOnly startDate, DateOnly endDate)
         {
             RentalId = rentalId;
             RenterId = renterId;
-            StartDate = starDate;
+            StartDate = startDate;
             EndDate = endDate;
         }
         //Parameterløs contructor
