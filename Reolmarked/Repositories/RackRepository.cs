@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using Reolmarked.Model;
-
 
 namespace Reolmarked.Repositories
 {
     public class RackRepository : IRackRepository
     {
-
         private readonly string _connectionString;
 
         public RackRepository(string connectionString)
@@ -20,192 +12,189 @@ namespace Reolmarked.Repositories
             _connectionString = connectionString;
         }
 
-        // Henter alle reoler fra databasen 
-
-        public IEnumerable<Rack> GetAll()
+        // Tilføjer en ny reol i databasen
+        public void Add(Rack rack)
         {
-            var racks = new List<Rack>();
-            string query = @"
-                SELECT RackId, Status
-                FROM Rack";
+            using var connection = new SqlConnection(_connectionString);
+            connection.Open();
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                SqlCommand command = new SqlCommand(query, connection);
-                connection.Open();
-                using (SqlDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        racks.Add(new Rack
-                        {
-                            RackId = (int)reader["RackId"],
-                            Status = (RackStatus)(int)reader["Status"]
-                        });
-                    }
-                }
-            }
-            return racks;
+            string query = @"
+                INSERT INTO Rack (Status)
+                VALUES (@Status);
+                SELECT SCOPE_IDENTITY();";
+
+            var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@Status", (int)rack.Status);
+
+            
+            rack.RackId = Convert.ToInt32(command.ExecuteScalar());
         }
 
-        // Henter en enkelt reol baseret på Id
+       // Opdaterer en eksisterende reol i databasen
+        public void Update(Rack rack)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            connection.Open();
+
+            string query = @"
+                UPDATE Rack
+                SET Status = @Status
+                WHERE RackID = @RackID";
+
+            var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@Status", (int)rack.Status);
+            command.Parameters.AddWithValue("@RackID", rack.RackId);
+
+            command.ExecuteNonQuery();
+        }
+
+        // Sletter en reol i databasen, ud fra id
+        public void Delete(int id)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            connection.Open();
+
+            string query = "DELETE FROM Rack WHERE RackID = @RackID";
+
+            var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@RackID", id);
+
+            command.ExecuteNonQuery();
+        }
+
+        // Finder en reol i database ud fra id
         public Rack GetById(int id)
         {
             Rack rack = null;
-            string query = @"
-                SELECT RackID, Status
-                FROM RACK
-                WHERE RackId = @RackId";
+            string query = "SELECT RackID, Status FROM Rack WHERE RackID = @RackID";
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using var connection = new SqlConnection(_connectionString);
+            var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@RackID", id);
+
+            connection.Open();
+            using var reader = command.ExecuteReader();
+            if (reader.Read())
             {
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@RackID", id);
-
-                connection.Open();
-                using (SqlDataReader reader = command.ExecuteReader())
+                rack = new Rack
                 {
-                    if (reader.Read())
-                    {
-                        rack = new Rack
-                        {
-                            RackId = (int)reader["RackID"],
-                            Status = (RackStatus)(int)reader["Status"]
-                        };
-                    }
-                }
+                    RackId = (int)reader["RackID"],
+                    Status = (RackStatus)(int)reader["Status"]
+                };
             }
+
             return rack;
         }
 
-        // Henter alle reoler med ledig status 
+        // henter alle reoler fra database 
+        public IEnumerable<Rack> GetAll()
+        {
+            var racks = new List<Rack>();
+            string query = "SELECT RackID, Status FROM Rack";
+
+            using var connection = new SqlConnection(_connectionString);
+            var command = new SqlCommand(query, connection);
+
+            connection.Open();
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                racks.Add(new Rack
+                {
+                    RackId = (int)reader["RackID"],
+                    Status = (RackStatus)(int)reader["Status"]
+                });
+            }
+
+            return racks;
+        }
+
+   
+
+        // Henter alle reoler med status = Ledig (til Reoloversigt)
         public IEnumerable<Rack> GetAvailableRacks()
         {
             var racks = new List<Rack>();
             string query = "SELECT RackID, Status FROM Rack WHERE Status = @Status";
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@Status", (int)RackStatus.Ledig);
+            using var connection = new SqlConnection(_connectionString);
+            var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@Status", (int)RackStatus.Ledig);
 
-                connection.Open();
-                using (SqlDataReader reader = command.ExecuteReader())
+            connection.Open();
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                racks.Add(new Rack
                 {
-                    while (reader.Read())
-                    {
-                        racks.Add(new Rack
-                        {
-                            RackId = (int)reader["RackID"],
-                            Status = (RackStatus)(int)reader["Status"]
-                        });
-                    }
-                }
+                    RackId = (int)reader["RackID"],
+                    Status = (RackStatus)(int)reader["Status"]
+                });
             }
 
             return racks;
         }
 
-        // Henter alle reoler med optaget status 
+        // Henter alle reoler med status = Optaget (til reoloversigt)
         public IEnumerable<Rack> GetOccupiedRacks()
         {
             var racks = new List<Rack>();
             string query = "SELECT RackID, Status FROM Rack WHERE Status = @Status";
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@Status", (int)RackStatus.Optaget);
+            using var connection = new SqlConnection(_connectionString);
+            var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@Status", (int)RackStatus.Optaget);
 
-                connection.Open();
-                using (SqlDataReader reader = command.ExecuteReader())
+            connection.Open();
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                racks.Add(new Rack
                 {
-                    while (reader.Read())
-                    {
-                        racks.Add(new Rack
-                        {
-                            RackId = (int)reader["RackID"],
-                            Status = (RackStatus)(int)reader["Status"]
-                        });
-                    }
-                }
+                    RackId = (int)reader["RackID"],
+                    Status = (RackStatus)(int)reader["Status"]
+                });
             }
 
             return racks;
         }
 
-        // Opdaterer status for en reol 
-        public void UpdateRackStatus(int rackId, RackStatus? newStatus)
+        // Opdaterer status på en enkelt reol (for læsbarhed i domænemetoder, kan evt fjernes)
+        public void UpdateRackStatus(int rackId, RackStatus newStatus)
         {
             string query = "UPDATE Rack SET Status = @Status WHERE RackID = @RackID";
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@Status", (int)newStatus);
-                command.Parameters.AddWithValue("@RackID", rackId);
+            using var connection = new SqlConnection(_connectionString);
+            var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@Status", (int)newStatus);
+            command.Parameters.AddWithValue("@RackID", rackId);
 
-                connection.Open();
-                command.ExecuteNonQuery();
-            }
+            connection.Open();
+            command.ExecuteNonQuery();
         }
 
-
-        // Tilføjer en ny reol til databasen
-        public void Add(Rack rack)
+        //  Opdaterer status for alle reoler, hvor kontrakten er udløbet (kan bruges når man åbner reolovertsigt UI, eller evt på en "opdater" knap i UI?
+        public void UpdateStatusesForEndedContracts()
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-                string query = @"
-                INSERT INTO Rack (Status)
-                VALUES (@Status);
-                SELECT SCOPE_IDENTITY();";
-
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@Status", (int)rack.Status);
-
-                rack.RackId = Convert.ToInt32(command.ExecuteScalar());
-            }
-        }
-
-        // Opdaterer en eksisterense reoli databasen
-        public void Update(Rack rack)
-        {
-            using(SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-                string query = @"
+            string query = @"
                 UPDATE Rack
-                SET Status = @Status
-                WHERE RackID = @RackID";
+                SET Status = @Ledig
+                WHERE RackID IN (
+                    SELECT RackID
+                    FROM RentalContract
+                    WHERE EndDate IS NOT NULL AND EndDate <= @Today
+                )";
 
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@Status", (int)rack.Status);
-                command.Parameters.AddWithValue("@RackID", rack.RackId);
+            using var connection = new SqlConnection(_connectionString);
+            var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@Ledig", (int)RackStatus.Ledig);
 
-                command.ExecuteNonQuery();
-            }
+            
+            command.Parameters.AddWithValue("@Today", DateOnly.FromDateTime(DateTime.Today).ToDateTime(TimeOnly.MinValue));
+
+            connection.Open();
+            command.ExecuteNonQuery();
         }
-
-        // Sletter en reol fra databasen baseret på RackId
-        public void Delete(int id)
-        {
-            string query = "DELETE FROM Rack WHERE RackID = @RackID";
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@RackID", id);
-                connection.Open();
-                command.ExecuteNonQuery();
-            }
-
-        }
-
 
     }
-
-
-
 }

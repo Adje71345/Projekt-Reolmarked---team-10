@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Reolmarked.Model;
+﻿using Reolmarked.Model;
 
 namespace Reolmarked.Repositories
 {
+    // Interface for RentalContractRepository - arver fra generisk IRepository
+    // og tilføjer specialiserede metoder til lejekontrakter
     public interface IRentalContractRepository : IRepository<RentalContract>
     {
+        // Henter aktiv kontrakt for en bestemt reol
         RentalContract GetActiveContractByRack(int rackId);
+
+        // Henter alle aktive kontrakter for en bestemt lejer
         IEnumerable<RentalContract> GetActiveContractsByRenter(int renterId);
-        void TerminateContractByRack(int rackId);
-        void TerminateContractByRenter(int renterId);
-        void RenewContract(int rentalId, DateTime? newEndDate);
+
+        // Opsiger en enkelt kontrakt ved at sætte slutdato
+        void TerminateSingleContract(int rentalId, DateOnly endDate);
     }
 }

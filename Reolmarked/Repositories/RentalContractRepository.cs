@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using Reolmarked.Model;
 
 namespace Reolmarked.Repositories
@@ -17,245 +12,35 @@ namespace Reolmarked.Repositories
             _connectionString = connectionString;
         }
 
-        // Tilføjer en ny lejekontrakt
+        
+        // Tilføjer en ny kontrakt
         public void Add(RentalContract rentalContract)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-                string query = @"
+            using var connection = new SqlConnection(_connectionString);
+            connection.Open();
+
+            string query = @"
                 INSERT INTO RentalContract (RenterID, RackID, StartDate, EndDate)
                 VALUES (@RenterID, @RackID, @StartDate, @EndDate);
                 SELECT SCOPE_IDENTITY();";
 
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@RenterID", rentalContract.RenterId);
-                command.Parameters.AddWithValue("@RackID", rentalContract.RackId);
-                command.Parameters.AddWithValue("@StartDate", rentalContract.StartDate);
-                command.Parameters.AddWithValue("@EndDate", rentalContract.EndDate?? (object)DBNull.Value);
+            var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@RenterID", rentalContract.RenterId);
+            command.Parameters.AddWithValue("@RackID", rentalContract.RackId);
 
-                rentalContract.RentalId = Convert.ToInt32(command.ExecuteScalar());
-            }
+            // konverterer DateOnly til DateTime, fordi sql ikek kender dateonly
+            command.Parameters.AddWithValue("@StartDate", rentalContract.StartDate.ToDateTime(TimeOnly.MinValue));
+            command.Parameters.AddWithValue("@EndDate", rentalContract.EndDate?.ToDateTime(TimeOnly.MinValue) ?? (object)DBNull.Value);
 
-            // Opdater reolstatus til Optaget
-            var rackRepo = new RackRepository(_connectionString);
-            var rack = new Rack
-            {
-                RackId = rentalContract.RackId,
-                Status = RackStatus.Optaget
-            };
-            rackRepo.Update(rack);
+            rentalContract.RentalId = Convert.ToInt32(command.ExecuteScalar());
         }
 
-        // Sletter en lejekontrakt
-        public void Delete(int id)
-        {
-            string query = "DELETE FROM RentalContract WHERE RentalID = @RentalID";
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@RentalID", id);
-
-                connection.Open();
-                command.ExecuteNonQuery();
-            }
-        }
-
-        // Henter aktiv kontrakt for en bestemt reol
-        public RentalContract GetActiveContractByRack(int rackId)
-        {
-            RentalContract contract = null;
-            string query = @"
-                SELECT RentalID, RenterID, RackID, StartDate, EndDate
-                FROM RentalContract
-                WHERE RackID = @RackID AND EndDate IS NULL";
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@RackID", rackId);
-
-                connection.Open();
-                using (SqlDataReader reader = command.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        contract = new RentalContract
-                        {
-                            RentalId = (int)reader["RentalID"],
-                            RenterId = (int)reader["RenterID"],
-                            RackId = (int)reader["RackID"],
-                            StartDate = (DateOnly)reader["StartDate"],
-                            EndDate = null
-                        };
-                    }
-                }
-            }
-
-            return contract;
-        }
-
-        // Henter alle aktive kontrakter for en lejer
-        public IEnumerable<RentalContract> GetActiveContractsByRenter(int renterId)
-        {
-            var contracts = new List<RentalContract>();
-            string query = @"
-                SELECT RentalID, RenterID, RackID, StartDate, EndDate
-                FROM RentalContract
-                WHERE RenterID = @RenterID AND EndDate IS NULL";
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@RenterID", renterId);
-
-                connection.Open();
-                using (SqlDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        contracts.Add(new RentalContract
-                        {
-                            RentalId = (int)reader["RentalID"],
-                            RenterId = (int)reader["RenterID"],
-                            RackId = (int)reader["RackID"],
-                            StartDate = (DateOnly)reader["StartDate"],
-                            EndDate = null
-                        });
-                    }
-                }
-            }
-
-            return contracts;
-        }
-
-        // Henter alle kontrakter
-        public IEnumerable<RentalContract> GetAll()
-        {
-            var contracts = new List<RentalContract>();
-            string query = "SELECT RentalID, RenterID, RackID, StartDate, EndDate FROM RentalContract";
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                SqlCommand command = new SqlCommand(query, connection);
-                connection.Open();
-
-                using (SqlDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        contracts.Add(new RentalContract
-                        {
-                            RentalId = (int)reader["RentalID"],
-                            RenterId = (int)reader["RenterID"],
-                            RackId = (int)reader["RackID"],
-                            StartDate = (DateOnly)reader["StartDate"],
-                            EndDate = reader["EndDate"] == DBNull.Value ? null : (DateOnly?)reader["EndDate"]
-                        });
-                    }
-                }
-            }
-
-            return contracts;
-        }
-
-        // Henter én kontrakt baseret på ID
-        public RentalContract GetById(int id)
-        {
-            RentalContract contract = null;
-            string query = "SELECT RentalID, RenterID, RackID, StartDate, EndDate FROM RentalContract WHERE RentalID = @RentalID";
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@RentalID", id);
-
-                connection.Open();
-                using (SqlDataReader reader = command.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        contract = new RentalContract
-                        {
-                            RentalId = (int)reader["RentalID"],
-                            RenterId = (int)reader["RenterID"],
-                            RackId = (int)reader["RackID"],
-                            StartDate = (DateOnly)reader["StartDate"],
-                            EndDate = reader["EndDate"] == DBNull.Value ? null : (DateOnly?)reader["EndDate"]
-                        };
-                    }
-                }
-            }
-
-            return contract;
-        }
-
-        // Fornyer en kontrakt med ny slutdato (eller fjerner den)
-        public void RenewContract(int rentalId, DateTime? newEndDate)
-        {
-            string query = @"
-                UPDATE RentalContract
-                SET EndDate = @EndDate
-                WHERE RentalID = @RentalID";
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@EndDate", newEndDate ?? (object)DBNull.Value);
-                command.Parameters.AddWithValue("@RentalID", rentalId);
-
-                connection.Open();
-                command.ExecuteNonQuery();
-            }
-        }
-
-        // Opsiger kontrakt via reol
-        public void TerminateContractByRack(int rackId)
-        {
-            var contract = GetActiveContractByRack(rackId);
-            if (contract == null) return;
-
-            string query = "UPDATE RentalContract SET EndDate = @EndDate WHERE RentalID = @RentalID";
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@EndDate", DateTime.Now);
-                command.Parameters.AddWithValue("@RentalID", contract.RentalId);
-
-                connection.Open();
-                command.ExecuteNonQuery();
-            }
-
-            new RackRepository(_connectionString).UpdateRackStatus(rackId, RackStatus.Ledig);
-        }
-
-        // Opsiger alle aktive kontrakter for en lejer
-        public void TerminateContractByRenter(int renterId)
-        {
-            var contracts = GetActiveContractsByRenter(renterId);
-            foreach (var contract in contracts)
-            {
-                string query = "UPDATE RentalContract SET EndDate = @EndDate WHERE RentalID = @RentalID";
-
-                using (SqlConnection connection = new SqlConnection(_connectionString))
-                {
-                    SqlCommand command = new SqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@EndDate", DateTime.Now);
-                    command.Parameters.AddWithValue("@RentalID", contract.RentalId);
-
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-
-                new RackRepository(_connectionString).UpdateRackStatus(contract.RackId, RackStatus.Ledig);
-            }
-        }
-
-        // Opdaterer en eksisterende kontrakt
+        // Opdaterer en kontrakt
         public void Update(RentalContract rentalContract)
         {
+            using var connection = new SqlConnection(_connectionString);
+            connection.Open();
+
             string query = @"
                 UPDATE RentalContract
                 SET RenterID = @RenterID,
@@ -264,19 +49,164 @@ namespace Reolmarked.Repositories
                     EndDate = @EndDate
                 WHERE RentalID = @RentalID";
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@RenterID", rentalContract.RenterId);
-                command.Parameters.AddWithValue("@RackID", rentalContract.RackId);
-                command.Parameters.AddWithValue("@StartDate", rentalContract.StartDate);
-                command.Parameters.AddWithValue("@EndDate", rentalContract.EndDate ?? (object)DBNull.Value);
-                command.Parameters.AddWithValue("@RentalID", rentalContract.RentalId);
+            var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@RenterID", rentalContract.RenterId);
+            command.Parameters.AddWithValue("@RackID", rentalContract.RackId);
+            command.Parameters.AddWithValue("@StartDate", rentalContract.StartDate.ToDateTime(TimeOnly.MinValue));
+            command.Parameters.AddWithValue("@EndDate", rentalContract.EndDate?.ToDateTime(TimeOnly.MinValue) ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@RentalID", rentalContract.RentalId);
 
-                connection.Open();
-                command.ExecuteNonQuery();
+            command.ExecuteNonQuery();
+        }
+
+        // Sletter en kontrakt ud fra ID
+        public void Delete(int id)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            connection.Open();
+
+            string query = "DELETE FROM RentalContract WHERE RentalID = @RentalID";
+
+            var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@RentalID", id);
+
+            command.ExecuteNonQuery();
+        }
+
+        // Finder kontrakt ud fra ID
+        public RentalContract GetById(int id)
+        {
+            RentalContract contract = null;
+            string query = "SELECT RentalID, RenterID, RackID, StartDate, EndDate FROM RentalContract WHERE RentalID = @RentalID";
+
+            using var connection = new SqlConnection(_connectionString);
+            var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@RentalID", id);
+
+            connection.Open();
+            using var reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                contract = new RentalContract
+                {
+                    RentalId = (int)reader["RentalID"],
+                    RenterId = (int)reader["RenterID"],
+                    RackId = (int)reader["RackID"],
+
+                    StartDate = DateOnly.FromDateTime((DateTime)reader["StartDate"]),
+                    EndDate = reader["EndDate"] == DBNull.Value
+                        ? null
+                        : DateOnly.FromDateTime((DateTime)reader["EndDate"])
+                };
             }
+
+            return contract;
+        }
+
+        // Henter alle kontrakter
+        public IEnumerable<RentalContract> GetAll()
+        {
+            var contracts = new List<RentalContract>();
+            string query = "SELECT RentalID, RenterID, RackID, StartDate, EndDate FROM RentalContract";
+
+            using var connection = new SqlConnection(_connectionString);
+            var command = new SqlCommand(query, connection);
+
+            connection.Open();
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                contracts.Add(new RentalContract
+                {
+                    RentalId = (int)reader["RentalID"],
+                    RenterId = (int)reader["RenterID"],
+                    RackId = (int)reader["RackID"],
+
+                    StartDate = DateOnly.FromDateTime((DateTime)reader["StartDate"]),
+                    EndDate = reader["EndDate"] == DBNull.Value
+                        ? null
+                        : DateOnly.FromDateTime((DateTime)reader["EndDate"])
+                });
+            }
+
+            return contracts;
+        }
+
+        
+
+        // Finder aktiv kontrakt for en bestemt reol
+        public RentalContract GetActiveContractByRack(int rackId)
+        {
+            RentalContract contract = null;
+            string query = @"
+                SELECT RentalID, RenterID, RackID, StartDate, EndDate
+                FROM RentalContract
+                WHERE RackID = @RackID AND EndDate IS NULL";
+
+            using var connection = new SqlConnection(_connectionString);
+            var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@RackID", rackId);
+
+            connection.Open();
+            using var reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                contract = new RentalContract
+                {
+                    RentalId = (int)reader["RentalID"],
+                    RenterId = (int)reader["RenterID"],
+                    RackId = (int)reader["RackID"],
+
+                    StartDate = DateOnly.FromDateTime((DateTime)reader["StartDate"]),
+                    EndDate = null
+                };
+            }
+
+            return contract;
+        }
+
+        // Finder alle aktive kontrakter for en bestemt lejer
+        public IEnumerable<RentalContract> GetActiveContractsByRenter(int renterId)
+        {
+            var contracts = new List<RentalContract>();
+            string query = @"
+                SELECT RentalID, RenterID, RackID, StartDate, EndDate
+                FROM RentalContract
+                WHERE RenterID = @RenterID AND EndDate IS NULL";
+
+            using var connection = new SqlConnection(_connectionString);
+            var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@RenterID", renterId);
+
+            connection.Open();
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                contracts.Add(new RentalContract
+                {
+                    RentalId = (int)reader["RentalID"],
+                    RenterId = (int)reader["RenterID"],
+                    RackId = (int)reader["RackID"],
+
+                    StartDate = DateOnly.FromDateTime((DateTime)reader["StartDate"]),
+                    EndDate = null
+                });
+            }
+
+            return contracts;
+        }
+
+        // Opsiger en enkelt kontrakt med slutdato 
+        public void TerminateSingleContract(int rentalId, DateOnly endDate)
+        {
+            var contract = GetById(rentalId);
+            if (contract == null) return;
+
+            contract.EndDate = endDate;
+            Update(contract);
+
+            // Bemærk: Rack status ændres ikke her
+            // Det håndteres i RackRepository.UpdateStatusesForEndedContracts()
         }
     }
-
 }
