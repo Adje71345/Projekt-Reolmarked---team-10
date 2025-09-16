@@ -9,34 +9,6 @@
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="600">
 
-    <!-- Style til DataGrid-rækker-->
-    <UserControl.Resources>
-        <Style x:Key="RenterRowStyle" TargetType="DataGridRow">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="Black"/>
-            
-            <Style.Triggers>
-                <!-- Hver anden række får lys baggrund -->
-                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(ItemsControl.AlternationIndex)}" Value="1">
-                    <Setter Property="Background" Value="#F9F9F9"/>
-                </DataTrigger>
-
-                <!-- Hover-effekt: Rækken bliver mørkeblå med hvid tekst -->
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#1976D2"/>
-                    <Setter Property="Foreground" Value="White"/>
-                </Trigger>
-
-                <!-- Markering: Række bliver lysere blå med hvid tekst -->
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="#3399FF"/>
-                    <Setter Property="Foreground" Value="White"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </UserControl.Resources>
-
-
     <!-- Layout: Grid med to rækker-->
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -54,7 +26,7 @@
              Controls:TextBoxHelper.ClearTextButton="True" />
             
             <!-- Tilføj ny lejer-knap-->
-            <Button Content="Tilføj lejer"
+            <Button Content="Opret lejer"
                      Width="120"
                      Click="AddRenterButton_Click"/>
         </DockPanel>

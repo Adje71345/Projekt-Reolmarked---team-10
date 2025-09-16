@@ -4,9 +4,50 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Reolmarked"
+        xmlns:views="clr-namespace:Reolmarked.View"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow"
+        Height="800"
+        Width="1200"
+        Background="{StaticResource BackgroundBrush}">
 
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>     <!-- Indhold -->
+            <RowDefinition Height="20"/>    <!-- Bundluft -->
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20"/>  <!-- Venstre luft -->            
+            <ColumnDefinition Width="220"/> <!-- Sidebjælke -->
+            <ColumnDefinition Width="10"/>  <!-- Mellemrum -->
+            <ColumnDefinition Width="*"/>   <!-- Indhold -->
+            <ColumnDefinition Width="20"/>  <!-- Højre luft -->
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebjælke -->
+        <views:SidebarView Grid.Row="0" Grid.Column="1"
+                   DataContext="{Binding Sidebar}" />
+
+
+        <!-- Indholdsområde -->
+        <Grid Grid.Row="0" Grid.Column="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <!-- Topbjælke -->
+                <RowDefinition Height="*"/>
+                <!-- Dynamisk indhold -->
+            </Grid.RowDefinitions>
+
+            <!-- Topbjælke -->
+            <views:TopbarView x:Name="TopbarControl" Grid.Row="0"
+                              DataContext="{Binding Topbar}" />
+
+            <!-- Indhold -->
+            <Border Grid.Row="1"
+                    Style="{DynamicResource RoundedPanel}">
+                <ContentControl Content="{Binding CurrentViewModel}" />
+            </Border>
+        </Grid>
     </Grid>
 </Window>
