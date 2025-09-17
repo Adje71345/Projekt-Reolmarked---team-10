@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Reolmarked.Model
 {
-    public class Paymentmethod
+    public class PaymentMethod
     {
-        public int PaymentmethodId { get; set; }
+        public int PaymentMethodId { get; set; }
         public string Name { get; set; }
     }
 }

@@ -26,7 +26,7 @@ namespace Reolmarked.View
     public partial class RenterView : UserControl
     {
         private readonly IRenterRepository _renterRepository;
-        private readonly IRepository<Paymentmethod> _paymentmethodRepository;
+        private readonly IRepository<PaymentMethod> _paymentMethodRepository;
         private readonly RenterViewModel _viewModel;
 
         /*public RenterView()
@@ -43,7 +43,7 @@ namespace Reolmarked.View
 
             // Opret repositories
             _renterRepository = new RenterRepository(connectionString);
-            _paymentmethodRepository = new PaymentmethodRepository(connectionString);
+            _paymentMethodRepository = new PaymentMethodRepository(connectionString);
 
 
             // Opret ViewModel og sæt som DataContext
@@ -59,7 +59,7 @@ namespace Reolmarked.View
         // Click-eventhandler til AddRenterButton
         private void AddRenterButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new AddRenterView(_renterRepository, _paymentmethodRepository);
+            var dialog = new AddRenterView(_renterRepository, _paymentMethodRepository);
 
             dialog.RenterAdded += (s, args) =>
             {

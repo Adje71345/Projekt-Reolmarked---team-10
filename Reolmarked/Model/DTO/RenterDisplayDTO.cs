@@ -14,6 +14,6 @@ namespace Reolmarked.Model.DTO
         public string FullName => $"{FirstName} {LastName}";
         public string Email { get; set; }
         public string Phone { get; set; }
-        public string PaymentmethodName { get; set; }
+        public string PaymentMethodName { get; set; }
     }
 }
