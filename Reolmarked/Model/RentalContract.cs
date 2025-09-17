@@ -23,6 +23,7 @@ namespace Reolmarked.Model
             StartDate = startDate;
             EndDate = endDate;
         }
+
         //Parameterløs contructor
         public RentalContract() { }
     }
