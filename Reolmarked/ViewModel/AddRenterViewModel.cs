@@ -11,7 +11,7 @@ namespace Reolmarked.ViewModel
     public class AddRenterViewModel : ViewModelBase, IDataErrorInfo
     {
         private readonly IRenterRepository _renterRepository;
-        private readonly IRepository<Paymentmethod> _paymentmethodRepository;
+        private readonly IRepository<PaymentMethod> _paymentMethodRepository;
 
         private string _firstName = "";
         public string FirstName
@@ -41,15 +41,15 @@ namespace Reolmarked.ViewModel
             set => SetProperty(ref _email, value);
         }
 
-        private int _paymentmethodId;
-        public int PaymentmethodId
+        private int _paymentMethodId;
+        public int PaymentMethodId
         {
-            get => _paymentmethodId;
-            set => SetProperty(ref _paymentmethodId, value);
+            get => _paymentMethodId;
+            set => SetProperty(ref _paymentMethodId, value);
         }
 
 
-        public ObservableCollection<Paymentmethod> PaymentMethods { get; }
+        public ObservableCollection<PaymentMethod> PaymentMethods { get; }
 
 
         //IDataErrorInfo
@@ -64,7 +64,7 @@ namespace Reolmarked.ViewModel
                     nameof(LastName) => string.IsNullOrWhiteSpace(LastName) ? "Efternavn må ikke være tomt." : null,
                     nameof(PhoneNumber) => string.IsNullOrWhiteSpace(PhoneNumber) ? "Telefonnummer må ikke være tomt." : null,
                     nameof(Email) => string.IsNullOrWhiteSpace(Email) ? "Email må ikke være tomt." : null,
-                    nameof(PaymentmethodId) => PaymentmethodId <= 0 ? "Vælg en betalingsmetode." : null,
+                    nameof(PaymentMethodId) => PaymentMethodId <= 0 ? "Vælg en betalingsmetode." : null,
                     _ => null
                 };
             }
@@ -74,12 +74,12 @@ namespace Reolmarked.ViewModel
         public ICommand AddRenterCommand { get; }
         public ICommand CancelCommand { get; }
 
-        public AddRenterViewModel(IRenterRepository renterRepository, IRepository<Paymentmethod> paymentmethodRepository)
+        public AddRenterViewModel(IRenterRepository renterRepository, IRepository<PaymentMethod> paymentMethodRepository)
         {
             _renterRepository = renterRepository;
-            _paymentmethodRepository = paymentmethodRepository;
+            _paymentMethodRepository = paymentMethodRepository;
 
-            PaymentMethods = new ObservableCollection<Paymentmethod>(_paymentmethodRepository.GetAll());
+            PaymentMethods = new ObservableCollection<PaymentMethod>(_paymentMethodRepository.GetAll());
             AddRenterCommand = new RelayCommand(AddRenter, CanAddRenter);
             CancelCommand = new RelayCommand(Cancel);
         }
@@ -100,7 +100,7 @@ namespace Reolmarked.ViewModel
                 LastName = this.LastName,
                 Phone = this.PhoneNumber,
                 Email = this.Email,
-                PaymentmethodId = this.PaymentmethodId
+                PaymentMethodId = this.PaymentMethodId
             };
 
             _renterRepository.Add(renter);
@@ -110,7 +110,7 @@ namespace Reolmarked.ViewModel
             LastName = "";
             PhoneNumber = "";
             Email = "";
-            PaymentmethodId = 0;
+            PaymentMethodId = 0;
 
             RequestClose?.Invoke(this, EventArgs.Empty);
         }
@@ -122,7 +122,7 @@ namespace Reolmarked.ViewModel
                 && !string.IsNullOrWhiteSpace(LastName)
                 && !string.IsNullOrWhiteSpace(PhoneNumber)
                 && !string.IsNullOrWhiteSpace(Email)
-                && PaymentmethodId > 0;
+                && PaymentMethodId > 0;
         }
     }
 }

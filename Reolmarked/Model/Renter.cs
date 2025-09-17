@@ -14,7 +14,7 @@ namespace Reolmarked.Model
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
-        public int PaymentmethodId { get; set; }
+        public int PaymentMethodId { get; set; }
 
         // --- Constructor (fra DCD) ---
         public Renter(string firstName, string lastName, string email, string phone)

@@ -197,7 +197,7 @@ namespace Reolmarked.Repositories
         }
 
         // Opsiger en enkelt kontrakt med slutdato 
-        public void TerminateSingleContract(int rentalId, DateOnly endDate)
+        public void EndSingleContract(int rentalId, DateOnly endDate)
         {
             var contract = GetById(rentalId);
             if (contract == null) return;

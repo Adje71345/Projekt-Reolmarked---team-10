@@ -13,6 +13,6 @@ namespace Reolmarked.Repositories
         IEnumerable<RentalContract> GetActiveContractsByRenter(int renterId);
 
         // Opsiger en enkelt kontrakt ved at sætte slutdato
-        void TerminateSingleContract(int rentalId, DateOnly endDate);
+        void EndSingleContract(int rentalId, DateOnly endDate);
     }
 }
