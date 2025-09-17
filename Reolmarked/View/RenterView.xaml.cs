@@ -29,7 +29,7 @@ namespace Reolmarked.View
         private readonly IRepository<Paymentmethod> _paymentmethodRepository;
         private readonly RenterViewModel _viewModel;
 
-        public RenterView()
+        /*public RenterView()
         {
             InitializeComponent();
 
@@ -49,6 +49,11 @@ namespace Reolmarked.View
             // Opret ViewModel og sæt som DataContext
             _viewModel = new RenterViewModel(_renterRepository);
             DataContext = _viewModel;
+        }*/
+
+        public RenterView()
+        {
+            InitializeComponent();
         }
 
         // Click-eventhandler til AddRenterButton

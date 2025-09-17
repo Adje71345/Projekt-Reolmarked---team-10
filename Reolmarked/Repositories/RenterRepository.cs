@@ -216,5 +216,14 @@ namespace Reolmarked.Repositories
                 command.ExecuteNonQuery();
             }
         }
+
+        public int GetCount()
+        {
+            const string query = "SELECT COUNT(*) FROM Renter";
+            using var conn = new SqlConnection(_connectionString);
+            using var cmd = new SqlCommand(query, conn);
+            conn.Open();
+            return (int)cmd.ExecuteScalar();
+        }
     }
 }

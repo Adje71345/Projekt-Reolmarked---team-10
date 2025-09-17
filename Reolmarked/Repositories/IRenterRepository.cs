@@ -12,5 +12,6 @@ namespace Reolmarked.Repositories
     {
         IEnumerable<RenterDisplayDTO> GetAllDisplay();
         RenterDisplayDTO GetByIdDisplay(int id);
+        int GetCount();
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Data;
+using System.Data.SqlClient;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -9,8 +11,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Extensions.Configuration;
-using System.Data;
-using System.Data.SqlClient;
+using Reolmarked.View;
+using Reolmarked.ViewModel;
 
 
 namespace Reolmarked
@@ -20,15 +22,16 @@ namespace Reolmarked
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly MainWindowViewModel _viewModel;
         public MainWindow()
         {
             InitializeComponent();
 
-            IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+            _viewModel = new MainWindowViewModel();
+            DataContext = _viewModel;
 
-            string? ConnectionString = config.GetConnectionString("DefaultConnection");
 
-            this.Close();
-        }
+
+        }     
     }
 }
