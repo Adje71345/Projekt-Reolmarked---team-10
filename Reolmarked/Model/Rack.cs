@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace Reolmarked.Model
 {
@@ -18,6 +19,21 @@ namespace Reolmarked.Model
         //Attributter
         public int RackId { get; set; }
         public RackStatus Status { get; set; }
+        private Brush rackBackGround = Brushes.Green;
+        public Brush RackBackground
+        {
+            get => rackBackGround; set
+            {
+                if (Status == RackStatus.Optaget)
+                {
+                    rackBackGround = Brushes.Red;
+                }
+                else if (Status == RackStatus.Defekt)
+                {
+                    rackBackGround = Brushes.Gray;
+                }
+            }
+        }
 
         //Constructor
         public Rack(int rackId, RackStatus status)
