@@ -29,46 +29,10 @@ namespace Reolmarked.View
         private readonly IRepository<PaymentMethod> _paymentMethodRepository;
         private readonly RenterViewModel _viewModel;
 
-        /*public RenterView()
-        {
-            InitializeComponent();
-
-            // Læs connection string fra appsettings.json
-            IConfigurationRoot config = new ConfigurationBuilder()
-                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
-
-            string connectionString = config.GetConnectionString("DefaultConnection");
-
-            // Opret repositories
-            _renterRepository = new RenterRepository(connectionString);
-            _paymentMethodRepository = new PaymentMethodRepository(connectionString);
-
-
-            // Opret ViewModel og sæt som DataContext
-            _viewModel = new RenterViewModel(_renterRepository);
-            DataContext = _viewModel;
-        }*/
-
         public RenterView()
         {
             InitializeComponent();
         }
-
-        // Click-eventhandler til AddRenterButton
-        private void AddRenterButton_Click(object sender, RoutedEventArgs e)
-        {
-            var dialog = new AddRenterView(_renterRepository, _paymentMethodRepository);
-
-            dialog.RenterAdded += (s, args) =>
-            {
-                _viewModel.RefreshRenters();
-            };
-
-            dialog.ShowDialog();
-        }
-
 
         //Eventhandler som håndterer UI specifik sortering
         private void DataGrid_Sorting(object sender, DataGridSortingEventArgs e)

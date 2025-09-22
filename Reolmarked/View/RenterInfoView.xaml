@@ -6,67 +6,59 @@
              mc:Ignorable="d"
              d:DesignHeight="420" d:DesignWidth="360">
 
-    <Border Padding="12" Background="White" CornerRadius="6" BorderBrush="#DDD" BorderThickness="1">
+    <Border Style="{StaticResource WhitePanel}">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <!-- header -->
-                <RowDefinition Height="Auto"/>
-                <!-- person + statistik -->
-                <RowDefinition Height="*"/>
-                <!-- aktive aftaler -->
-                <RowDefinition Height="Auto"/>
-                <!-- handlinger -->
+                <RowDefinition Height="Auto"/> <!-- header -->
+                <RowDefinition Height="Auto"/> <!-- person + statistik -->
+                <RowDefinition Height="*"/> <!-- aktive aftaler -->
+                <RowDefinition Height="Auto"/> <!-- handlinger -->
             </Grid.RowDefinitions>
 
-            <!-- Header: Navn + ID -->
+            <!-- Header -->
             <StackPanel Orientation="Horizontal" Grid.Row="0" VerticalAlignment="Center" Margin="0,0,0,8">
-                <TextBlock Text="{Binding SelectedRenter.FirstName}" FontWeight="Bold" FontSize="16"/>
+                <TextBlock Text="{Binding SelectedRenter.FirstName}" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource TextBrush}" />
                 <TextBlock Text=" " FontSize="16"/>
-                <TextBlock Text="{Binding SelectedRenter.LastName}" FontWeight="Bold" FontSize="16" Margin="6,0,0,0"/>
+                <TextBlock Text="{Binding SelectedRenter.LastName}" FontWeight="Bold" FontSize="16" Margin="6,0,0,0" Foreground="{DynamicResource TextBrush}" />
                 <TextBlock Text="{Binding SelectedRenter.RenterId, StringFormat='(ID: {0})'}"
-                   Margin="10,4,0,0" VerticalAlignment="Center" Foreground="#666" FontSize="12"/>
+                   Margin="10,4,0,0" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" Opacity="0.6" FontSize="12"/>
             </StackPanel>
 
-            <!-- Personoplysninger | Statistik (side-by-side) -->
+            <!-- Personoplysninger | Statistik -->
             <Grid Grid.Row="1" Margin="0,0,0,12">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <!-- person -->
+                    <ColumnDefinition Width="*" /> <!-- person -->
                     <ColumnDefinition Width="12" />
-                    <ColumnDefinition Width="220" />
-                    <!-- statistik -->
+                    <ColumnDefinition Width="220" /> <!-- statistik -->
                 </Grid.ColumnDefinitions>
 
                 <!-- Personoplysninger (venstre) -->
-                <Border Grid.Column="0" Padding="10" CornerRadius="4" BorderBrush="#EEE" BorderThickness="1" Background="#FFF">
+                <Border Grid.Column="0" Padding="10" CornerRadius="4" BorderBrush="{DynamicResource SoftBorderBrush}" BorderThickness="1" 
+                        Background="{DynamicResource WhiteBrush}">
+
                     <StackPanel>
                         <TextBlock Text="Kontakt" FontWeight="Bold" Margin="0,0,0,8"/>
 
                         <StackPanel Margin="0,0,0,8">
-                            <TextBlock Text="E-mail:" Foreground="#777" FontSize="12" />
-                            <TextBlock Text="{Binding SelectedRenter.Email}" FontSize="12" Foreground="#222" TextWrapping="Wrap" />
+                            <TextBlock Text="E-mail:" Foreground="{DynamicResource TextBrush}" Opacity="0.7" FontSize="12" />
+                            <TextBlock Text="{Binding SelectedRenter.Email}" FontSize="12" Foreground="{DynamicResource TextBrush}" />
                         </StackPanel>
 
                         <StackPanel Margin="0,0,0,8">
-                            <TextBlock Text="Telefon:" Foreground="#777" FontSize="12" />
-                            <TextBlock Text="{Binding SelectedRenter.Phone}" FontSize="12" Foreground="#222" />
+                            <TextBlock Text="Telefon:" Foreground="{DynamicResource TextBrush}" Opacity="0.7" FontSize="12" />
+                            <TextBlock Text="{Binding SelectedRenter.Phone}" FontSize="12" Foreground="{DynamicResource TextBrush}" />
                         </StackPanel>
                     </StackPanel>
                 </Border>
 
                 <!-- Statistik (højre) -->
-                <Border Grid.Column="2" Background="#FAFAFA" Padding="10" CornerRadius="4" BorderBrush="#EEE" BorderThickness="1">
+                <Border Grid.Column="2" Background="{DynamicResource LightBackgroundBrush}"
+                        Padding="10" CornerRadius="4" BorderBrush="{DynamicResource SoftBorderBrush}" BorderThickness="1">
                     <StackPanel>
                         <TextBlock Text="Statistik" FontWeight="Bold" Margin="0,0,0,8" />
                         <StackPanel Orientation="Horizontal" Margin="0,4">
                             <TextBlock Text="Aktive reoler:" Width="110" Foreground="#555"/>
                             <TextBlock Text="{Binding DummyStats.ActiveShelves}" FontWeight="SemiBold"/>
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal" Margin="0,4">
-                            <TextBlock Text="Varer til salg:" Width="110" Foreground="#555"/>
-                            <TextBlock Text="{Binding DummyStats.ItemsForSale}" FontWeight="SemiBold"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="0,4">
@@ -89,17 +81,14 @@
                 <ItemsControl ItemsSource="{Binding ActiveContracts}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Background="#FFF" CornerRadius="4" BorderBrush="#EEE" BorderThickness="1" Padding="8" Margin="0,0,0,8">
+                            <Border Background="{DynamicResource WhiteBrush}" CornerRadius="4"
+                                    BorderBrush="{DynamicResource SoftBorderBrush}" BorderThickness="1" Padding="8" Margin="0,0,0,8">
                                 <StackPanel>
                                     <TextBlock Text="{Binding ShelfName}" FontWeight="SemiBold"/>
                                     <TextBlock Text="{Binding Period}" Foreground="#666" FontSize="12" Margin="0,4,0,8" TextWrapping="Wrap"/>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                                        <Button Content="Forny 1 måned" Command="{Binding DataContext.RenewOneMonthCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                            CommandParameter="{Binding}" Padding="6,2" Margin="0,0,6,0"/>
-                                        <Button Content="Forny" Command="{Binding DataContext.RenewCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                            CommandParameter="{Binding}" Padding="6,2" Margin="0,0,6,0"/>
                                         <Button Content="Opsig" Command="{Binding DataContext.TerminateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                            CommandParameter="{Binding}" Padding="6,2"/>
+                                                CommandParameter="{Binding}" Padding="6,2"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
@@ -111,7 +100,6 @@
             <!-- Footer actions -->
             <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
                 <Button Content="Luk" Width="80" Margin="6,0,0,0" Command="{Binding CloseCommand}" />
-                <Button Content="Rediger" Width="80" Margin="6,0,0,0" Command="{Binding EditCommand}" />
             </StackPanel>
         </Grid>
     </Border>

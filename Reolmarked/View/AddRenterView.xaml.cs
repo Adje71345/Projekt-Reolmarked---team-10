@@ -22,23 +22,13 @@ namespace Reolmarked.View
     /// <summary>
     /// Interaction logic for AddRenterView.xaml
     /// </summary>
-    public partial class AddRenterView : Window
+    public partial class AddRenterView : UserControl
     {
         public event EventHandler RenterAdded;
 
-        public AddRenterView(IRenterRepository renterRepository, IRepository<PaymentMethod> paymentMethodRepository)
+        public AddRenterView()
         {
             InitializeComponent();
-
-            var vm = new AddRenterViewModel(renterRepository, paymentMethodRepository);
-
-            vm.RequestClose += (s, e) =>
-            {
-                RenterAdded?.Invoke(this, EventArgs.Empty);
-                this.Close();
-            };
-
-            DataContext = vm;
         }
     }
 }
