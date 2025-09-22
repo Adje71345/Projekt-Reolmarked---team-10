@@ -28,10 +28,12 @@ namespace Reolmarked.Commands
             _execute();
         }
 
-        public event EventHandler? CanExecuteChanged
+        public event EventHandler? CanExecuteChanged;
+
+        public void RaiseCanExecuteChanged()
         {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
+            CommandManager.InvalidateRequerySuggested();
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -58,11 +60,13 @@ namespace Reolmarked.Commands
                 _execute(t);
         }
 
-        public event EventHandler? CanExecuteChanged
+        public event EventHandler? CanExecuteChanged;
+        public void RaiseCanExecuteChanged()
         {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
+            CommandManager.InvalidateRequerySuggested();
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
+
     }
 
 }

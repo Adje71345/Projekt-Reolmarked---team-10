@@ -7,61 +7,68 @@
              xmlns:local="clr-namespace:Reolmarked.View"
              xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              mc:Ignorable="d"
+             x:Name="RootControl"
              d:DesignHeight="450" d:DesignWidth="600">
 
     <!-- Layout: Grid med to rækker-->
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Grid x:Name="LayoutRoot">
+        <!-- Hovedlayout -->
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <!-- Søgefelt og knap til at tilføje lejer -->
-        <DockPanel Grid.Row="0" Margin="0,0,0,15">
-            <!-- Søg efter lejer-felt-->
-            <TextBox Width="250"
-             Margin="0,0,10,0"
-             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-             Controls:TextBoxHelper.Watermark="Søg efter lejer..."
-             Controls:TextBoxHelper.ClearTextButton="True" />
-            
-            <!-- Tilføj ny lejer-knap-->
-            <Button Content="Opret lejer"
-                     Width="120"
-                     Click="AddRenterButton_Click"/>
-        </DockPanel>
+            <!-- Søgefelt og knap -->
+            <DockPanel Grid.Row="0" Margin="0,0,0,15">
+                <TextBox Width="250"
+                 Margin="0,0,10,0"
+                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+                <Button Content="Opret lejer" Width="120" Command="{Binding AddRenterCommand}" />
+            </DockPanel>
 
-        <!-- Liste over lejere -->
-        <Border Grid.Row="1"
-                Background="#FFF"
-                CornerRadius="6"
-                Padding="10"
+            <!-- Liste -->
+            <Border Grid.Row="1" Background="#FFF" CornerRadius="6" Padding="10" BorderBrush="#DDD" BorderThickness="1">
+                <DataGrid ItemsSource="{Binding RentersView}"
+                  SelectedItem="{Binding SelectedRenter, Mode=TwoWay}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID" Binding="{Binding RenterId}" Width="50"/>
+                        <DataGridTextColumn Header="Fornavn" Binding="{Binding FirstName}" Width="*"/>
+                        <DataGridTextColumn Header="Efternavn" Binding="{Binding LastName}" Width="*"/>
+                        <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="*"/>
+                        <DataGridTextColumn Header="Telefon" Binding="{Binding Phone}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+        </Grid>
+
+        <!-- Semi-transparent baggrund (luk ved klik) -->
+        <Rectangle Fill="#80000000"
+               Visibility="{Binding IsInfoPanelOpen, Converter={StaticResource BoolToVisibilityConverter}}"
+               Panel.ZIndex="90"
+               Focusable="True"
+               Cursor="Hand">
+            <Rectangle.InputBindings>
+                <MouseBinding MouseAction="LeftClick" Command="{Binding CloseOverlayCommand}" />
+            </Rectangle.InputBindings>
+        </Rectangle>
+
+        <!-- Overlay panel der fylder halvdelen af RenterView -->
+        <Border Background="White"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Stretch"
+                Visibility="{Binding IsInfoPanelOpen, Converter={StaticResource BoolToVisibilityConverter}}"
+                Panel.ZIndex="100"
                 BorderBrush="#DDD"
                 BorderThickness="1"
-                Effect="{DynamicResource ShadowEffect}">
-            <DataGrid ItemsSource="{Binding RentersView}"
-                      AutoGenerateColumns="False"
-                      IsReadOnly="True"
-                      CanUserSortColumns="True"
-                      Sorting="DataGrid_Sorting"
-                      RowHeaderWidth="0"
-                      HeadersVisibility="Column"
-                      GridLinesVisibility="None"
-                      ColumnHeaderHeight="30"
-                      RowHeight="28"
-                      FontSize="13"
-                      AlternationCount="2"
-                      RowStyle="{StaticResource RenterRowStyle}">
-                
-                <!-- Kolonner i tabellen-->
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="ID" Binding="{Binding RenterId}" SortMemberPath="RenterId" Width="50"/>
-                    <DataGridTextColumn Header="Fornavn" Binding="{Binding FirstName}" SortMemberPath="FirstName" Width="*"/>
-                    <DataGridTextColumn Header="Efternavn" Binding="{Binding LastName}" SortMemberPath="LastName" Width="*"/>
-                    <DataGridTextColumn Header="Email" Binding="{Binding Email}" SortMemberPath="Email" Width="*"/>
-                    <DataGridTextColumn Header="Telefon" Binding="{Binding Phone}" SortMemberPath="Phone" Width="*"/>
-                </DataGrid.Columns>
-            </DataGrid>
+                Padding="8"
+                Width="{Binding ActualWidth, ElementName=LayoutRoot, Converter={StaticResource MultiplyDoubleConverter}, ConverterParameter=0.5}"
+                MaxWidth="900">
+            <!-- valgfri sikkerhed -->
+            <local:RenterInfoView DataContext="{Binding RenterInfo}" />
         </Border>
     </Grid>
 </UserControl>
+

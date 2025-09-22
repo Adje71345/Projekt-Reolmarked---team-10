@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:Reolmarked"
              xmlns:vm="clr-namespace:Reolmarked.ViewModel"
              xmlns:view="clr-namespace:Reolmarked.View"   
+             xmlns:converters="clr-namespace:Reolmarked.ViewModel.Helpers"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
@@ -26,6 +27,9 @@
 
             <!-- Converters -->
             <vm:EnumToBoolConverter x:Key="EnumToBoolConverter" />
+            <converters:MultiplyDoubleConverter x:Key="MultiplyDoubleConverter" />
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+
         </ResourceDictionary>
     </Application.Resources>
 
