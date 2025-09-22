@@ -27,9 +27,9 @@ namespace Reolmarked.Repositories
         {
             var renters = new List<Renter>();
             string query = @"
-                SELECT r.RenterID, r.FirstName, r.LastName, r.Email, r.Phone, r.PaymentmethodID, p.Paymentmethod
+                SELECT r.RenterID, r.FirstName, r.LastName, r.Email, r.Phone, r.PaymentMethodID, p.PaymentMethod
                 FROM Renter r
-                JOIN Paymentmethod p ON r.PaymentmethodID = p.PaymentmethodID";
+                JOIN PaymentMethod p ON r.PaymentMethodID = p.PaymentMethodID";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -46,7 +46,7 @@ namespace Reolmarked.Repositories
                             LastName = (string)reader["LastName"],
                             Email = (string)reader["Email"],
                             Phone = (string)reader["Phone"],
-                            PaymentMethodId = (int)reader["PaymentmethodID"],
+                            PaymentMethodId = (int)reader["PaymentMethodID"],
                         });
                     }
                 }
@@ -58,9 +58,9 @@ namespace Reolmarked.Repositories
         {
             Renter renter = null;
             string query = @"
-                SELECT r.RenterID, r.FirstName, r.LastName, r.Email, r.Phone, r.PaymentmethodID, p.Paymentmethod
+                SELECT r.RenterID, r.FirstName, r.LastName, r.Email, r.Phone, r.PaymentMethodID, p.PaymentMethod
                 FROM Renter r
-                JOIN Paymentmethod p ON r.PaymentmethodID = p.PaymentmethodID
+                JOIN PaymentMethod p ON r.PaymentMethodID = p.PaymentMethodID
                 WHERE r.RenterID = @RenterID";
 
             using SqlConnection connection = new SqlConnection(_connectionString);
@@ -79,7 +79,7 @@ namespace Reolmarked.Repositories
                             LastName = (string)reader["LastName"],
                             Email = (string)reader["Email"],
                             Phone = (string)reader["Phone"],
-                            PaymentMethodId = (int)reader["PaymentmethodID"],
+                            PaymentMethodId = (int)reader["PaymentMethodID"],
                         };
                     }
                 }
@@ -92,9 +92,9 @@ namespace Reolmarked.Repositories
         {
             var renters = new List<RenterDisplayDTO>();
             string query = @"
-            SELECT r.RenterID, r.FirstName, r.LastName, r.Email, r.Phone, p.Paymentmethod
+            SELECT r.RenterID, r.FirstName, r.LastName, r.Email, r.Phone, p.PaymentMethod
             FROM Renter r
-            JOIN Paymentmethod p ON r.PaymentmethodID = p.PaymentmethodID";
+            JOIN PaymentMethod p ON r.PaymentMethodID = p.PaymentMethodID";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -111,7 +111,7 @@ namespace Reolmarked.Repositories
                             LastName = (string)reader["LastName"],
                             Email = (string)reader["Email"],
                             Phone = (string)reader["Phone"],
-                            PaymentMethodName = reader["Paymentmethod"] as string
+                            PaymentMethodName = reader["PaymentMethod"] as string
                         });
                     }
                 }
@@ -119,14 +119,14 @@ namespace Reolmarked.Repositories
             return renters;
         }
 
-        // Hent en enkelt Renter med Paymentmethod navn til visning
+        // Hent en enkelt Renter med PaymentMethod navn til visning
         public RenterDisplayDTO GetByIdDisplay(int id)
         {
             RenterDisplayDTO renter = null;
             string query = @"
-            SELECT r.RenterID, r.FirstName, r.LastName, r.Email, r.Phone, p.Paymentmethod
+            SELECT r.RenterID, r.FirstName, r.LastName, r.Email, r.Phone, p.PaymentMethod
             FROM Renter r
-            JOIN Paymentmethod p ON r.PaymentmethodID = p.PaymentmethodID
+            JOIN PaymentMethod p ON r.PaymentMethodID = p.PaymentMethodID
             WHERE r.RenterID = @RenterID";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -145,7 +145,7 @@ namespace Reolmarked.Repositories
                             LastName = (string)reader["LastName"],
                             Email = (string)reader["Email"],
                             Phone = (string)reader["Phone"],
-                            PaymentMethodName = reader["Paymentmethod"] as string
+                            PaymentMethodName = reader["PaymentMethod"] as string
                         };
                     }
                 }
@@ -159,7 +159,7 @@ namespace Reolmarked.Repositories
             {
                 connection.Open();
                 string query = @"
-                INSERT INTO Renter (FirstName, LastName, Email, Phone, PaymentmethodID)
+                INSERT INTO Renter (FirstName, LastName, Email, Phone, PaymentMethodID)
                 VALUES (@FirstName, @LastName, @Email, @Phone, @PaymentMethodID);
                 SELECT SCOPE_IDENTITY();";
 
@@ -187,7 +187,7 @@ namespace Reolmarked.Repositories
                     LastName = @LastName,
                     Email = @Email,
                     Phone = @Phone,
-                    PaymentmethodID = @PaymentMethodID
+                    PaymentMethodID = @PaymentMethodID
                 WHERE RenterID = @RenterID";
 
                 SqlCommand command = new SqlCommand(query, connection);

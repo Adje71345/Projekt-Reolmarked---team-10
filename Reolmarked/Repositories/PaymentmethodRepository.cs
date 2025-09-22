@@ -21,7 +21,7 @@ namespace Reolmarked.Repositories
         public IEnumerable<PaymentMethod> GetAll()
         {
             var methods = new List<PaymentMethod>();
-            string query = "SELECT PaymentmethodID, Paymentmethod FROM Paymentmethod";
+            string query = "SELECT PaymentMethodID, PaymentMethod FROM PaymentMethod";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -33,8 +33,8 @@ namespace Reolmarked.Repositories
                     {
                         methods.Add(new PaymentMethod
                         {
-                            PaymentMethodId = (int)reader["PaymentmethodID"],
-                            Name = (string)reader["Paymentmethod"]
+                            PaymentMethodId = (int)reader["PaymentMethodID"],
+                            Name = (string)reader["PaymentMethod"]
                         });
                     }
                 }
