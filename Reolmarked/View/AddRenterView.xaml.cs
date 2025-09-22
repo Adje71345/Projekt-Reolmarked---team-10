@@ -26,11 +26,11 @@ namespace Reolmarked.View
     {
         public event EventHandler RenterAdded;
 
-        public AddRenterView(IRenterRepository renterRepository, IRepository<Paymentmethod> paymentmethodRepository)
+        public AddRenterView(IRenterRepository renterRepository, IRepository<PaymentMethod> paymentMethodRepository)
         {
             InitializeComponent();
 
-            var vm = new AddRenterViewModel(renterRepository, paymentmethodRepository);
+            var vm = new AddRenterViewModel(renterRepository, paymentMethodRepository);
 
             vm.RequestClose += (s, e) =>
             {

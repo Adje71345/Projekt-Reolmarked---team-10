@@ -46,7 +46,7 @@ namespace Reolmarked.Repositories
                             LastName = (string)reader["LastName"],
                             Email = (string)reader["Email"],
                             Phone = (string)reader["Phone"],
-                            PaymentmethodId = (int)reader["PaymentmethodID"],
+                            PaymentMethodId = (int)reader["PaymentmethodID"],
                         });
                     }
                 }
@@ -79,7 +79,7 @@ namespace Reolmarked.Repositories
                             LastName = (string)reader["LastName"],
                             Email = (string)reader["Email"],
                             Phone = (string)reader["Phone"],
-                            PaymentmethodId = (int)reader["PaymentmethodID"],
+                            PaymentMethodId = (int)reader["PaymentmethodID"],
                         };
                     }
                 }
@@ -111,7 +111,7 @@ namespace Reolmarked.Repositories
                             LastName = (string)reader["LastName"],
                             Email = (string)reader["Email"],
                             Phone = (string)reader["Phone"],
-                            PaymentmethodName = reader["Paymentmethod"] as string
+                            PaymentMethodName = reader["Paymentmethod"] as string
                         });
                     }
                 }
@@ -145,7 +145,7 @@ namespace Reolmarked.Repositories
                             LastName = (string)reader["LastName"],
                             Email = (string)reader["Email"],
                             Phone = (string)reader["Phone"],
-                            PaymentmethodName = reader["Paymentmethod"] as string
+                            PaymentMethodName = reader["Paymentmethod"] as string
                         };
                     }
                 }
@@ -160,7 +160,7 @@ namespace Reolmarked.Repositories
                 connection.Open();
                 string query = @"
                 INSERT INTO Renter (FirstName, LastName, Email, Phone, PaymentmethodID)
-                VALUES (@FirstName, @LastName, @Email, @Phone, @PaymentmethodID);
+                VALUES (@FirstName, @LastName, @Email, @Phone, @PaymentMethodID);
                 SELECT SCOPE_IDENTITY();";
 
                 SqlCommand command = new SqlCommand(query, connection);
@@ -168,7 +168,7 @@ namespace Reolmarked.Repositories
                 command.Parameters.AddWithValue("@LastName", renter.LastName);
                 command.Parameters.AddWithValue("@Email", renter.Email ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("@Phone", renter.Phone ?? (object)DBNull.Value);
-                command.Parameters.AddWithValue("@PaymentmethodID", renter.PaymentmethodId);
+                command.Parameters.AddWithValue("@PaymentMethodID", renter.PaymentMethodId);
 
                 renter.RenterId = Convert.ToInt32(command.ExecuteScalar());
             }
@@ -187,7 +187,7 @@ namespace Reolmarked.Repositories
                     LastName = @LastName,
                     Email = @Email,
                     Phone = @Phone,
-                    PaymentmethodID = @PaymentmethodID
+                    PaymentmethodID = @PaymentMethodID
                 WHERE RenterID = @RenterID";
 
                 SqlCommand command = new SqlCommand(query, connection);
@@ -195,7 +195,7 @@ namespace Reolmarked.Repositories
                 command.Parameters.AddWithValue("@LastName", renter.LastName);
                 command.Parameters.AddWithValue("@Email", renter.Email ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("@Phone", renter.Phone ?? (object)DBNull.Value);
-                command.Parameters.AddWithValue("@PaymentmethodID", renter.PaymentmethodId);
+                command.Parameters.AddWithValue("@PaymentMethodID", renter.PaymentMethodId);
                 command.Parameters.AddWithValue("@RenterID", renter.RenterId);
 
                 command.ExecuteNonQuery();
@@ -215,6 +215,15 @@ namespace Reolmarked.Repositories
                 connection.Open();
                 command.ExecuteNonQuery();
             }
+        }
+
+        public int GetCount()
+        {
+            const string query = "SELECT COUNT(*) FROM Renter";
+            using var conn = new SqlConnection(_connectionString);
+            using var cmd = new SqlCommand(query, conn);
+            conn.Open();
+            return (int)cmd.ExecuteScalar();
         }
     }
 }

@@ -8,19 +8,19 @@ using Reolmarked.Model;
 
 namespace Reolmarked.Repositories
 {
-    public class PaymentmethodRepository : IRepository<Paymentmethod>
+    public class PaymentMethodRepository : IRepository<PaymentMethod>
     {
         private readonly string _connectionString;
 
-        public PaymentmethodRepository(string connectionString)
+        public PaymentMethodRepository(string connectionString)
         {
             _connectionString = connectionString;
         }
 
 
-        public IEnumerable<Paymentmethod> GetAll()
+        public IEnumerable<PaymentMethod> GetAll()
         {
-            var methods = new List<Paymentmethod>();
+            var methods = new List<PaymentMethod>();
             string query = "SELECT PaymentmethodID, Paymentmethod FROM Paymentmethod";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -31,9 +31,9 @@ namespace Reolmarked.Repositories
                 {
                     while (reader.Read())
                     {
-                        methods.Add(new Paymentmethod
+                        methods.Add(new PaymentMethod
                         {
-                            PaymentmethodId = (int)reader["PaymentmethodID"],
+                            PaymentMethodId = (int)reader["PaymentmethodID"],
                             Name = (string)reader["Paymentmethod"]
                         });
                     }
@@ -42,12 +42,12 @@ namespace Reolmarked.Repositories
             return methods;
         }
 
-        public Paymentmethod GetById(int id)
+        public PaymentMethod GetById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public void Add(Paymentmethod entity)
+        public void Add(PaymentMethod entity)
         {
             throw new NotImplementedException();
         }
@@ -57,7 +57,7 @@ namespace Reolmarked.Repositories
             throw new NotImplementedException();
         }
 
-        public void Update(Paymentmethod entity)
+        public void Update(PaymentMethod entity)
         {
             throw new NotImplementedException();
         }
