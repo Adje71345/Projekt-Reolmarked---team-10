@@ -26,8 +26,6 @@ namespace Reolmarked.ViewModel
         public ICommand EditCommand { get; }
 
         // Commands for contract actions
-        public ICommand RenewOneMonthCommand { get; }
-        public ICommand RenewCommand { get; }
         public ICommand TerminateCommand { get; }
 
         private readonly Action _closeAction;
@@ -41,8 +39,6 @@ namespace Reolmarked.ViewModel
             CloseCommand = new RelayCommand(() => _closeAction());
             EditCommand = new RelayCommand(() => _editAction(SelectedRenter), () => SelectedRenter != null);
 
-            RenewOneMonthCommand = new RelayCommand<RentalContract>(c => RenewOneMonth(c));
-            RenewCommand = new RelayCommand<RentalContract>(c => Renew(c));
             TerminateCommand = new RelayCommand<RentalContract>(c => Terminate(c));
 
             // Dummy initial data so UI shows something. Replace when real data is available.
@@ -60,7 +56,6 @@ namespace Reolmarked.ViewModel
         {
             // Stats
             DummyStats.ActiveShelves = 2;
-            DummyStats.ItemsForSale = 43;
             DummyStats.SoldThisMonth = 19;
             DummyStats.RevenueThisMonth = 2340;
 
@@ -68,19 +63,6 @@ namespace Reolmarked.ViewModel
             ActiveContracts.Clear();
             ActiveContracts.Add(new RentalContract { ShelfName = "Reol 12", Period = "1. sep - 30. sep" });
             ActiveContracts.Add(new RentalContract { ShelfName = "Reol 13", Period = "1. sep - 30. sep" });
-        }
-
-        private void RenewOneMonth(RentalContract contract)
-        {
-            // Simple dummy behaviour: append note to period
-            contract.Period += " (fornyet +1m)";
-            OnPropertyChanged(nameof(ActiveContracts));
-        }
-
-        private void Renew(RentalContract contract)
-        {
-            contract.Period += " (fornyet)";
-            OnPropertyChanged(nameof(ActiveContracts));
         }
 
         private void Terminate(RentalContract contract)

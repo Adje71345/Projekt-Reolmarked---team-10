@@ -16,7 +16,8 @@ namespace Reolmarked.ViewModel
     public class RenterViewModel : ViewModelBase 
     {
         // Repository til kommunikation med databasen
-        private readonly IRepository<Renter> _renterRepository;
+        private readonly IRenterRepository _renterRepository;
+        private readonly IRepository<PaymentMethod> _paymentMethodRepository;
 
 
         // Samling af alle lejere hentet fra databasen
@@ -61,6 +62,7 @@ namespace Reolmarked.ViewModel
         public bool IsInfoPanelOpen { get => _isInfoPanelOpen; set => SetProperty(ref _isInfoPanelOpen, value); }
 
         public RenterInfoViewModel RenterInfo { get; }
+        public AddRenterViewModel AddRenter { get; }
 
         public ICommand CloseOverlayCommand { get; }
 
@@ -72,11 +74,30 @@ namespace Reolmarked.ViewModel
 
         private void EditRenter(Renter r) { /* edit flow */ }
 
+        public ICommand OpenAddPanelCommand { get; }
+
+
+        private bool _isAddPanelOpen;
+        public bool IsAddPanelOpen
+        {
+            get => _isAddPanelOpen;
+            set
+            {
+                if (SetProperty(ref _isAddPanelOpen, value))
+                {
+                    OnPropertyChanged(nameof(CurrentOverlayViewModel));
+                }
+            }
+        }
+
+        public object CurrentOverlayViewModel => IsAddPanelOpen ? (object)AddRenter : (object)RenterInfo;
+
 
         // Constructor hvor repository injiceres og data initialiseres
-        public RenterViewModel(IRepository<Renter> renterRepository)
+        public RenterViewModel(IRenterRepository renterRepository, IRepository<PaymentMethod> paymentMethodRepository)
         {
             _renterRepository = renterRepository;
+            _paymentMethodRepository = paymentMethodRepository;
 
             // Hent alle lejere fra databasen og opret ObservableCollection
             Renters = new ObservableCollection<Renter>(_renterRepository.GetAll());
@@ -86,9 +107,24 @@ namespace Reolmarked.ViewModel
             RentersView.Filter = FilterRenters; // Sæt filterfunktion
             RentersView.SortDescriptions.Add(new SortDescription("RenterId", ListSortDirection.Ascending)); // Sortér efter Id
 
+            OpenAddPanelCommand = new RelayCommand(() =>
+            {
+                IsAddPanelOpen = true;
+                IsInfoPanelOpen = true;
+            });
             RenterInfo = new RenterInfoViewModel(() => IsInfoPanelOpen = false, EditRenter);
-            CloseOverlayCommand = new RelayCommand(() => IsInfoPanelOpen = false);
-
+            AddRenter = new AddRenterViewModel(_renterRepository, _paymentMethodRepository);
+            AddRenter.RequestClose += (s, e) =>
+            {
+                IsAddPanelOpen = false;
+                IsInfoPanelOpen = false;
+                RefreshRenters(); // eller Renters.Add(nyRenter) hvis du har adgang til den
+            };
+            CloseOverlayCommand = new RelayCommand(() =>
+            {
+                IsInfoPanelOpen = false;
+                IsAddPanelOpen = false;
+            });
         }
 
         // Filterfunktion som anvendes på RentersView

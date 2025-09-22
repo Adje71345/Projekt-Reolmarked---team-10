@@ -24,7 +24,7 @@
                 <TextBox Width="250"
                  Margin="0,0,10,0"
                  Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
-                <Button Content="Opret lejer" Width="120" Command="{Binding AddRenterCommand}" />
+                <Button Content="Opret lejer" Width="120" Command="{Binding OpenAddPanelCommand}" />
             </DockPanel>
 
             <!-- Liste -->
@@ -66,8 +66,8 @@
                 Padding="8"
                 Width="{Binding ActualWidth, ElementName=LayoutRoot, Converter={StaticResource MultiplyDoubleConverter}, ConverterParameter=0.5}"
                 MaxWidth="900">
-            <!-- valgfri sikkerhed -->
-            <local:RenterInfoView DataContext="{Binding RenterInfo}" />
+
+            <ContentControl Content="{Binding CurrentOverlayViewModel}" />
         </Border>
     </Grid>
 </UserControl>

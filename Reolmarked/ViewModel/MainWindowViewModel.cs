@@ -45,7 +45,7 @@ namespace Reolmarked.ViewModel
             switch (view)
             {
                 case ViewType.Renter:
-                    CurrentViewModel = new RenterViewModel(_renterRepository);
+                    CurrentViewModel = new RenterViewModel(_renterRepository, _paymentMethodRepository);
                     break;
                 case ViewType.DashBoard:
                     CurrentViewModel = new DashBoardViewModel(_renterRepository);
@@ -79,11 +79,13 @@ namespace Reolmarked.ViewModel
 
         //Repositories
         private readonly IRenterRepository _renterRepository;
+        private readonly IRepository<PaymentMethod> _paymentMethodRepository;
 
         public MainWindowViewModel()
         {
             string connectionString = ConnectionHelper.GetConnectionString();
             _renterRepository = new RenterRepository(connectionString);
+            _paymentMethodRepository = new PaymentMethodRepository(connectionString);
 
             //Instantier sub-viewmodels
             Sidebar = new SidebarViewModel(this);

@@ -25,6 +25,14 @@
                 <view:DashBoardView />
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type vm:RenterInfoViewModel}">
+                <view:RenterInfoView />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:AddRenterViewModel}">
+                <view:AddRenterView />
+            </DataTemplate>
+
             <!-- Converters -->
             <vm:EnumToBoolConverter x:Key="EnumToBoolConverter" />
             <converters:MultiplyDoubleConverter x:Key="MultiplyDoubleConverter" />
