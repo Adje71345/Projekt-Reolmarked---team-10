@@ -41,6 +41,37 @@ namespace Reolmarked.ViewModel
             }
         }
 
+        private Renter _selectedRenter;
+        public Renter SelectedRenter
+        {
+            get => _selectedRenter;
+            set
+            {
+                if (SetProperty(ref _selectedRenter, value) && value != null)
+                {
+                    // Indlæs data i info-viewmodel FØR panelet åbnes
+                    RenterInfo.LoadRenter(value);
+                    IsInfoPanelOpen = true;
+                }
+            }
+        }
+
+
+        private bool _isInfoPanelOpen;
+        public bool IsInfoPanelOpen { get => _isInfoPanelOpen; set => SetProperty(ref _isInfoPanelOpen, value); }
+
+        public RenterInfoViewModel RenterInfo { get; }
+
+        public ICommand CloseOverlayCommand { get; }
+
+        private void OpenRenterInfo(Renter r)
+        {
+            RenterInfo.LoadRenter(r);
+            IsInfoPanelOpen = true;
+        }
+
+        private void EditRenter(Renter r) { /* edit flow */ }
+
 
         // Constructor hvor repository injiceres og data initialiseres
         public RenterViewModel(IRepository<Renter> renterRepository)
@@ -54,6 +85,10 @@ namespace Reolmarked.ViewModel
             RentersView = CollectionViewSource.GetDefaultView(Renters);
             RentersView.Filter = FilterRenters; // Sæt filterfunktion
             RentersView.SortDescriptions.Add(new SortDescription("RenterId", ListSortDirection.Ascending)); // Sortér efter Id
+
+            RenterInfo = new RenterInfoViewModel(() => IsInfoPanelOpen = false, EditRenter);
+            CloseOverlayCommand = new RelayCommand(() => IsInfoPanelOpen = false);
+
         }
 
         // Filterfunktion som anvendes på RentersView
