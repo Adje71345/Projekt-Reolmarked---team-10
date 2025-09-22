@@ -50,6 +50,9 @@ namespace Reolmarked.ViewModel
                 case ViewType.DashBoard:
                     CurrentViewModel = new DashBoardViewModel(_renterRepository);
                     break;
+                case ViewType.Rack:
+                    CurrentViewModel = new RackViewModel();
+                    break;
                     // Tilføj flere cases her
             }
         }
