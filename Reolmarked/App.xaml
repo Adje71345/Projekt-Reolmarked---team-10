@@ -27,6 +27,10 @@
                 <view:DashBoardView />
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type vm:RackViewModel}">
+                <view:RackView />
+            </DataTemplate>
+
             <DataTemplate DataType="{x:Type vm:RenterInfoViewModel}">
                 <view:RenterInfoView />
             </DataTemplate>

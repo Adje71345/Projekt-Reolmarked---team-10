@@ -16,7 +16,7 @@ using Reolmarked.View.RackSideContent;
 
 namespace Reolmarked.ViewModel
 {
-    internal class RackViewModel : ViewModelBase
+    public class RackViewModel : ViewModelBase
     {        
         public ObservableCollection<Rack> Racks { get; set; }
         public IEnumerable<Rack> Rack1to13 => Racks.Take(13);
