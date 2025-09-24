@@ -33,7 +33,7 @@ namespace Reolmarked.ViewModel
         DashBoard,
         Renter,
         Rack,
-        Varer,
+        Labels,
         Salg,
         Afregning
     }

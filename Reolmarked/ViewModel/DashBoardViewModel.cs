@@ -23,9 +23,7 @@ namespace Reolmarked.ViewModel
             set => SetProperty(ref _renterCount, value);
         }
 
-        public int UnitCount { get; set; }
-
-        
+       
 
         public DashBoardViewModel(IRenterRepository renterRepository) 
         { 
@@ -37,7 +35,6 @@ namespace Reolmarked.ViewModel
             // Sample data til demonstration
             SalesToday = 1250.75m;
             OccupancyPercentage = 85;
-            UnitCount = 150;
 
         }
 
