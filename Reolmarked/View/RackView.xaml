@@ -1,326 +1,101 @@
 ﻿<UserControl x:Class="Reolmarked.View.RackView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Reolmarked.View" xmlns:viewmodel="clr-namespace:Reolmarked.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:RackViewModel}"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="600"
-             MinHeight="450" MinWidth="600"
-             MaxHeight="450" MaxWidth="600">
-  
-    
-    
-    <Border Background="LightGray"
-            CornerRadius="20">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="50"/>
-                <RowDefinition Height="50"/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d">
 
-            <TextBlock Text="Reoler"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Left"
-                       Foreground="Black"
-                       FontSize="22"
-                       Margin="20,0,0,0"/>
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Reolmarked;component/Resources/RackPanelsViewLocators.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <sys:Double x:Key="DesignWidth">1200</sys:Double>
+            <sys:Double x:Key="DesignHeight">520</sys:Double>
+        </ResourceDictionary>
+    </UserControl.Resources>
 
-            <Border Grid.Row="1"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="2"
-                    Background="White"
-                    CornerRadius="10"/>
+    <Grid Margin="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="24" />
+            <ColumnDefinition Width="210" />
+        </Grid.ColumnDefinitions>
 
-
-            <StackPanel Grid.Row="1"
-                        Orientation="Horizontal">
-                <TextBlock Text="Belægning"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Left"
-                           FontSize="15"
-                           Margin="20,0,0,0"/>
-                <TextBlock x:Name="Occupation"
-                           VerticalAlignment="Center"
-                           Margin="5,0,0,0"
-                           Text="BindThisText"/>         <!-- Bind statistik her -->
-
-            </StackPanel>
-            <StackPanel Grid.Row="1"
-                        Grid.Column="1"
-                        Orientation="Horizontal"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center">
-                <Border Height="20"
-                        Width="40"
-                        Background="Green"
-                        CornerRadius="5"
-                        Margin="0,0,10,0">
-                    <TextBlock Text="Ledig"
-                               HorizontalAlignment="Center"/>
-                </Border>
-
-                <Border Height="20"
-                        Width="40"
-                        Background="Red"
-                        CornerRadius="5"
-                        Margin="0,0,10,0">
-                    <TextBlock Text="Optaget"
-                               HorizontalAlignment="Center"/>
-                </Border>
-                <Border Height="20"
-                        Width="40"
-                        Background="Blue"
-                        CornerRadius="5"
-                        Margin="0,0,10,0">
-                    <TextBlock Text="Valgt"
-                               HorizontalAlignment="Center"/>
-                </Border>
-            </StackPanel>
-
-            <Border Grid.Row="2"
-                    Background="White"
-                    CornerRadius="10"
-                    Margin="0,5,0,0">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="6*"/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <ItemsControl ItemsSource="{Binding Rack14to18}"
-                                      HorizontalAlignment="Left"
-                                      VerticalAlignment="Bottom">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <RadioButton Content="{Binding RackId}"
-                                                 GroupName="Racks"
-                                                 Background="{Binding RackBackground}"
-                                                 Style="{StaticResource RackButtonTheme}"
-                                                 Checked="RadioButton_Checked"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>                            
-                        </ItemsControl>
-                        
-                        <ItemsControl ItemsSource="{Binding Rack19to21}"
-                                      Grid.Column="1"
-                                      HorizontalAlignment="Right"
-                                      VerticalAlignment="Bottom">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <RadioButton Content="{Binding RackId}"
-                                                 GroupName="Racks"
-                                                 Background="{Binding RackBackground}"
-                                                 Style="{StaticResource RackButtonTheme}"
-                                                 Checked="RadioButton_Checked"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <ItemsControl ItemsSource="{Binding Rack22to24}"
-                                      Grid.Column="2"
-                                      HorizontalAlignment="Left"
-                                      VerticalAlignment="Bottom">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <RadioButton Content="{Binding RackId}"
-                                                 GroupName="Racks"
-                                                 Background="{Binding RackBackground}"
-                                                 Style="{StaticResource RackButtonTheme}"
-                                                 Checked="RadioButton_Checked"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <ItemsControl ItemsSource="{Binding Rack25to31}"
-                                      Grid.Column="3"
-                                      HorizontalAlignment="Right"
-                                      VerticalAlignment="Bottom">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <RadioButton Content="{Binding RackId}"
-                                                 GroupName="Racks"
-                                                 Background="{Binding RackBackground}"
-                                                 Style="{StaticResource RackButtonTheme}"
-                                                 Checked="RadioButton_Checked"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <ItemsControl ItemsSource="{Binding Rack32to38}"
-                                      Grid.Column="4"
-                                      HorizontalAlignment="Left"
-                                      VerticalAlignment="Bottom">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <RadioButton Content="{Binding RackId}"
-                                                 GroupName="Racks"
-                                                 Background="{Binding RackBackground}"
-                                                 Style="{StaticResource RackButtonTheme}"
-                                                 Checked="RadioButton_Checked"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <ItemsControl ItemsSource="{Binding Rack39to45}"
-                                      Grid.Column="5"
-                                      HorizontalAlignment="Right"
-                                      VerticalAlignment="Bottom">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <RadioButton Content="{Binding RackId}"
-                                                 GroupName="Racks"
-                                                 Background="{Binding RackBackground}"
-                                                 Style="{StaticResource RackButtonTheme}"
-                                                 Checked="RadioButton_Checked"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <ItemsControl ItemsSource="{Binding Rack46to52}"
-                                      Grid.Column="6"
-                                      HorizontalAlignment="Left"
-                                      VerticalAlignment="Bottom">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <RadioButton Content="{Binding RackId}"
-                                                 GroupName="Racks"
-                                                 Background="{Binding RackBackground}"
-                                                 Style="{StaticResource RackButtonTheme}"
-                                                 Checked="RadioButton_Checked"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <ItemsControl ItemsSource="{Binding Rack53to59}"
-                                      Grid.Column="7"
-                                      HorizontalAlignment="Right"
-                                      VerticalAlignment="Bottom">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <RadioButton Content="{Binding RackId}"
-                                                 GroupName="Racks"
-                                                 Background="{Binding RackBackground}"
-                                                 Style="{StaticResource RackButtonTheme}"
-                                                 Checked="RadioButton_Checked"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <ItemsControl ItemsSource="{Binding Rack60to66}"
-                                      Grid.Column="8"
-                                      HorizontalAlignment="Left"
-                                      VerticalAlignment="Bottom">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <RadioButton Content="{Binding RackId}"
-                                                 GroupName="Racks"
-                                                 Background="{Binding RackBackground}"
-                                                 Style="{StaticResource RackButtonTheme}"
-                                                 Checked="RadioButton_Checked"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <ItemsControl ItemsSource="{Binding Rack67to71}"
-                                      Grid.Column="9"
-                                      HorizontalAlignment="Right"
-                                      VerticalAlignment="Bottom">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <RadioButton Content="{Binding RackId}"
-                                                 GroupName="Racks"
-                                                 Background="{Binding RackBackground}"
-                                                 Style="{StaticResource RackButtonTheme}"
-                                                 Checked="RadioButton_Checked"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <ItemsControl ItemsSource="{Binding Rack72to76}"
-                                      Grid.Column="10"
-                                      HorizontalAlignment="Left"
-                                      VerticalAlignment="Bottom">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <RadioButton Content="{Binding RackId}"
-                                                 GroupName="Racks"
-                                                 Background="{Binding RackBackground}"
-                                                 Style="{StaticResource RackButtonTheme}"
-                                                 Checked="RadioButton_Checked"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <ItemsControl ItemsSource="{Binding Rack77to80}"
-                                      Grid.Column="11"
-                                      HorizontalAlignment="Right"
-                                      VerticalAlignment="Bottom">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <RadioButton Content="{Binding RackId}"
-                                                 GroupName="Racks"
-                                                 Background="{Binding RackBackground}"
-                                                 Style="{StaticResource RackButtonTheme}"
-                                                 Checked="RadioButton_Checked"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                    </Grid>
-
-                    <ItemsControl ItemsSource="{Binding Rack1to13}"
-                                      Grid.Row="1"
-                                      HorizontalAlignment="Right"
-                                      VerticalAlignment="Bottom"
-                                  Margin="0,0,10,0">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <RadioButton Content="{Binding RackId}"
-                                             GroupName="Racks"
-                                             Background="{Binding RackBackground}"
-                                             Style="{StaticResource RackButtonTheme}"
-                                             Checked="RadioButton_Checked"/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
+        <Border Grid.Column="0"
+            CornerRadius="36"
+            Background="#FFFFFF"
+            BorderBrush="#E0E0E0"
+            BorderThickness="1"
+            Padding="20">
+            <Viewbox Stretch="Uniform" StretchDirection="Both">
+                <Grid Width="{StaticResource DesignWidth}" Height="{StaticResource DesignHeight}">
+                    <ItemsControl ItemsSource="{Binding RackSlots}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal"/>
+                                <Canvas/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
+
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="ContentPresenter">
+                                <Setter Property="Canvas.Left" Value="{Binding X}"/>
+                                <Setter Property="Canvas.Top"  Value="{Binding Y}"/>
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding DataContext.SelectRackByIdCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        CommandParameter="{Binding RackId}">
+                                    <Button.Style>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Width"  Value="28"/>
+                                            <Setter Property="Height" Value="44"/>
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border x:Name="Box"
+                                    CornerRadius="6"
+                                    BorderThickness="1"
+                                    Background="#E8F5E9"
+                                    BorderBrush="#81C784">
+                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <DataTrigger Binding="{Binding IsOccupied}" Value="True">
+                                                                <Setter TargetName="Box" Property="Background" Value="#EEEEEE"/>
+                                                                <Setter TargetName="Box" Property="BorderBrush" Value="#BDBDBD"/>
+                                                            </DataTrigger>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="Box" Property="BorderBrush" Value="#1565C0"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsHorizontal}" Value="True">
+                                                    <Setter Property="Width"  Value="44"/>
+                                                    <Setter Property="Height" Value="28"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+
+                                    <TextBlock Text="{Binding RackId}" FontWeight="SemiBold"/>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
                     </ItemsControl>
-
                 </Grid>
+            </Viewbox>
+        </Border>
 
-            </Border>
-            <ContentControl x:Name="RackSideContent"
-                            Content="{Binding CurrentRackView}"
-                            Grid.Row="2"
-                            Grid.Column="1"                            
-                            Margin="5,5,0,0"/> 
+        <Separator Grid.Column="1" VerticalAlignment="Stretch"/>
 
-
-        </Grid>
-        
-    </Border>
+        <ContentControl Grid.Column="2" Content="{Binding CurrentRackPanel}"/>
+    </Grid>
 </UserControl>
