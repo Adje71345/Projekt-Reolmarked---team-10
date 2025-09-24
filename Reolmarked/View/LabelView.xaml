@@ -1,0 +1,46 @@
+﻿<UserControl x:Class="Reolmarked.View.LabelView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="Transparent">
+
+    <Grid>
+        <!-- Selve kortet -->
+        <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="15" 
+                Background="White" Padding="20"
+                VerticalAlignment="Center" HorizontalAlignment="Center"
+                MinWidth="400" MinHeight="300">
+
+            <StackPanel>
+                <!-- Input -->
+                <StackPanel Margin="0 0 0 20">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0 0 10">
+                        <TextBlock Text="Reol:" Width="40" VerticalAlignment="Center"/>
+                        <TextBox Width="100" Height="25"
+                                 Text="{Binding RackId, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBlock Text="Pris:" Width="40" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBox Width="100" Height="25"
+                                 Text="{Binding Price, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Buttons -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 20 0 30">
+                    <Button Content="Generer label" Width="120" Height="30" Margin="0 0 15 0"
+                            Command="{Binding GenerateCommand}"/>
+                    <Button Content="Print" Width="80" Height="30"
+                            Command="{Binding PrintCommand}"/>
+                </StackPanel>
+
+                <!-- Preview -->
+                <Border BorderBrush="LightGray" BorderThickness="1" Padding="10"
+                        Width="300" Height="150" Margin="0 10 0 0"
+                        HorizontalAlignment="Center">
+                    <Image Source="{Binding BarcodeImage}" Stretch="None"/>
+                </Border>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

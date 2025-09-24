@@ -53,6 +53,10 @@ namespace Reolmarked.ViewModel
                 case ViewType.Rack:
                     CurrentViewModel = new RackViewModel();
                     break;
+                case ViewType.Labels:
+                    CurrentViewModel = new LabelViewModel();
+                    break;
+
                     // Tilføj flere cases her
             }
         }
