@@ -12,7 +12,7 @@
         </Grid.RowDefinitions>
 
         <!-- Info-kasser -->
-        <UniformGrid Columns="4" Margin="0,0,0,20">
+        <UniformGrid Columns="3" Margin="0,0,0,20">
             <!-- Dagens salg -->
             <Border Style="{StaticResource WhitePanel}" Margin="10" MinHeight="80">
                 <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -44,17 +44,6 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Aktive lejere:" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,5,0"/>
                     <TextBlock Text="{Binding RenterCount, StringFormat='{}{0}'}" Grid.Column="1" VerticalAlignment="Center"/>
-                </Grid>
-            </Border>
-            <!-- Antal varer -->
-            <Border Style="{StaticResource WhitePanel}" Margin="10" MinHeight="80">
-                <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="Antal varer:" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                    <TextBlock Text="{Binding UnitCount, StringFormat='{}{0}'}" Grid.Column="1" VerticalAlignment="Center"/>
                 </Grid>
             </Border>
         </UniformGrid>

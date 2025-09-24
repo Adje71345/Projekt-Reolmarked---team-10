@@ -29,7 +29,7 @@
                          GroupName="SidebarGroup"
                          IsChecked="{Binding SelectedView, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Rack}" />
             
-            <RadioButton Content="Varer" Style="{StaticResource SidebarButtonStyle}" GroupName="SidebarGroup" />
+            <RadioButton Content="Labels" Style="{StaticResource SidebarButtonStyle}" GroupName="SidebarGroup" />
             <RadioButton Content="Salg" Style="{StaticResource SidebarButtonStyle}" GroupName="SidebarGroup"/>
             <RadioButton Content="Afregning" Style="{StaticResource SidebarButtonStyle}" GroupName="SidebarGroup"/>
         </StackPanel>
