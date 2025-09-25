@@ -51,7 +51,7 @@ namespace Reolmarked.ViewModel
                     CurrentViewModel = new DashBoardViewModel(_renterRepository);
                     break;
                 case ViewType.Rack:
-                    CurrentViewModel = new RackViewModel();
+                    CurrentViewModel = new RackViewModel(_rackRepository);
                     break;
                 case ViewType.Labels:
                     CurrentViewModel = new LabelViewModel();
@@ -87,12 +87,14 @@ namespace Reolmarked.ViewModel
         //Repositories
         private readonly IRenterRepository _renterRepository;
         private readonly IRepository<PaymentMethod> _paymentMethodRepository;
+        private readonly IRackRepository _rackRepository;
 
         public MainWindowViewModel()
         {
             string connectionString = ConnectionHelper.GetConnectionString();
             _renterRepository = new RenterRepository(connectionString);
             _paymentMethodRepository = new PaymentMethodRepository(connectionString);
+            _rackRepository = new RackRepository(connectionString);
 
             //Instantier sub-viewmodels
             Sidebar = new SidebarViewModel(this);
