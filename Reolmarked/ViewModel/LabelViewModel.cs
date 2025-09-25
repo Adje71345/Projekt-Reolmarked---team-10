@@ -54,7 +54,64 @@ namespace Reolmarked.ViewModel
         }
 
         private void GenerateLabel()
-        { }
+        {
+            // Læser input og fjerner eventuelle mellemrum
+            var rackId = (RackId ?? string.Empty).Trim().Replace(" ", "");
+            var price = (Price ?? string.Empty).Trim().Replace(" ", "");
+
+            if (string.IsNullOrWhiteSpace(rackId) || string.IsNullOrWhiteSpace(price))
+            {
+                MessageBox.Show("Udfyld både Reol og Pris");
+                return;
+            }
+
+            // data som gemmes i selve stregkoden (som kan aflæses senere)
+            string barcodeData = $"{rackId};{price}";
+
+            // opretter stregkoden
+            var writer = new BarcodeWriter
+            {
+                Format = BarcodeFormat.CODE_128,
+                Options = new ZXing.Common.EncodingOptions
+                {
+                    Width = 260,
+                    Height = 80,
+                    Margin = 2,
+                    PureBarcode = true
+                }
+            };
+
+            using (var barcodeBitmap = writer.Write(barcodeData))
+            {
+                // laver label billedet, med ekstra plads til at tilføje tekst.
+                _labelBitmap = new Bitmap(barcodeBitmap.Width, barcodeBitmap.Height + 22);
+
+                using (var graphics = Graphics.FromImage(_labelBitmap))
+                {
+                    graphics.Clear(System.Drawing.Color.White);
+                    graphics.DrawImage(barcodeBitmap, 0, 0);
+
+                    using var font = new Font("Arial", 8f);
+                    using var brush = new SolidBrush(System.Drawing.Color.Black);
+
+                    string text = $"Reol: {rackId}   Pris: {price} kr";
+
+                    // måler tekstbredde og centrerer det under stregkoden
+                    var size = graphics.MeasureString(text, font);
+                    float x = (barcodeBitmap.Width - size.Width) / 2f;
+                    float y = barcodeBitmap.Height + 2f;
+
+                    graphics.DrawString(text, font, brush, x, y);
+                }
+
+                // konverter bitmap til imagesource og vis i UI
+                var hBitmap = _labelBitmap.GetHbitmap();
+                BarcodeImage = Imaging.CreateBitmapSourceFromHBitmap(
+                    hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            }
+
+
+        }
 
         private void PrintLabel()
         { }
