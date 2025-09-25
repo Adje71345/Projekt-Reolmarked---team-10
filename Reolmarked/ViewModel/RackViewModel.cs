@@ -1,6 +1,9 @@
 ﻿using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
+using ControlzEx.Standard;
 using Reolmarked.Commands;
 using Reolmarked.Model;
 
@@ -17,6 +20,21 @@ namespace Reolmarked.ViewModel
 
     public class RackViewModel : ViewModelBase
     {
+        private Brush rackBackGround = Brushes.Green;
+        public Brush RackBackground
+        {
+            get => rackBackGround;
+            set
+            {
+                Rack.RackStatusId switch
+                {
+                    2 => Brushes.Red,     // Optaget
+                    3 => Brushes.Gray,    // Defekt
+                    _ => Brushes.Green    // Ledig eller andet
+                };
+            }
+        }
+
         public ObservableCollection<Rack> Racks { get; }
         public ObservableCollection<RackSlot> RackSlots { get; } = new();
 
