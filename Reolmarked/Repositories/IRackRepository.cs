@@ -12,7 +12,7 @@ namespace Reolmarked.Repositories
         IEnumerable<Rack> GetOccupiedRacks();
 
         // Opdaterer status for en reol direkte (bruges fx til at frigive en reol)
-        void UpdateRackStatus(int rackId, RackStatus newStatus);
+        void UpdateRackStatus(int rackId, int newStatus);
 
         // Opdaterer status på alle reoler, hvor kontrakter er udløbet
         void UpdateStatusesForEndedContracts();
