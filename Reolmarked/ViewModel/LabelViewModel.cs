@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing; 
+﻿using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Interop;
-using System.Windows.Input;
+using Reolmarked.Commands;
 using ZXing;
 using ZXing.Windows.Compatibility;
-using Reolmarked.Commands;
 
 
 namespace Reolmarked.ViewModel
@@ -109,14 +104,35 @@ namespace Reolmarked.ViewModel
                 BarcodeImage = Imaging.CreateBitmapSourceFromHBitmap(
                     hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
             }
-
-
         }
 
         private void PrintLabel()
-        { }
+        { 
+            if (_labelBitmap == null)
+            {
+                MessageBox.Show("Generér først en stregkode");
+                    return;
+            }
 
+            var printDialog = new PrintDialog();
+            if (printDialog.ShowDialog() == true)
+            {
+                // konverter bitmap til en imagesource
+                var hBitmap = _labelBitmap.GetHbitmap();
+                var imageSource = Imaging.CreateBitmapSourceFromHBitmap(
+                    hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
+                // laver printbart billede
+                var imageToPrint = new System.Windows.Controls.Image
+                {
+                    Source = imageSource,
+                    Width = imageSource.Width,
+                    Height = imageSource.Height
+                };
 
+                // åbner printerdialog og sender billede af label til printer
+                printDialog.PrintVisual(imageToPrint, "Label Print");
+            }
+        }
     }
 }
