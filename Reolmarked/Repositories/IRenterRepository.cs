@@ -10,8 +10,6 @@ namespace Reolmarked.Repositories
 {
     public interface IRenterRepository : IRepository<Renter>
     {
-        IEnumerable<RenterDisplayDTO> GetAllDisplay();
-        RenterDisplayDTO GetByIdDisplay(int id);
         int GetCount();
     }
 }
