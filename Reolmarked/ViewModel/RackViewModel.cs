@@ -1,11 +1,13 @@
 ﻿using System.Collections.ObjectModel;
-using System.Drawing;
+using System.Windows.Media;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ControlzEx.Standard;
 using Reolmarked.Commands;
 using Reolmarked.Model;
+using Reolmarked.Repositories;
+
 
 namespace Reolmarked.ViewModel
 {
@@ -19,21 +21,22 @@ namespace Reolmarked.ViewModel
     }
 
     public class RackViewModel : ViewModelBase
+
     {
+        private readonly IRackRepository _repo;
+        private System.Collections.Generic.HashSet<int> _occupiedIds = new();
+
         private Brush rackBackGround = Brushes.Green;
         public Brush RackBackground
         {
             get => rackBackGround;
             set
             {
-                Rack.RackStatusId switch
-                {
-                    2 => Brushes.Red,     // Optaget
-                    3 => Brushes.Gray,    // Defekt
-                    _ => Brushes.Green    // Ledig eller andet
-                };
+                rackBackGround = value;
+                OnPropertyChanged(nameof(RackBackground));
             }
         }
+
 
         public ObservableCollection<Rack> Racks { get; }
         public ObservableCollection<RackSlot> RackSlots { get; } = new();
@@ -66,9 +69,10 @@ namespace Reolmarked.ViewModel
         private const double H_V = 44;  // lodret højde
         private const double GAP = 10;
 
-        public RackViewModel()
+        public RackViewModel(IRackRepository repo)
         {
-            Racks = new ObservableCollection<Rack>(Rack.CreateDefaultRacks());
+            _repo = repo;
+            Racks = new ObservableCollection<Rack>(_repo.GetAll());
             CurrentRackPanel = new RackHomeViewModel();
 
             SelectRackCommand = new DelegateCommand<Rack>(
@@ -165,10 +169,7 @@ namespace Reolmarked.ViewModel
             );
         }
 
-        // ---------- DIN EKSISTERENDE LAYOUT-KODE (placeringer) ----------
-
-        private static readonly System.Collections.Generic.HashSet<int> OCCUPIED =
-            new System.Collections.Generic.HashSet<int>(new[] { 12, 28, 43, 56, 61, 63, 65, 68, 70, 71, 73, 75, 78, 80 });
+        // ---------- Tais eksisterende LAYOUT-KODE (placeringer) ----------
 
         private (double x, double y) Cell(int col, int row, bool horizontal, double ox = 0, double oy = 0)
         {
@@ -186,12 +187,18 @@ namespace Reolmarked.ViewModel
                 X = p.x,
                 Y = p.y,
                 IsHorizontal = horizontal,
-                IsOccupied = OCCUPIED.Contains(rackId)
+                IsOccupied = _occupiedIds.Contains(rackId)
             });
         }
 
         private void BuildSlots()
         {
+            // Byg lookup over optagede reoler (RackStatusId == 2)
+            _occupiedIds = Racks
+                .Where(r => r.RackStatusId == 2)
+                .Select(r => r.RackId)
+                .ToHashSet();
+
             RackSlots.Clear();
 
             double OX_LEFT = 10;
