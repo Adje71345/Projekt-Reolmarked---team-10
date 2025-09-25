@@ -3,44 +3,59 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Background="Transparent">
 
-    <Grid>
-        <!-- Selve kortet -->
-        <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="15" 
-                Background="White" Padding="20"
+    
+        
+        <Border Style="{StaticResource WhitePanel}"
                 VerticalAlignment="Center" HorizontalAlignment="Center"
-                MinWidth="400" MinHeight="300">
+                Width="450" Height="400">
+
+        <Grid Margin="30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!--Input-->
+                <RowDefinition Height="Auto"/> <!--knapper-->
+                <RowDefinition Height="*"/> <!--Label Preview-->
+            </Grid.RowDefinitions>
+
 
             <StackPanel>
                 <!-- Input -->
-                <StackPanel Margin="0 0 0 20">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0 0 10">
-                        <TextBlock Text="Reol:" Width="40" VerticalAlignment="Center"/>
-                        <TextBox Width="100" Height="25"
+                <StackPanel Grid.Row="0" Margin="0 0 0 20" HorizontalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Margin="0 0 0 10">
+                        <TextBlock Text="Reol:" Width="60" VerticalAlignment="Center"/>
+                        <TextBox Width="150" 
                                  Text="{Binding RackId, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <TextBlock Text="Pris:" Width="40" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Width="100" Height="25"
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Pris:" Width="60" VerticalAlignment="Center"/>
+                        <TextBox Width="150" 
                                  Text="{Binding Price, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
                 </StackPanel>
 
                 <!-- Buttons -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 20 0 30">
-                    <Button Content="Generer label" Width="120" Height="30" Margin="0 0 15 0"
+                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0 0 20">
+                    
+                    <Button Content="Generer label"
+                            Width="120" Height="30"
+                            Margin="0 0 10 0"
+                            Style="{StaticResource GrayRoundedButton}"
                             Command="{Binding GenerateCommand}"/>
-                    <Button Content="Print" Width="80" Height="30"
+                    
+                    <Button Content="Print"
+                            Width="85" Height="30"
+                            Style="{StaticResource GrayRoundedButton}"
                             Command="{Binding PrintCommand}"/>
                 </StackPanel>
 
                 <!-- Preview -->
-                <Border BorderBrush="LightGray" BorderThickness="1" Padding="10"
-                        Width="300" Height="150" Margin="0 10 0 0"
-                        HorizontalAlignment="Center">
+                <Border Grid.Row="2" BorderBrush="LightGray" BorderThickness="1" Padding="5"
+                        Width="300" Height="150" 
+                        HorizontalAlignment="Center" VerticalAlignment="Top">
                     <Image Source="{Binding BarcodeImage}" Stretch="None"/>
                 </Border>
             </StackPanel>
-        </Border>
-    </Grid>
+        </Grid>
+    </Border>
+  
 </UserControl>
