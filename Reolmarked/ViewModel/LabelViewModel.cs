@@ -114,7 +114,33 @@ namespace Reolmarked.ViewModel
         }
 
         private void PrintLabel()
-        { }
+        { 
+            if (_labelBitmap == null)
+            {
+                MessageBox.Show("Generér først en stregkode");
+                    return;
+            }
+
+            var printDialog = new PrintDialog();
+            if (printDialog.ShowDialog() == true)
+            {
+                // konverter bitmap til en imagesource
+                var hBitmap = _labelBitmap.GetHbitmap();
+                var imageSource = Imaging.CreateBitmapSourceFromHBitmap(
+                    hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+
+                // laver printbart billede
+                var imageToPrint = new System.Windows.Controls.Image
+                {
+                    Source = imageSource,
+                    Width = imageSource.Width,
+                    Height = imageSource.Height
+                };
+
+                // åbner printerdialog og sender billede af label til printer
+                printDialog.PrintVisual(imageToPrint, "Label Print");
+            }
+        }
 
 
 
