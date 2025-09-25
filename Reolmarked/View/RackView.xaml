@@ -9,6 +9,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <!-- mapper med nubærende RackPanel (Home/Selected/Add/End) -->
                 <ResourceDictionary Source="/Reolmarked;component/Resources/RackPanelsViewLocators.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <sys:Double x:Key="DesignWidth">1200</sys:Double>
@@ -19,10 +20,14 @@
     <Grid Margin="16">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
+            <!-- reoler -->
             <ColumnDefinition Width="24" />
-            <ColumnDefinition Width="210" />
+            <!-- skillelinje -->
+            <ColumnDefinition Width="420" />
+            <!-- højre panel -->
         </Grid.ColumnDefinitions>
 
+        <!-- Venstre: kort / reoler -->
         <Border Grid.Column="0"
             CornerRadius="36"
             Background="#FFFFFF"
@@ -76,6 +81,7 @@
                                                 </Setter.Value>
                                             </Setter>
 
+                                            <!-- vandrette reoler -->
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsHorizontal}" Value="True">
                                                     <Setter Property="Width"  Value="44"/>
@@ -94,8 +100,10 @@
             </Viewbox>
         </Border>
 
+        <!-- Separator -->
         <Separator Grid.Column="1" VerticalAlignment="Stretch"/>
 
+        <!-- Højre panel (der hvor DataTemplates styrer indholdet) -->
         <ContentControl Grid.Column="2" Content="{Binding CurrentRackPanel}"/>
     </Grid>
 </UserControl>

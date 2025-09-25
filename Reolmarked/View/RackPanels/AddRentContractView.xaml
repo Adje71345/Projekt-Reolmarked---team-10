@@ -27,9 +27,9 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
                         <Border CornerRadius="{StaticResource PillRadius}"
-                    Background="{TemplateBinding Background}"
-                    BorderBrush="{TemplateBinding BorderBrush}"
-                    BorderThickness="{TemplateBinding BorderThickness}">
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
                             <ScrollViewer x:Name="PART_ContentHost" Margin="{StaticResource PillPadding}"/>
                         </Border>
                     </ControlTemplate>
@@ -50,9 +50,9 @@
                     <ControlTemplate TargetType="ComboBox">
                         <Grid>
                             <Border x:Name="Bd" CornerRadius="{StaticResource PillRadius}"
-                      Background="{TemplateBinding Background}"
-                      BorderBrush="{TemplateBinding BorderBrush}"
-                      BorderThickness="{TemplateBinding BorderThickness}"/>
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"/>
                             <Grid Margin="8,0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
@@ -60,7 +60,7 @@
                                 </Grid.ColumnDefinitions>
                                 <ContentPresenter Margin="8,6" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="1" FontFamily="Segoe MDL2 Assets" Text="&#xE70D;"
-                           VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.7"/>
+                                           VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.7"/>
                             </Grid>
                             <Popup IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" AllowsTransparency="True">
                                 <Border Background="White" BorderBrush="{StaticResource BdrSoft}" BorderThickness="1" CornerRadius="12" Padding="4">
@@ -91,18 +91,18 @@
                     <ControlTemplate TargetType="DatePicker">
                         <Grid>
                             <Border CornerRadius="{StaticResource PillRadius}"
-                      Background="{StaticResource BgrdInput}"
-                      BorderBrush="{StaticResource BdrSoft}"
-                      BorderThickness="1.5"/>
+                                    Background="{StaticResource BgrdInput}"
+                                    BorderBrush="{StaticResource BdrSoft}"
+                                    BorderThickness="1.5"/>
                             <Grid Margin="6,2">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
                                     <ColumnDefinition Width="36"/>
                                 </Grid.ColumnDefinitions>
                                 <DatePickerTextBox x:Name="PART_TextBox" Background="Transparent" BorderThickness="0"
-                                   Padding="10,8" VerticalContentAlignment="Center"/>
+                                                   Padding="10,8" VerticalContentAlignment="Center"/>
                                 <TextBlock Grid.Column="1" FontFamily="Segoe MDL2 Assets" Text="&#xE787;"
-                           VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.8"/>
+                                           VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.8"/>
                             </Grid>
                             <Popup x:Name="PART_Popup" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
                                 <Border Background="White" BorderBrush="{StaticResource BdrSoft}" BorderThickness="1" CornerRadius="12">
@@ -129,10 +129,10 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border CornerRadius="{StaticResource BtnRadius}"
-                    Background="{TemplateBinding Background}"
-                    BorderBrush="{TemplateBinding BorderBrush}"
-                    BorderThickness="{TemplateBinding BorderThickness}"
-                    Padding="{TemplateBinding Padding}">
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </ControlTemplate>
@@ -156,124 +156,134 @@
         </Style>
     </UserControl.Resources>
 
+    <!-- TILFØJET: hvid afrundet baggrund bag hele indholdet -->
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+        <Border Background="#FFFFFF"
+                BorderBrush="#E5E7EB"
+                BorderThickness="1"
+                CornerRadius="24"
+                Margin="-13,-13,-107,-14"
+                IsHitTestVisible="False"/>
 
-        <!-- Header -->
-        <DockPanel Grid.Row="0" Margin="0,0,0,16">
-            <TextBlock Text="Opret lejekontrakt" FontSize="20" FontWeight="SemiBold"/>
-            <Button Content="&#x2715;" FontSize="16" Command="{Binding CloseCommand}"
-              DockPanel.Dock="Right" Style="{StaticResource BtnGhostPill}"/>
-        </DockPanel>
+        <Grid Margin="2,0,-2,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <!-- Felter -->
-        <StackPanel Grid.Row="1">
-            <!-- Reol -->
-            <Grid Margin="0,0,0,14">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="140"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Reol" Style="{StaticResource FormLabel}" Margin="0,8,0,0"/>
-                <TextBox Grid.Column="1" Text="{Binding RackId, UpdateSourceTrigger=PropertyChanged}" Width="160" Style="{StaticResource InputPill}"/>
-            </Grid>
+            <!-- Header -->
+            <DockPanel Grid.Row="0" Margin="0,0,0,16">
+                <TextBlock Text="Opret lejekontrakt" FontSize="20" FontWeight="SemiBold"/>
+                <Button Content="&#x2715;" FontSize="16" Command="{Binding CloseCommand}"
+                        DockPanel.Dock="Right" Style="{StaticResource BtnGhostPill}"/>
+            </DockPanel>
 
-            <!-- Lejer (navn) + forslag (vis KUN ved fokus + tekst + forslag) -->
-            <Grid Margin="0,0,0,14">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="140"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Lejer (navn)" Style="{StaticResource FormLabel}"/>
-                <StackPanel Grid.Column="1">
-                    <TextBox x:Name="NameBox" Text="{Binding RenterNameQuery, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InputPill}"/>
-                    <Border CornerRadius="12" Background="White"
-                  BorderBrush="{StaticResource BdrSoft}" BorderThickness="1" Margin="0,8,0,0" Padding="4">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                                <Style.Triggers>
-                                    <!-- Vis når feltet har fokus -->
-                                    <DataTrigger Binding="{Binding ElementName=NameBox, Path=IsKeyboardFocusWithin}" Value="True">
-                                        <Setter Property="Visibility" Value="Visible"/>
-                                    </DataTrigger>
-                                    <!-- Skjul hvis ingen forslag -->
-                                    <DataTrigger Binding="{Binding NameSuggestions.Count}" Value="0">
-                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                    </DataTrigger>
-                                    <!-- Skjul hvis tomt -->
-                                    <DataTrigger Binding="{Binding ElementName=NameBox, Path=Text}" Value="">
-                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <ItemsControl ItemsSource="{Binding NameSuggestions}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Button Content="{Binding Display}"
-                          Command="{Binding DataContext.PickRenterCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                          CommandParameter="{Binding RenterId}"
-                          HorizontalContentAlignment="Left"
-                          BorderThickness="0" Background="Transparent" Padding="10,6"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </Border>
-                </StackPanel>
-            </Grid>
+            <!-- Felter -->
+            <StackPanel Grid.Row="1">
+                <!-- Reol -->
+                <Grid Margin="0,0,0,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Reol" Style="{StaticResource FormLabel}" Margin="0,8,0,0"/>
+                    <TextBox Grid.Column="1" Text="{Binding RackId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InputPill}"/>
+                </Grid>
 
-            <!-- Lejer-ID -->
-            <Grid Margin="0,0,0,14">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="140"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Lejer-ID" Style="{StaticResource FormLabel}" Margin="0,8,0,0"/>
-                <TextBox Grid.Column="1" Text="{Binding RenterId, UpdateSourceTrigger=PropertyChanged}" Width="160" Style="{StaticResource InputPill}"/>
-            </Grid>
+                <!-- Lejer (navn) + forslag (vis KUN ved fokus + tekst + forslag) -->
+                <Grid Margin="0,0,0,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Lejer (navn)" Style="{StaticResource FormLabel}"/>
+                    <StackPanel Grid.Column="1">
+                        <TextBox x:Name="NameBox" Text="{Binding RenterNameQuery, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InputPill}"/>
+                        <Border CornerRadius="12" Background="White"
+                                BorderBrush="{StaticResource BdrSoft}" BorderThickness="1" Margin="0,8,0,0" Padding="4">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <!-- Vis når feltet har fokus -->
+                                        <DataTrigger Binding="{Binding ElementName=NameBox, Path=IsKeyboardFocusWithin}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                        <!-- Skjul hvis ingen forslag -->
+                                        <DataTrigger Binding="{Binding NameSuggestions.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                        <!-- Skjul hvis tomt -->
+                                        <DataTrigger Binding="{Binding ElementName=NameBox, Path=Text}" Value="">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <ItemsControl ItemsSource="{Binding NameSuggestions}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Content="{Binding Display}"
+                                                Command="{Binding DataContext.PickRenterCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding RenterId}"
+                                                HorizontalContentAlignment="Left"
+                                                BorderThickness="0" Background="Transparent" Padding="10,6"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+                    </StackPanel>
+                </Grid>
 
-            <!-- Startdato -->
-            <Grid Margin="0,0,0,14">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="140"/>
-                    <ColumnDefinition Width="160.18"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Startdato" Style="{StaticResource FormLabel}" Margin="0,8,0,0"/>
-                <DatePicker Grid.Column="1" SelectedDate="{Binding StartDateTime}" Style="{StaticResource DatePill}"/>
-            </Grid>
+                <!-- Lejer-ID -->
+                <Grid Margin="0,0,0,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="160.18"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Lejer-ID" Style="{StaticResource FormLabel}" Margin="0,8,0,0"/>
+                    <TextBox Grid.Column="1" Text="{Binding RenterId, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InputPill}" Margin="0,0,-85,0"/>
+                </Grid>
 
-            <!-- Slutdato + Ingen slutdato -->
-            <Grid Margin="0,0,0,14">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="140"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Slutdato" Style="{StaticResource FormLabel}" Margin="0,8,0,0"/>
-                <StackPanel Grid.Column="1">
-                    <DatePicker SelectedDate="{Binding EndDateTime}" IsEnabled="{Binding EndDateEnabled}" Style="{StaticResource DatePill}"/>
-                    <CheckBox Content="Ingen slutdato" IsChecked="{Binding NoEnd}" Margin="12,8,0,0" Foreground="{StaticResource TxtMain}" FontSize="14"/>
-                </StackPanel>
-            </Grid>
+                <!-- Startdato -->
+                <Grid Margin="0,0,0,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="160.18"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Startdato" Style="{StaticResource FormLabel}" Margin="0,8,0,0"/>
+                    <DatePicker Grid.Column="1" SelectedDate="{Binding StartDateTime}" Style="{StaticResource DatePill}"/>
+                </Grid>
 
-            <!-- Betalingsmetode -->
-            <Grid Margin="0,0,0,14">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="140"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Betalingsmetode" Style="{StaticResource FormLabel}" Margin="0,8,0,0"/>
-                <ComboBox Grid.Column="1" ItemsSource="{Binding PaymentMethods}" SelectedItem="{Binding SelectedPaymentMethod}"
-                  DisplayMemberPath="Name" Style="{StaticResource ComboPill}"/>
-            </Grid>
-        </StackPanel>
+                <!-- Slutdato + Ingen slutdato -->
+                <Grid Margin="0,0,0,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Slutdato" Style="{StaticResource FormLabel}" Margin="0,8,0,0"/>
+                    <StackPanel Grid.Column="1">
+                        <DatePicker SelectedDate="{Binding EndDateTime}" IsEnabled="{Binding EndDateEnabled}" Style="{StaticResource DatePill}"/>
+                        <CheckBox Content="Ingen slutdato" IsChecked="{Binding NoEnd}" Margin="12,8,0,0" Foreground="{StaticResource TxtMain}" FontSize="14"/>
+                    </StackPanel>
+                </Grid>
 
-        <!-- Opret lejekontrakt -->
-        <Button Grid.Row="2" Content="Opret lejekontrakt" Command="{Binding SubmitCommand}"
-            Style="{StaticResource BtnPrimaryPill}" Margin="0,20,0,0"/>
+                <!-- Betalingsmetode -->
+                <Grid Margin="0,0,0,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Betalingsmetode" Style="{StaticResource FormLabel}" Margin="0,8,0,0"/>
+                    <ComboBox Grid.Column="1" ItemsSource="{Binding PaymentMethods}" SelectedItem="{Binding SelectedPaymentMethod}"
+                              DisplayMemberPath="Name" Style="{StaticResource ComboPill}"/>
+                </Grid>
+            </StackPanel>
+
+            <!-- Opret lejekontrakt -->
+            <Button Grid.Row="2" Content="Opret lejekontrakt" Command="{Binding SubmitCommand}"
+                    Style="{StaticResource BtnPrimaryPill}" Margin="0,14,0,6"/>
+        </Grid>
     </Grid>
 </UserControl>
