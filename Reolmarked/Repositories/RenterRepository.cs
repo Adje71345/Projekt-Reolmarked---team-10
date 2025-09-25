@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Reolmarked.Model;
-using Reolmarked.Model.DTO;
 
 
 namespace Reolmarked.Repositories
