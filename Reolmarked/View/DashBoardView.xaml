@@ -82,16 +82,19 @@
 
         </Grid>
 
-        <!-- Tjekliste -->
+        <!-- Kommende begivenheder -->
         <Border Style="{StaticResource WhitePanel}" Grid.Row="2" Margin="10">
             <StackPanel>
-                <TextBlock Text="Checklist Today" FontWeight="Bold" Margin="0,0,0,10"/>
-                <DataGrid ItemsSource="{Binding Checklist}" AutoGenerateColumns="False">
+                <TextBlock Text="Kommende begivenheder" 
+                           FontWeight="Bold" Margin="0,0,0,10"
+                           TextAlignment="Center"/>
+                <DataGrid ItemsSource="{Binding Events}"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Task" Binding="{Binding Task}" Width="*"/>
-                        <DataGridTextColumn Header="Responsible" Binding="{Binding Responsible}" Width="*"/>
-                        <DataGridTextColumn Header="Time Frame" Binding="{Binding TimeFrame}" Width="*"/>
-                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*"/>
+                        <DataGridTextColumn Header="Event" Binding="{Binding Name}" Width="2*"/>
+                        <DataGridTextColumn Header="Dato" Binding="{Binding Date}" Width="*"/>
+                        <DataGridTextColumn Header="Beskrivelse" Binding="{Binding Description}" Width="3*"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </StackPanel>
