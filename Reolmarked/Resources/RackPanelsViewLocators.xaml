@@ -1,14 +1,26 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:vm="clr-namespace:Reolmarked.ViewModel"
-                    xmlns:v ="clr-namespace:Reolmarked.View.RackUserControl">
+                    xmlns:vu="clr-namespace:Reolmarked.View.RackUserControl"
+                    xmlns:vp="clr-namespace:Reolmarked.View.RackPanels">
 
+    <!-- Start / tomt panel -->
     <DataTemplate DataType="{x:Type vm:RackHomeViewModel}">
-        <v:RackHome/>
+        <vu:RackHome/>
     </DataTemplate>
 
+    <!-- Detalje-panel for valgt reol -->
     <DataTemplate DataType="{x:Type vm:RackSelectedViewModel}">
-        <v:RackSelected/>
+        <vu:RackSelected/>
     </DataTemplate>
 
+    <!-- NY: Opret lejekontrakt -->
+    <DataTemplate DataType="{x:Type vm:AddRentContractViewModel}">
+        <vp:AddRentContractView/>
+    </DataTemplate>
+
+    <!-- NY: Opsig lejekontrakt -->
+    <DataTemplate DataType="{x:Type vm:EndRentContractViewModel}">
+        <vp:EndRentContractView/>
+    </DataTemplate>
 </ResourceDictionary>

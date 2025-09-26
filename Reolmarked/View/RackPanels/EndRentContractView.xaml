@@ -1,0 +1,186 @@
+﻿<UserControl x:Class="Reolmarked.View.RackPanels.EndRentContractView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="TxtMain"   Color="#111827"/>
+        <SolidColorBrush x:Key="TxtMuted"  Color="#6B7280"/>
+        <SolidColorBrush x:Key="BdrSoft"   Color="#E5EEF8"/>
+        <SolidColorBrush x:Key="BgrdInput" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="Danger" Color="#DC2626"/>
+        <SolidColorBrush x:Key="DangerLight" Color="#FCA5A5"/>
+
+        <CornerRadius x:Key="PillRadius">18</CornerRadius>
+        <CornerRadius x:Key="BtnRadius">22</CornerRadius>
+        <Thickness x:Key="PillPadding">16,12</Thickness>
+
+        <Style x:Key="InputPill" TargetType="TextBox">
+            <Setter Property="Foreground" Value="{StaticResource TxtMain}"/>
+            <Setter Property="Background" Value="{StaticResource BgrdInput}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BdrSoft}"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border CornerRadius="{StaticResource PillRadius}" Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="{StaticResource PillPadding}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TextAreaPill" TargetType="TextBox" BasedOn="{StaticResource InputPill}">
+            <Setter Property="AcceptsReturn" Value="True"/>
+            <Setter Property="MinLines" Value="3"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border CornerRadius="16" Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="16"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DatePill" TargetType="DatePicker">
+            <Setter Property="Foreground" Value="{StaticResource TxtMain}"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DatePicker">
+                        <Grid>
+                            <Border CornerRadius="{StaticResource PillRadius}" Background="{StaticResource BgrdInput}"
+                      BorderBrush="{StaticResource BdrSoft}" BorderThickness="1.5"/>
+                            <Grid Margin="6,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="36"/>
+                                </Grid.ColumnDefinitions>
+                                <DatePickerTextBox x:Name="PART_TextBox" Background="Transparent" BorderThickness="0"
+                                   Padding="10,8" VerticalContentAlignment="Center"/>
+                                <TextBlock Grid.Column="1" FontFamily="Segoe MDL2 Assets" Text="&#xE787;" 
+                           VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.8"/>
+                            </Grid>
+                            <Popup x:Name="PART_Popup" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
+                                <Border Background="White" BorderBrush="{StaticResource BdrSoft}" BorderThickness="1" CornerRadius="12">
+                                    <Calendar x:Name="PART_Calendar"/>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="BtnDangerOutlinePill" TargetType="Button">
+            <Setter Property="Foreground" Value="{StaticResource Danger}"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DangerLight}"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="20,14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="{StaticResource BtnRadius}" Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                    Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="BtnGhostPill" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <Style x:Key="FormLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource TxtMuted}"/>
+            <Setter Property="Margin" Value="0,6,0,4"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="Opsig lejekontrakt" FontSize="20" FontWeight="SemiBold"/>
+            <Button Content="&#x2715;" Command="{Binding CloseCommand}" FontSize="16" DockPanel.Dock="Right" Style="{StaticResource BtnGhostPill}"/>
+        </DockPanel>
+
+        <StackPanel Grid.Row="1">
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Reol" Style="{StaticResource FormLabel}" Margin="0,8,0,0"/>
+                <TextBox Grid.Column="1" Text="{Binding RackId}" IsReadOnly="True" Style="{StaticResource InputPill}"/>
+            </Grid>
+
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Lejer" Style="{StaticResource FormLabel}" Margin="0,8,0,0"/>
+                <TextBox Grid.Column="1" Text="{Binding RenterDisplay}" IsReadOnly="True" Style="{StaticResource InputPill}"/>
+            </Grid>
+
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Lejer-ID" Style="{StaticResource FormLabel}" Margin="0,8,0,0"/>
+                <TextBox Grid.Column="1" Text="{Binding RenterId}" IsReadOnly="True" Style="{StaticResource InputPill}"/>
+            </Grid>
+
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Slutdato" Style="{StaticResource FormLabel}" Margin="0,8,0,0"/>
+                <TextBox Grid.Column="1" Text="{Binding CurrentEndDateText}" IsReadOnly="True" Style="{StaticResource InputPill}"/>
+            </Grid>
+
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Opsigelsesdato" Style="{StaticResource FormLabel}" Margin="0,8,0,0"/>
+                <DatePicker Grid.Column="1" SelectedDate="{Binding TerminationDate}" Style="{StaticResource DatePill}"/>
+            </Grid>
+
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Årsag" Style="{StaticResource FormLabel}" Margin="0,8,0,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Reason}" Style="{StaticResource TextAreaPill}"/>
+            </Grid>
+        </StackPanel>
+
+        <Button Grid.Row="2" Content="Bekræft opsigelse" Command="{Binding SubmitCommand}"
+            Style="{StaticResource BtnDangerOutlinePill}" Margin="0,20,0,0"/>
+    </Grid>
+</UserControl>

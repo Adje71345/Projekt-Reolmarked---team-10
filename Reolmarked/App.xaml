@@ -39,6 +39,10 @@
                 <view:AddRenterView />
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type vm:LabelViewModel}">
+                <view:LabelView/>
+            </DataTemplate>
+
             <!-- Converters -->
             <vm:EnumToBoolConverter x:Key="EnumToBoolConverter" />
             <converters:MultiplyDoubleConverter x:Key="MultiplyDoubleConverter" />

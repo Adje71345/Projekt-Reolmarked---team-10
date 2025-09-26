@@ -7,52 +7,20 @@ using System.Windows.Media;
 
 namespace Reolmarked.Model
 {
-    public enum RackStatus
-    {
-        Ledig,
-        Optaget,
-        Defekt
-    }
-
     public class Rack
     {
         //Attributter
         public int RackId { get; set; }
-        public RackStatus Status { get; set; }
-        private Brush rackBackGround = Brushes.Green;
-        public Brush RackBackground
-        {
-            get => rackBackGround; set
-            {
-                if (Status == RackStatus.Optaget)
-                {
-                    rackBackGround = Brushes.Red;
-                }
-                else if (Status == RackStatus.Defekt)
-                {
-                    rackBackGround = Brushes.Gray;
-                }
-            }
-        }
-
+        public int RackStatusId  { get; set; }
+        public string StatusName {get; set; }
         //Constructor
-        public Rack(int rackId, RackStatus status)
+        public Rack(int rackId, int rackStatusId, string statusName)
         {
             RackId = rackId;
-            Status = status;
+            RackStatusId = rackStatusId;
+            StatusName = statusName;
         }
 
         public Rack() { }
-
-        //Statisk metode til at oprette 80 reoler
-        public static List<Rack> CreateDefaultRacks()
-        {
-            var racks = new List<Rack>();
-            for (int i = 1; i <= 80; i++)
-            {
-                racks.Add(new Rack(i, RackStatus.Ledig));
-            }
-            return racks;
-        }
     }
 }

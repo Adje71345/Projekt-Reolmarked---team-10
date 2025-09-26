@@ -10,7 +10,7 @@ namespace Reolmarked.Model
     {
         //Attributter
         public int RentalId { get; set; }
-        public int RenterId { get; set; } //-----skal den ikke hente RenterId fra Renter klassen???
+        public int RenterId { get; set; } // FK til Renter
         public int RackId { get; set; } // FK til Rack
         public DateOnly StartDate { get; set; }
         public DateOnly? EndDate { get; set; }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Windows.Input;
+using Reolmarked.Commands;
 using Reolmarked.Model;
 
 namespace Reolmarked.ViewModel
@@ -27,20 +29,14 @@ namespace Reolmarked.ViewModel
         public DateOnly? PeriodStart
         {
             get => _periodStart;
-            private set
-            {
-                if (SetProperty(ref _periodStart, value)) UpdateDerived();
-            }
+            private set { if (SetProperty(ref _periodStart, value)) UpdateDerived(); }
         }
 
         private DateOnly? _periodEnd;
         public DateOnly? PeriodEnd
         {
             get => _periodEnd;
-            private set
-            {
-                if (SetProperty(ref _periodEnd, value)) UpdateDerived();
-            }
+            private set { if (SetProperty(ref _periodEnd, value)) UpdateDerived(); }
         }
 
         private string _periodText = "-";
@@ -57,13 +53,28 @@ namespace Reolmarked.ViewModel
             private set => SetProperty(ref _daysLeft, value);
         }
 
-        public RackSelectedViewModel(Rack rack)
+        // Navigation
+        public ICommand AddContractCommand { get; }
+        public ICommand EndContractCommand { get; }
+        private readonly Action _goToAddContract;
+        private readonly Action _goToEndContract;
+
+        public RackSelectedViewModel(
+            Rack rack,
+            Action goToAddContract,
+            Action goToEndContract)
         {
             Rack = rack ?? throw new ArgumentNullException(nameof(rack));
+            _goToAddContract = goToAddContract ?? (() => { });
+            _goToEndContract = goToEndContract ?? (() => { });
+
             LoadDetails(rack);
+
+            AddContractCommand = new RelayCommand(() => _goToAddContract());
+            EndContractCommand = new RelayCommand(() => _goToEndContract());
         }
 
-        // For sjovt demo indtil DB kobles på
+        // Demo-data indtil DB
         private static readonly HashSet<int> _occupiedIds =
             new HashSet<int>(new[] { 12, 28, 43, 56, 61, 63, 65, 68, 70, 71, 73, 75, 78, 80 });
 

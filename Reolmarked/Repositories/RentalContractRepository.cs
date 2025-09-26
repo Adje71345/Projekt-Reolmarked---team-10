@@ -20,13 +20,13 @@ namespace Reolmarked.Repositories
             connection.Open();
 
             string query = @"
-                INSERT INTO RentalContract (RenterID, RackID, StartDate, EndDate)
-                VALUES (@RenterID, @RackID, @StartDate, @EndDate);
+                INSERT INTO RentalContract (RenterId, RackId, StartDate, EndDate)
+                VALUES (@RenterId, @RackId, @StartDate, @EndDate);
                 SELECT SCOPE_IDENTITY();";
 
             var command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@RenterID", rentalContract.RenterId);
-            command.Parameters.AddWithValue("@RackID", rentalContract.RackId);
+            command.Parameters.AddWithValue("@RenterId", rentalContract.RenterId);
+            command.Parameters.AddWithValue("@RackId", rentalContract.RackId);
 
             // konverterer DateOnly til DateTime, fordi sql ikke kender dateonly
             command.Parameters.AddWithValue("@StartDate", rentalContract.StartDate.ToDateTime(TimeOnly.MinValue));
@@ -43,18 +43,18 @@ namespace Reolmarked.Repositories
 
             string query = @"
                 UPDATE RentalContract
-                SET RenterID = @RenterID,
-                    RackID = @RackID,
+                SET RenterId = @RenterId,
+                    RackId = @RackId,
                     StartDate = @StartDate,
                     EndDate = @EndDate
-                WHERE RentalID = @RentalID";
+                WHERE RentalContractId = @RentalContractId";
 
             var command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@RenterID", rentalContract.RenterId);
-            command.Parameters.AddWithValue("@RackID", rentalContract.RackId);
+            command.Parameters.AddWithValue("@RenterId", rentalContract.RenterId);
+            command.Parameters.AddWithValue("@RackId", rentalContract.RackId);
             command.Parameters.AddWithValue("@StartDate", rentalContract.StartDate.ToDateTime(TimeOnly.MinValue));
             command.Parameters.AddWithValue("@EndDate", rentalContract.EndDate?.ToDateTime(TimeOnly.MinValue) ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@RentalID", rentalContract.RentalId);
+            command.Parameters.AddWithValue("@RentalContractId", rentalContract.RentalId);
 
             command.ExecuteNonQuery();
         }
@@ -65,10 +65,10 @@ namespace Reolmarked.Repositories
             using var connection = new SqlConnection(_connectionString);
             connection.Open();
 
-            string query = "DELETE FROM RentalContract WHERE RentalID = @RentalID";
+            string query = "DELETE FROM RentalContract WHERE RentalContractId = @RentalContractId";
 
             var command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@RentalID", id);
+            command.Parameters.AddWithValue("@RentalContractId", id);
 
             command.ExecuteNonQuery();
         }
@@ -77,11 +77,11 @@ namespace Reolmarked.Repositories
         public RentalContract GetById(int id)
         {
             RentalContract contract = null;
-            string query = "SELECT RentalID, RenterID, RackID, StartDate, EndDate FROM RentalContract WHERE RentalID = @RentalID";
+            string query = "SELECT RentalContractId, RenterId, RackId, StartDate, EndDate FROM RentalContract WHERE RentalContractId = @RentalContractId";
 
             using var connection = new SqlConnection(_connectionString);
             var command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@RentalID", id);
+            command.Parameters.AddWithValue("@RentalContractId", id);
 
             connection.Open();
             using var reader = command.ExecuteReader();
@@ -89,9 +89,9 @@ namespace Reolmarked.Repositories
             {
                 contract = new RentalContract
                 {
-                    RentalId = (int)reader["RentalID"],
-                    RenterId = (int)reader["RenterID"],
-                    RackId = (int)reader["RackID"],
+                    RentalId = (int)reader["RentalContractId"],
+                    RenterId = (int)reader["RenterId"],
+                    RackId = (int)reader["RackId"],
 
                     StartDate = DateOnly.FromDateTime((DateTime)reader["StartDate"]),
                     EndDate = reader["EndDate"] == DBNull.Value
@@ -107,7 +107,7 @@ namespace Reolmarked.Repositories
         public IEnumerable<RentalContract> GetAll()
         {
             var contracts = new List<RentalContract>();
-            string query = "SELECT RentalID, RenterID, RackID, StartDate, EndDate FROM RentalContract";
+            string query = "SELECT RentalContractId, RenterId, RackId, StartDate, EndDate FROM RentalContract";
 
             using var connection = new SqlConnection(_connectionString);
             var command = new SqlCommand(query, connection);
@@ -118,9 +118,9 @@ namespace Reolmarked.Repositories
             {
                 contracts.Add(new RentalContract
                 {
-                    RentalId = (int)reader["RentalID"],
-                    RenterId = (int)reader["RenterID"],
-                    RackId = (int)reader["RackID"],
+                    RentalId = (int)reader["RentalContractId"],
+                    RenterId = (int)reader["RenterId"],
+                    RackId = (int)reader["RackId"],
 
                     StartDate = DateOnly.FromDateTime((DateTime)reader["StartDate"]),
                     EndDate = reader["EndDate"] == DBNull.Value
@@ -139,13 +139,13 @@ namespace Reolmarked.Repositories
         {
             RentalContract contract = null;
             string query = @"
-                SELECT RentalID, RenterID, RackID, StartDate, EndDate
+                SELECT RentalContractId, RenterId, RackId, StartDate, EndDate
                 FROM RentalContract
-                WHERE RackID = @RackID AND EndDate IS NULL";
+                WHERE RackId = @RackId AND EndDate IS NULL";
 
             using var connection = new SqlConnection(_connectionString);
             var command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@RackID", rackId);
+            command.Parameters.AddWithValue("@RackId", rackId);
 
             connection.Open();
             using var reader = command.ExecuteReader();
@@ -153,9 +153,9 @@ namespace Reolmarked.Repositories
             {
                 contract = new RentalContract
                 {
-                    RentalId = (int)reader["RentalID"],
-                    RenterId = (int)reader["RenterID"],
-                    RackId = (int)reader["RackID"],
+                    RentalId = (int)reader["RentalContractId"],
+                    RenterId = (int)reader["RenterId"],
+                    RackId = (int)reader["RackId"],
 
                     StartDate = DateOnly.FromDateTime((DateTime)reader["StartDate"]),
                     EndDate = null
@@ -170,13 +170,13 @@ namespace Reolmarked.Repositories
         {
             var contracts = new List<RentalContract>();
             string query = @"
-                SELECT RentalID, RenterID, RackID, StartDate, EndDate
+                SELECT RentalContractId, RenterId, RackId, StartDate, EndDate
                 FROM RentalContract
-                WHERE RenterID = @RenterID AND EndDate IS NULL";
+                WHERE RenterId = @RenterId AND EndDate IS NULL";
 
             using var connection = new SqlConnection(_connectionString);
             var command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@RenterID", renterId);
+            command.Parameters.AddWithValue("@RenterId", renterId);
 
             connection.Open();
             using var reader = command.ExecuteReader();
@@ -184,9 +184,9 @@ namespace Reolmarked.Repositories
             {
                 contracts.Add(new RentalContract
                 {
-                    RentalId = (int)reader["RentalID"],
-                    RenterId = (int)reader["RenterID"],
-                    RackId = (int)reader["RackID"],
+                    RentalId = (int)reader["RentalContractId"],
+                    RenterId = (int)reader["RenterId"],
+                    RackId = (int)reader["RackId"],
 
                     StartDate = DateOnly.FromDateTime((DateTime)reader["StartDate"]),
                     EndDate = null

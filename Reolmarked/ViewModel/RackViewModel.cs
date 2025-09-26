@@ -1,7 +1,13 @@
 ﻿using System.Collections.ObjectModel;
+using System.Windows.Media;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
+using ControlzEx.Standard;
 using Reolmarked.Commands;
 using Reolmarked.Model;
+using Reolmarked.Repositories;
+
 
 namespace Reolmarked.ViewModel
 {
@@ -15,9 +21,29 @@ namespace Reolmarked.ViewModel
     }
 
     public class RackViewModel : ViewModelBase
+
     {
+        private readonly IRackRepository _repo;
+        private System.Collections.Generic.HashSet<int> _occupiedIds = new();
+
+        private Brush rackBackGround = Brushes.Green;
+        public Brush RackBackground
+        {
+            get => rackBackGround;
+            set
+            {
+                rackBackGround = value;
+                OnPropertyChanged(nameof(RackBackground));
+            }
+        }
+
+
         public ObservableCollection<Rack> Racks { get; }
         public ObservableCollection<RackSlot> RackSlots { get; } = new();
+
+        // (Valgfrit) datakilder til Add-panelet. Kan være tomme indtil DB er klar.
+        public ObservableCollection<Renter> Renters { get; } = new();
+        public ObservableCollection<PaymentMethod> PaymentMethods { get; } = new();
 
         private Rack _selectedRack;
         public Rack SelectedRack
@@ -43,9 +69,10 @@ namespace Reolmarked.ViewModel
         private const double H_V = 44;  // lodret højde
         private const double GAP = 10;
 
-        public RackViewModel()
+        public RackViewModel(IRackRepository repo)
         {
-            Racks = new ObservableCollection<Rack>(Rack.CreateDefaultRacks());
+            _repo = repo;
+            Racks = new ObservableCollection<Rack>(_repo.GetAll());
             CurrentRackPanel = new RackHomeViewModel();
 
             SelectRackCommand = new DelegateCommand<Rack>(
@@ -64,14 +91,85 @@ namespace Reolmarked.ViewModel
         private void SelectAndShow(Rack r)
         {
             SelectedRack = r;
-            CurrentRackPanel = new RackSelectedViewModel(r);
+            CurrentRackPanel = new RackSelectedViewModel(
+                r,
+                goToAddContract: () => ShowAddRentContract(),
+                goToEndContract: () => ShowEndRentContract()
+            );
         }
 
         private Rack FindRack(int id) =>
             id <= 0 ? null : System.Linq.Enumerable.FirstOrDefault(Racks, x => x.RackId == id);
 
-        private static readonly System.Collections.Generic.HashSet<int> OCCUPIED =
-            new System.Collections.Generic.HashSet<int>(new[] { 12, 28, 43, 56, 61, 63, 65, 68, 70, 71, 73, 75, 78, 80 });
+        // ---------- NAVIGATION TIL NYE PANELER ----------
+
+        private void ShowAddRentContract()
+        {
+            var rack = SelectedRack;
+            if (rack == null) return;
+
+            CurrentRackPanel = new AddRentContractViewModel(
+                rackId: rack.RackId,
+                renters: Renters,
+                paymentMethods: PaymentMethods,
+                onSubmit: data =>
+                {
+                    // TODO: Persistér kontrakten i DB (data.RackId, data.RenterId, data.StartDateTime, data.EndDateTime, data.NoEnd, data.SelectedPaymentMethod)
+                    CurrentRackPanel = new RackSelectedViewModel(
+                        rack,
+                        () => ShowAddRentContract(),
+                        () => ShowEndRentContract()
+                    );
+                },
+                onClose: () =>
+                {
+                    CurrentRackPanel = new RackSelectedViewModel(
+                        rack,
+                        () => ShowAddRentContract(),
+                        () => ShowEndRentContract()
+                    );
+                },
+                onChangeRackId: rid =>
+                {
+                    var target = Racks.FirstOrDefault(x => x.RackId == rid);
+                    if (target != null) SelectedRack = target;
+                }
+            );
+        }
+
+        private void ShowEndRentContract()
+        {
+            var rack = SelectedRack;
+            if (rack == null) return;
+
+            string renterDisplay = "-";
+            System.DateOnly? currentEnd = null;
+
+            CurrentRackPanel = new EndRentContractViewModel(
+                rack.RackId,
+                renterDisplay,
+                currentEnd,
+                onSubmit: data =>
+                {
+                    // TODO: Gem opsigelsen i DB (data.TerminationDate, data.Reason)
+                    CurrentRackPanel = new RackSelectedViewModel(
+                        rack,
+                        () => ShowAddRentContract(),
+                        () => ShowEndRentContract()
+                    );
+                },
+                onClose: () =>
+                {
+                    CurrentRackPanel = new RackSelectedViewModel(
+                        rack,
+                        () => ShowAddRentContract(),
+                        () => ShowEndRentContract()
+                    );
+                }
+            );
+        }
+
+        // ---------- Tais eksisterende LAYOUT-KODE (placeringer) ----------
 
         private (double x, double y) Cell(int col, int row, bool horizontal, double ox = 0, double oy = 0)
         {
@@ -89,27 +187,30 @@ namespace Reolmarked.ViewModel
                 X = p.x,
                 Y = p.y,
                 IsHorizontal = horizontal,
-                IsOccupied = OCCUPIED.Contains(rackId)
+                IsOccupied = _occupiedIds.Contains(rackId)
             });
         }
 
         private void BuildSlots()
         {
+            // Byg lookup over optagede reoler (RackStatusId == 2)
+            _occupiedIds = Racks
+                .Where(r => r.RackStatusId == 2)
+                .Select(r => r.RackId)
+                .ToHashSet();
+
             RackSlots.Clear();
 
-            // Offsets for grupper
             double OX_LEFT = 10;
-            double OY_TOP = 10;   // fælles top for midter- og højreblokke
-            double OX_BLOCK2 = 170;  // 19..24
-            double OX_COLS1 = 300;  // 25..38
-            double OX_COLS2 = 500;  // 39..52
-            double OX_COLS3 = 700;  // 53..66
-            double OX_RIGHT = 900;  // 67..76
-            double OX_STACKS = 1060; // 77..80 (samme lodrette række)
-            double OY_BOTTOM = 460;  // bundrække 13..1 rykket længere ned
+            double OY_TOP = 10;
+            double OX_BLOCK2 = 170;
+            double OX_COLS1 = 300;
+            double OX_COLS2 = 500;
+            double OX_COLS3 = 700;
+            double OX_RIGHT = 900;
+            double OX_STACKS = 1060;
+            double OY_BOTTOM = 460;
 
-            // Venstre enkelt søjle med reoler (14..18)
-            // Reol 14 ligger på "rækkeindex 4" i denne kolonne.
             double OY_LEFTCOL = OY_BOTTOM - H_V - 12 - 4 * (H_V + GAP);
 
             AddSlot(14, 0, 4, false, OX_LEFT, OY_LEFTCOL);
@@ -118,7 +219,6 @@ namespace Reolmarked.ViewModel
             AddSlot(17, 0, 1, false, OX_LEFT, OY_LEFTCOL);
             AddSlot(18, 0, 0, false, OX_LEFT, OY_LEFTCOL);
 
-            // 2x3 blok (lodrette reoler) 19..24
             AddSlot(21, 0, 0, false, OX_BLOCK2, OY_TOP);
             AddSlot(20, 0, 1, false, OX_BLOCK2, OY_TOP);
             AddSlot(19, 0, 2, false, OX_BLOCK2, OY_TOP);
@@ -126,54 +226,41 @@ namespace Reolmarked.ViewModel
             AddSlot(23, 1, 1, false, OX_BLOCK2, OY_TOP);
             AddSlot(22, 1, 2, false, OX_BLOCK2, OY_TOP);
 
-            // (25..31) og (32..38) – lodrette
             for (int i = 0; i < 7; i++)
             {
                 AddSlot(25 + i, 0, 6 - i, false, OX_COLS1, OY_TOP);
                 AddSlot(32 + i, 1, 6 - i, false, OX_COLS1, OY_TOP);
             }
 
-            // (39..45) og (46..52) – lodrette
             for (int i = 0; i < 7; i++)
             {
                 AddSlot(39 + i, 0, 6 - i, false, OX_COLS2, OY_TOP);
                 AddSlot(46 + i, 1, 6 - i, false, OX_COLS2, OY_TOP);
             }
 
-            // (53..59) og (60..66) – lodrette
             for (int i = 0; i < 7; i++)
             {
                 AddSlot(53 + i, 0, 6 - i, false, OX_COLS3, OY_TOP);
                 AddSlot(60 + i, 1, 6 - i, false, OX_COLS3, OY_TOP);
             }
 
-            // (67..71) og (72..76) – 5 i højden, lodrette
             for (int i = 0; i < 5; i++)
             {
                 AddSlot(67 + i, 0, 4 - i, false, OX_RIGHT, OY_TOP);
                 AddSlot(72 + i, 1, 4 - i, false, OX_RIGHT, OY_TOP);
             }
 
-            // 77..80 i SAMME lodrette række (vandrette kasser)
-            double OY_STACKS = 190;   // lodret start for 80
+            double OY_STACKS = 190;
             AddSlot(80, 0, 0, true, OX_STACKS, OY_STACKS);
             AddSlot(79, 0, 1, true, OX_STACKS, OY_STACKS);
             AddSlot(78, 0, 2, true, OX_STACKS, OY_STACKS);
             AddSlot(77, 0, 3, true, OX_STACKS, OY_STACKS);
 
-            // Bundrække 13..1 – vandrette fra venstre mod højre
             for (int i = 0; i < 13; i++)
             {
                 int id = 13 - i;
                 AddSlot(id, i, 0, true, OX_LEFT + 120, OY_BOTTOM);
             }
-        }
-
-        public void GoToCreate(Rack rack)
-        {
-            if (rack == null) return;
-            SelectedRack = rack;
-            CurrentRackPanel = new RackCreateRentalContactViewModel(rack);
         }
     }
 }

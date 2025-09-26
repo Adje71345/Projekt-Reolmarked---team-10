@@ -1,5 +1,8 @@
 ﻿using System.Windows.Controls;
 using Reolmarked.ViewModel;
+using System.Configuration;
+using Reolmarked.Repositories;
+
 
 namespace Reolmarked.View
 {
@@ -8,7 +11,6 @@ namespace Reolmarked.View
         public RackView()
         {
             InitializeComponent();
-            DataContext = new RackViewModel();
         }
     }
 }
