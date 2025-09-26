@@ -28,7 +28,7 @@ namespace Reolmarked.Repositories
             command.Parameters.AddWithValue("@RenterID", rentalContract.RenterId);
             command.Parameters.AddWithValue("@RackID", rentalContract.RackId);
 
-            // konverterer DateOnly til DateTime, fordi sql ikek kender dateonly
+            // konverterer DateOnly til DateTime, fordi sql ikke kender dateonly
             command.Parameters.AddWithValue("@StartDate", rentalContract.StartDate.ToDateTime(TimeOnly.MinValue));
             command.Parameters.AddWithValue("@EndDate", rentalContract.EndDate?.ToDateTime(TimeOnly.MinValue) ?? (object)DBNull.Value);
 

@@ -109,7 +109,6 @@ namespace Reolmarked.Repositories
             return racks;
         }
 
-   
 
         // Henter alle reoler med status = Ledig (til Reoloversigt)
         public IEnumerable<Rack> GetAvailableRacks()
