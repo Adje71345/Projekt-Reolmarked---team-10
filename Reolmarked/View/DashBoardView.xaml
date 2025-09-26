@@ -86,42 +86,49 @@
         <Border Style="{StaticResource WhitePanel}" Grid.Row="2" Margin="10">
             <StackPanel>
                 <TextBlock Text="Kommende begivenheder" 
-                           FontWeight="Bold" Margin="0,0,0,10"
-                           FontSize="13"
-                           TextAlignment="Center"/>
+                           FontWeight="Bold" 
+                           Margin="0,0,0,10"/>
+                
                 <DataGrid ItemsSource="{Binding Events}"
-                          AutoGenerateColumns="False"
-                          CanUserAddRows="False"
-                          HeadersVisibility="Column"
-                          GridLinesVisibility="None"
-                          RowHeight="36">
+                          AutoGenerateColumns="False" IsReadOnly="True"
+                          CanUserAddRows="False" CanUserReorderColumns="False" CanUserResizeRows="False"
+                          Focusable="False" RowHeight="28" Margin="0 5 0 0">
+                    
                     <DataGrid.Resources>
                         <Style TargetType="DataGridColumnHeader">
                             <Setter Property="Background" Value="#F5F7FA"/>
                             <Setter Property="FontWeight" Value="SemiBold"/>
-                            <Setter Property="FontSize" Value="13"/>
-                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            <Setter Property="FontSize" Value="12"/>
                             <Setter Property="Padding" Value="8,6"/>
+                            <Setter Property="Height" Value="28"/>
                         </Style>
+
                     </DataGrid.Resources>
 
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
                             <Setter Property="Background" Value="White"/>
-                            <Setter Property="Margin" Value="0,2"/>
                             <Style.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#eaf1ff"/>
+                                    <Setter Property="Background" Value="#DDE3EC"/>
                                 </Trigger>
                             </Style.Triggers>
                         </Style>
-                        
                     </DataGrid.RowStyle>
+
+                    <DataGrid.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="IsHitTestVisible" Value="False"/>
+                            <Setter Property="Focusable" Value="False"/>
+                            <Setter Property="Foreground" Value="Black"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                    </DataGrid.CellStyle>
                     
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Event" Binding="{Binding Name}" Width="2*"/>
-                        <DataGridTextColumn Header="Dato" Binding="{Binding Date}" Width="*"/>
-                        <DataGridTextColumn Header="Beskrivelse" Binding="{Binding Description}" Width="3*"/>
+                        <DataGridTextColumn Header="Event" Binding="{Binding Name}" Width="1*"/>
+                        <DataGridTextColumn Header="Dato" Binding="{Binding Date}"  Width="*" MinWidth="90"/>
+                        <DataGridTextColumn Header="Beskrivelse" Binding="{Binding Description}" Width="4*" MinWidth="350"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </StackPanel>
