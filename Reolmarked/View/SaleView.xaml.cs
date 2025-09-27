@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace Reolmarked.View
 {
     /// <summary>
-    /// Interaction logic for SalgView.xaml
+    /// Interaction logic for SaleView.xaml
     /// </summary>
-    public partial class SalgView : UserControl
+    public partial class SaleView : UserControl
     {
-        public SalgView()
+        public SaleView()
         {
             InitializeComponent();
         }
