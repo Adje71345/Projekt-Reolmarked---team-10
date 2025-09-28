@@ -25,10 +25,6 @@ namespace Reolmarked.View
     /// </summary>
     public partial class RenterView : UserControl
     {
-        private readonly IRenterRepository _renterRepository;
-        private readonly IRepository<PaymentMethod> _paymentMethodRepository;
-        private readonly RenterViewModel _viewModel;
-
         public RenterView()
         {
             InitializeComponent();
@@ -44,8 +40,7 @@ namespace Reolmarked.View
                     ? ListSortDirection.Ascending
                     : ListSortDirection.Descending;
 
-                vm.RentersView.SortDescriptions.Clear();
-                vm.RentersView.SortDescriptions.Add(new SortDescription(column.SortMemberPath, direction));
+                vm.SortRenters(column.SortMemberPath, direction);
                 column.SortDirection = direction;
 
                 e.Handled = true;
