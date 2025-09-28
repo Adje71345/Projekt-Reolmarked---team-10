@@ -127,17 +127,21 @@ namespace Reolmarked.ViewModel
             });
         }
 
+        // Metode til at sortere RentersView baseret på kolonnenavn og retning
+        public void SortRenters(string propertyName, ListSortDirection direction)
+        {
+            RentersView.SortDescriptions.Clear();
+            RentersView.SortDescriptions.Add(new SortDescription(propertyName, direction));
+        }
+
         // Filterfunktion som anvendes på RentersView
         private bool FilterRenters(object obj)
         {
             if (obj is Renter renter)
             {
-                // Returnér true hvis søgeteksten matcher nogen af felterne
                 return string.IsNullOrWhiteSpace(SearchText) ||
-                       renter.FirstName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                       renter.LastName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                       renter.Email.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                       renter.Phone.Contains(SearchText, StringComparison.OrdinalIgnoreCase);
+                       new[] { renter.FirstName, renter.LastName, renter.Email, renter.Phone }
+                           .Any(field => field?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) == true);
             }
             return false;
         }
@@ -146,10 +150,11 @@ namespace Reolmarked.ViewModel
         public void RefreshRenters()
         {
             Renters.Clear();
-            foreach (var renter in _renterRepository.GetAll())
-            {
-                Renters.Add(renter);
-            }
+            _renterRepository.GetAll()
+                .OrderBy(r => r.RenterId)
+                .ToList()
+                .ForEach(r => Renters.Add(r));
+
             RentersView.Refresh();
         }
     }

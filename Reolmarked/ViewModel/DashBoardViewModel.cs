@@ -76,28 +76,7 @@ namespace Reolmarked.ViewModel
             Events.Add(new { Name = "Velgørenhedsstand", Date = "15-11-2025", Description = "Ekstra stand sættes op ved kassen dagen før. Donationer bliver uddelt 12/12/25." });
             Events.Add(new { Name = "Julemarked", Date = "01-12-2025", Description = "Opsætning kl 8.30. Pynte butikken, varme gløgg og sætte telt op udendørs." });
         }
-    }
-
-   
-    /*
-    public ObservableCollection<ChecklistItem> Checklist { get; }
-    public class ChecklistItem
-    {
-        public string Task { get; }
-        public string Responsible { get; }
-        public string TimeFrame { get; }
-        public string Status { get; }
-
-    public ChecklistItem(string task, string responsible, string timeFrame, string status)
-    {
-        Task = task;
-        Responsible = responsible;
-        TimeFrame = timeFrame;
-        Status = status;
-    }
-    }
-    */
-    
+    }    
 }
 
 
