@@ -75,16 +75,12 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <!-- Scan + Tilføj -->
                     <RowDefinition Height="16"/>
                     <RowDefinition Height="Auto"/>
-                    <!-- Antal/Samlet + Betal -->
                     <RowDefinition Height="16"/>
                     <RowDefinition Height="*"/>
-                    <!-- Grid -->
                     <RowDefinition Height="16"/>
                     <RowDefinition Height="Auto"/>
-                    <!-- Ryd kurv -->
                 </Grid.RowDefinitions>
 
                 <!-- Scan-linje -->
@@ -95,7 +91,6 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- TextBox med placeholder via triggers (behøver ikke converter) -->
                         <TextBox Grid.Column="0" Margin="0,0,10,0"
                                  Text="{Binding BarcodeInput, UpdateSourceTrigger=PropertyChanged}"
                                  Padding="10" FontSize="15"
@@ -120,7 +115,6 @@
                                                    Visibility="Collapsed"/>
                                     </Grid>
                                     <ControlTemplate.Triggers>
-                                        <!-- Vis placeholder når Text == tom -->
                                         <Trigger Property="Text" Value="">
                                             <Setter TargetName="Watermark" Property="Visibility" Value="Visible"/>
                                         </Trigger>
@@ -149,20 +143,23 @@
                             <Run Text="Antal: " FontWeight="SemiBold"/>
                             <Run Text="{Binding ItemCount, Mode=OneWay}"/>
                         </TextBlock>
-                        <TextBlock FontSize="16" RenderTransformOrigin="0.655,0.454"><Run Text="Samlet pris: " FontWeight="SemiBold"/><Run Text=" "/><Run Text="{Binding Total, Mode=OneWay, StringFormat={}{0:N2} kr.}"/></TextBlock>
+                        <TextBlock FontSize="16">
+                            <Run Text="Samlet pris: " FontWeight="SemiBold"/>
+                            <Run Text="{Binding Total, Mode=OneWay, StringFormat={}{0:N2} kr.}"/>
+                        </TextBlock>
                     </StackPanel>
 
                     <Button Grid.Column="1" Height="40"
                             Style="{StaticResource PrimaryButton}"
                             Content="Betal"
                             Command="{Binding CheckoutCommand}"
-                            IsEnabled="{Binding CanCheckout}" Margin="116,0,0,0" FontSize="16"/>
+                            IsEnabled="{Binding CanCheckout}"
+                            Margin="116,0,0,0" FontSize="16"/>
                 </Grid>
 
                 <!-- Tabel med linjer -->
                 <Border Grid.Row="4" CornerRadius="18" BorderBrush="#E5E7EB" BorderThickness="1" Padding="8">
                     <DataGrid x:Name="LinesGrid"
-                              ItemsSource="{Binding Lines}"
                               AutoGenerateColumns="False"
                               HeadersVisibility="Column"
                               CanUserAddRows="False" CanUserDeleteRows="False"

@@ -1,138 +1,92 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows;
 using System.Windows.Input;
 using Reolmarked.Commands;
+using Reolmarked.Model;
 
 namespace Reolmarked.ViewModel
 {
-    // En linje i salget (bindes til DataGrid)
-    public class SaleLine
+    internal class SaleViewModel : ViewModelBase
     {
-        public string RackNo { get; set; }
-        public decimal Price { get; set; }
-        public string Barcode { get; set; }
-    }
+        // Liste der bindes til DataGrid
+        public ObservableCollection<SaleLine> Sale { get; } = new();
 
-    public class SaleViewModel : ViewModelBase
-    {
-        // ===== Properties =====
-
-        private string _barcodeInput;
-        public string BarcodeInput
+        // Simpelt inputfelt (stregkode)
+        private string _barCode = "";
+        public string BarCode
         {
-            get => _barcodeInput;
-            set => SetProperty(ref _barcodeInput, value);
+            get => _barCode;
+            set
+            {
+                if (SetProperty(ref _barCode, value))
+                    (AddSaleLineCommand as RelayCommand)?.RaiseCanExecuteChanged();
+            }
         }
 
-        public ObservableCollection<SaleLine> Lines { get; } = new();
+        // Afledte (bind OneWay i XAML)
+        public int DisplayQuantity => Sale.Count;
+        public decimal DisplayTotalPrice => Sale.Sum(x => x.Price);
 
-        public int ItemCount => Lines.Count;
+        // Commands
+        public ICommand AddSaleLineCommand { get; }
+        public ICommand RemoveSaleLineCommand { get; }
+        public ICommand ClearSaleBasketCommand { get; }
+        public ICommand PayCommand { get; }
 
-        public decimal Total => Lines.Sum(l => l.Price);
-
-        private bool _canCheckout;
-        public bool CanCheckout
-        {
-            get => _canCheckout;
-            set => SetProperty(ref _canCheckout, value);
-        }
-
-        // ===== Commands =====
-        public ICommand ScanCommand { get; }
-        public ICommand RemoveLineCommand { get; }
-        public ICommand ClearCartCommand { get; }
-        public ICommand CheckoutCommand { get; }
-
-        // ===== Constructor =====
         public SaleViewModel()
         {
-            ScanCommand = new RelayCommand(Scan);
-            RemoveLineCommand = new RelayCommand<SaleLine>(RemoveLine);
-            ClearCartCommand = new RelayCommand(ClearCart);
-            CheckoutCommand = new RelayCommand(Checkout, () => CanCheckout);
+            // Dummy-data — rækkefølge: rackId, date, price, quantity
+            Sale.Add(new SaleLine(1, new DateTime(2025, 9, 25), 25m, 10));
+            Sale.Add(new SaleLine(2, new DateTime(2025, 9, 25), 100m, 5));
+            Sale.Add(new SaleLine(3, new DateTime(2025, 9, 25), 5m, 7));
+            Sale.Add(new SaleLine(4, new DateTime(2025, 9, 25), 80m, 10));
+
+            // Opdater afledte når listen ændres
+            Sale.CollectionChanged += (_, __) =>
+            {
+                OnPropertyChanged(nameof(DisplayQuantity));
+                OnPropertyChanged(nameof(DisplayTotalPrice));
+                (PayCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                (ClearSaleBasketCommand as RelayCommand)?.RaiseCanExecuteChanged();
+            };
+
+            // Commands
+            AddSaleLineCommand = new RelayCommand(AddSaleLine, () => !string.IsNullOrWhiteSpace(BarCode));
+            RemoveSaleLineCommand = new RelayCommand<SaleLine>(RemoveSaleLine);
+            ClearSaleBasketCommand = new RelayCommand(ClearSaleBasket, () => Sale.Any());
+            PayCommand = new RelayCommand(Pay, () => Sale.Any());
         }
 
-        // ===== Methods =====
-
-        private void Scan()
+        private void AddSaleLine()
         {
-            if (string.IsNullOrWhiteSpace(BarcodeInput))
-                return;
+            // For enkelhed:format "rackId;price;quantity"
+            int rackId = 0, quantity = 1;
+            decimal price = 0m;
 
-            // For demo: split "RackNo;Price"
-            var parts = BarcodeInput.Split(';');
-            if (parts.Length != 2)
-            {
-                MessageBox.Show("Ugyldig stregkode (forventet format: RackNo;Pris)");
-                return;
-            }
+            var parts = (BarCode ?? "").Split(';');
+            if (parts.Length >= 1 && int.TryParse(parts[0], out var r)) rackId = r;
+            if (parts.Length >= 2 && decimal.TryParse(parts[1], out var p)) price = p;
+            if (parts.Length >= 3 && int.TryParse(parts[2], out var q)) quantity = q;
 
-            var rackNo = parts[0];
-            if (!decimal.TryParse(parts[1], out var price))
-            {
-                MessageBox.Show("Ugyldig pris i stregkode");
-                return;
-            }
-
-            // Tilføj ny linje til kurven
-            Lines.Add(new SaleLine
-            {
-                RackNo = rackNo,
-                Price = price,
-                Barcode = BarcodeInput
-            });
-
-            // Ryd inputfelt
-            BarcodeInput = string.Empty;
-
-            // Opdater calculated properties
-            OnPropertyChanged(nameof(ItemCount));
-            OnPropertyChanged(nameof(Total));
-
-            // Nu kan man betale
-            CanCheckout = Lines.Any();
-            (CheckoutCommand as RelayCommand)?.RaiseCanExecuteChanged();
+            Sale.Add(new SaleLine(rackId, DateTime.Today, price, quantity));
+            BarCode = string.Empty;
         }
 
-        private void RemoveLine(SaleLine line)
+        private void RemoveSaleLine(SaleLine? line)
         {
-            if (line != null && Lines.Contains(line))
-            {
-                Lines.Remove(line);
-
-                OnPropertyChanged(nameof(ItemCount));
-                OnPropertyChanged(nameof(Total));
-
-                CanCheckout = Lines.Any();
-                (CheckoutCommand as RelayCommand)?.RaiseCanExecuteChanged();
-            }
+            if (line != null) Sale.Remove(line);
         }
 
-
-        private void ClearCart()
+        private void ClearSaleBasket()
         {
-            Lines.Clear();
-
-            OnPropertyChanged(nameof(ItemCount));
-            OnPropertyChanged(nameof(Total));
-
-            CanCheckout = false;
-            (CheckoutCommand as RelayCommand)?.RaiseCanExecuteChanged();
+            Sale.Clear();
         }
 
-        private void Checkout()
+        private void Pay()
         {
-            if (!Lines.Any())
-            {
-                MessageBox.Show("Ingen varer i kurven.");
-                return;
-            }
-
-            // Opmærksom: Her kan man gemme salget i DB eller lave kvittering
-            MessageBox.Show($"Salg gennemført. Total: {Total:N2} kr.");
-
-            ClearCart();
+            // Hvis det ikke skal gemmes i DB/kvittering – lige nu bare ryd
+            Sale.Clear();
         }
     }
 }
