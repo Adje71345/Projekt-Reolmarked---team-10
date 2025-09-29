@@ -11,6 +11,9 @@ namespace Reolmarked.Repositories
         // Henter alle reoler med optaget status
         IEnumerable<Rack> GetOccupiedRacks();
 
+        // Tæller alle reoler
+        int GetCount();
+
         // Opdaterer status for en reol direkte (bruges fx til at frigive en reol)
         void UpdateRackStatus(int rackId, int newStatus);
 

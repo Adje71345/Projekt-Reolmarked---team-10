@@ -104,7 +104,20 @@ namespace Reolmarked.Repositories
                 };
             }
             return saleLine;
+        }
 
+        // Ekstra metode til at hente dagens samlede salg. Bruges i DashBoardViewModel
+        public decimal GetTotalSalesToday()
+        {
+            const string query = @"
+                SELECT ISNULL(SUM(Price), 0)
+                FROM SaleLine
+                WHERE CAST(SaleDate AS DATE) = CAST(GETDATE() AS DATE)";
+
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            connection.Open();
+            return (decimal)command.ExecuteScalar();
         }
 
         public IEnumerable<SaleLine> GetSalesForRackWithActiveContractLastMonth(int rackId)

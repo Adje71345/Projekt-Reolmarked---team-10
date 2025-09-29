@@ -8,5 +8,8 @@ namespace Reolmarked.Repositories
     {
         //Henter alle salgslinjer for en bestemt reol med aktiv kontrakt
         IEnumerable<SaleLine> GetSalesForRackWithActiveContractLastMonth(int rackId);
+
+        //Henter dagens samlede salg
+        decimal GetTotalSalesToday();
     }
 }
