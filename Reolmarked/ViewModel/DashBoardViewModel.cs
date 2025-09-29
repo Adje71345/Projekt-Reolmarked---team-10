@@ -12,9 +12,22 @@ namespace Reolmarked.ViewModel
     public class DashBoardViewModel : ViewModelBase
     {
         private readonly IRenterRepository _renterRepository;
+        private readonly IRackRepository _rackRepository;
+        private readonly IRentalContractRepository _rentalContractRepository;
+        private readonly ISaleLineRepository _saleLineRepository;
 
-        public decimal SalesToday { get; set; }
-        public int OccupancyPercentage { get; set; }
+        private decimal _salesToday;
+        public decimal SalesToday
+            {
+            get => _salesToday;
+            set => SetProperty(ref _salesToday, value);
+        }
+        private int _occupancyPercentage;
+        public int OccupancyPercentage
+        {
+            get => _occupancyPercentage;
+            set => SetProperty(ref _occupancyPercentage, value);
+        }
 
         private int _renterCount;
         public int RenterCount
@@ -25,20 +38,21 @@ namespace Reolmarked.ViewModel
 
         public ObservableCollection<object> Events { get; } = new();
 
-        public DashBoardViewModel(IRenterRepository renterRepository)
+        public DashBoardViewModel(IRenterRepository renterRepository, IRackRepository rackRepository, IRentalContractRepository rentalContractRepository, ISaleLineRepository saleLineRepository)
         {
             _renterRepository = renterRepository;
+            _rackRepository = rackRepository;
+            _rentalContractRepository = rentalContractRepository;
+            _saleLineRepository = saleLineRepository;
 
             //Starter indlæsning af data som en baggrundsopgave med Task.Run
             StartLoadCounts();
 
             // Sample data til demonstration
             SalesToday = 1250.75m;
-            OccupancyPercentage = 85;
 
             //Dummydata til events
             SeedEvents();
-
         }
 
         private void StartLoadCounts()
@@ -49,12 +63,21 @@ namespace Reolmarked.ViewModel
                 {
                     // Hent data fra repository. Hentes i baggrundstråd pga. Task.Run
                     var count = _renterRepository.GetCount();
+                    var totalRacks = _rackRepository.GetCount();
+                    var occupiedRacks = _rackRepository.GetOccupiedRacks().Count();
+                    var salesToday = _saleLineRepository.GetTotalSalesToday();
+
+                    //Beregn belægningsprocent
+                    int occupancy = totalRacks > 0
+                        ? (int)Math.Round((double)occupiedRacks / totalRacks * 100)
+                        : 0;
 
                     // Når data er hentet, opdater UI-tråden
                     System.Windows.Application.Current.Dispatcher.Invoke(() =>
                     {
                         RenterCount = count;
-                        //Her skal de tre andre også hentes og opdateres
+                        OccupancyPercentage = occupancy;
+                        SalesToday = salesToday;
                     });
                 }
                 catch (Exception ex)

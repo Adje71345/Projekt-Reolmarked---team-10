@@ -172,6 +172,15 @@ namespace Reolmarked.Repositories
             return racks;
         }
 
+        public int GetCount()
+        {
+            const string query = "SELECT COUNT(*) FROM Rack";
+            using var conn = new SqlConnection(_connectionString);
+            using var cmd = new SqlCommand(query, conn);
+            conn.Open();
+            return (int)cmd.ExecuteScalar();
+        }
+
 
         // Opdaterer status på en enkelt reol (for læsbarhed i domænemetoder, kan evt fjernes)
         public void UpdateRackStatus(int rackId, int newStatusId)

@@ -11,7 +11,7 @@ using Reolmarked.Model;
 namespace Reolmarked.ViewModel
 {
     public class RenterInfoViewModel : ViewModelBase
-    {
+    {     
         private Renter _selectedRenter;
         public Renter SelectedRenter
         {
