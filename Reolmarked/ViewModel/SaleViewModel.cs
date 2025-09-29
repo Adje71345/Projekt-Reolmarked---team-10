@@ -29,6 +29,7 @@ namespace Reolmarked.ViewModel
                     (AddSaleLineCommand as RelayCommand)?.RaiseCanExecuteChanged();
                     UpdateBarcodePreview(_barCode); // live preview
                 }
+
             }
         }
 
@@ -68,7 +69,7 @@ namespace Reolmarked.ViewModel
         }
 
         /// <summary>
-        /// Der bør komme samme format (samme som i LabelView): "rackId;price" – evt. "rackId;price;quantity"
+        /// Lavet efter samme format (samme som i LabelView): "rackId;price" – evt. "rackId;price;quantity"
         /// Eksempler: "12;49,95" eller "12;49.95;2"
         /// </summary>
         private void AddSaleLine()
@@ -94,13 +95,16 @@ namespace Reolmarked.ViewModel
 
             // simpelt løbenummer til SaleLineId
             var nextId = (Sale.LastOrDefault()?.SaleLineId ?? 0) + 1;
+            var scanTxt = txt; // hele input bruges som scankode
 
             var line = new SaleLine
             {
                 SaleLineId = nextId,
                 SaleDate = DateTime.Today,
                 Price = price,
-                RackId = rackId
+                RackId = rackId,
+                ScanCode = scanTxt,
+                BarcodeImage = GenerateBarcodeImage(scanTxt)
             };
 
             Sale.Add(line);
@@ -150,7 +154,25 @@ namespace Reolmarked.ViewModel
             using var bmp = writer.Write(text);
             BarcodePreview = ConvertBitmapToImageSource(bmp);
         }
+        private ImageSource? GenerateBarcodeImage(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return null;
 
+            var writer = new BarcodeWriter
+            {
+                Format = BarcodeFormat.CODE_128,
+                Options = new ZXing.Common.EncodingOptions
+                {
+                    Width = 120,   // thumbnail-bredde til DataGrid
+                    Height = 32,
+                    Margin = 1,
+                    PureBarcode = true
+                }
+            };
+
+            using var bmp = writer.Write(text);
+            return ConvertBitmapToImageSource(bmp);
+        }
         private static ImageSource ConvertBitmapToImageSource(System.Drawing.Bitmap bmp)
         {
             var hBitmap = bmp.GetHbitmap();

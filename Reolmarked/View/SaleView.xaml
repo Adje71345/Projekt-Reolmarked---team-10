@@ -132,7 +132,7 @@
                 Content="Tilføj" FontSize="16"/>
 
                         <!-- Live stregkode-preview af den indtastede/scannede tekst -->
-                        <Border Grid.Column="2" CornerRadius="10" BorderBrush="#E5E7EB" BorderThickness="1" Padding="6" Background="White">
+                        <Border Grid.Column="2" CornerRadius="10" BorderBrush="#E5E7EB" BorderThickness="1" Padding="6" Background="White" Margin="10,0,0,0">
                             <Image Source="{Binding BarcodePreview}" Stretch="Uniform" />
                         </Border>
                     </Grid>
@@ -190,21 +190,34 @@
                         <!-- ⬇️ VIGTIGT: Kolonner skal ligge her -->
                         <DataGrid.Columns>
                             <DataGridTextColumn Binding="{Binding RackId}" Header="Reol" Width="80"/>
-                            <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N2} kr.}" Header="Pris" Width="120"/>
-                            <DataGridTextColumn Binding="{Binding SaleDate, StringFormat=d}" Header="Dato" Width="120"/>
-                            <DataGridTextColumn Binding="{Binding SaleLineId}" Header="Linje-ID" Width="90"/>
+                            <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N0}}" Header="Pris" Width="90"/>
 
-                            <!-- Slet-knap -->
-                            <DataGridTemplateColumn Width="48">
+                            <!-- Scan-kode (tekst) -->
+                            <DataGridTextColumn Binding="{Binding ScanCode}" Header="Scan-kode" Width="*"/>
+
+                            <!-- Scan-kode (billede) -->
+                            <DataGridTemplateColumn Header="" Width="160">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image Source="{Binding BarcodeImage}"
+                       Stretch="Uniform"
+                       Height="28" Margin="6,0"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- Slet helt ude til højre -->
+                            <DataGridTemplateColumn Header="" Width="48">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Button Style="{StaticResource CircleDeleteButton}"
-                            Command="{Binding DataContext.RemoveSaleLineCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                            CommandParameter="{Binding}"/>
+                        Command="{Binding DataContext.RemoveSaleLineCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                        CommandParameter="{Binding}"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                         </DataGrid.Columns>
+
                     </DataGrid>
                 </Border>
 
