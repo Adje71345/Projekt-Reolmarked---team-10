@@ -89,30 +89,32 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="280"/>
+                            <!-- plads til live preview -->
                         </Grid.ColumnDefinitions>
 
                         <TextBox Grid.Column="0" Margin="0,0,10,0"
-                                 Text="{Binding BarcodeInput, UpdateSourceTrigger=PropertyChanged}"
-                                 Padding="10" FontSize="15"
-                                 Background="White" BorderBrush="#E5E7EB" BorderThickness="1">
+                 Text="{Binding BarCode, UpdateSourceTrigger=PropertyChanged}"
+                 Padding="10" FontSize="15"
+                 Background="White" BorderBrush="#E5E7EB" BorderThickness="1">
                             <TextBox.InputBindings>
-                                <KeyBinding Key="Enter" Command="{Binding ScanCommand}"/>
+                                <KeyBinding Key="Enter" Command="{Binding AddSaleLineCommand}"/>
                             </TextBox.InputBindings>
 
                             <TextBox.Template>
                                 <ControlTemplate TargetType="TextBox">
                                     <Grid>
                                         <Border Background="{TemplateBinding Background}"
-                                                BorderBrush="{TemplateBinding BorderBrush}"
-                                                BorderThickness="{TemplateBinding BorderThickness}"
-                                                CornerRadius="10"/>
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10"/>
                                         <ScrollViewer Margin="8,6" x:Name="PART_ContentHost"/>
                                         <TextBlock x:Name="Watermark"
-                                                   Text="Scan eller indtast stregkode…"
-                                                   Foreground="#9CA3AF"
-                                                   Margin="14,8,0,0"
-                                                   IsHitTestVisible="False"
-                                                   Visibility="Collapsed"/>
+                                   Text="Scan eller indtast stregkode…"
+                                   Foreground="#9CA3AF"
+                                   Margin="14,8,0,0"
+                                   IsHitTestVisible="False"
+                                   Visibility="Collapsed"/>
                                     </Grid>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="Text" Value="">
@@ -124,12 +126,18 @@
                         </TextBox>
 
                         <Button Grid.Column="1"
-                                Style="{StaticResource PrimaryButton}"
-                                MinWidth="90" Height="40"
-                                Command="{Binding ScanCommand}"
-                                Content="Tilføj" FontSize="16"/>
+                Style="{StaticResource PrimaryButton}"
+                MinWidth="90" Height="40"
+                Command="{Binding AddSaleLineCommand}"
+                Content="Tilføj" FontSize="16"/>
+
+                        <!-- Live stregkode-preview af den indtastede/scannede tekst -->
+                        <Border Grid.Column="2" CornerRadius="10" BorderBrush="#E5E7EB" BorderThickness="1" Padding="6" Background="White">
+                            <Image Source="{Binding BarcodePreview}" Stretch="Uniform" />
+                        </Border>
                     </Grid>
                 </Border>
+
 
                 <!-- Antal/Samlet pris + Betal -->
                 <Grid Grid.Row="2">
@@ -141,31 +149,33 @@
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock FontSize="16" Margin="0,0,24,0">
                             <Run Text="Antal: " FontWeight="SemiBold"/>
-                            <Run Text="{Binding ItemCount, Mode=OneWay}"/>
+                            <Run Text="{Binding DisplayQuantity, Mode=OneWay}"/>
                         </TextBlock>
                         <TextBlock FontSize="16">
                             <Run Text="Samlet pris: " FontWeight="SemiBold"/>
-                            <Run Text="{Binding Total, Mode=OneWay, StringFormat={}{0:N2} kr.}"/>
+                            <Run Text="{Binding DisplayTotalPrice, Mode=OneWay, StringFormat={}{0:N2} kr.}"/>
                         </TextBlock>
                     </StackPanel>
 
                     <Button Grid.Column="1" Height="40"
                             Style="{StaticResource PrimaryButton}"
                             Content="Betal"
-                            Command="{Binding CheckoutCommand}"
-                            IsEnabled="{Binding CanCheckout}"
+                            Command="{Binding PayCommand}"
                             Margin="116,0,0,0" FontSize="16"/>
+
                 </Grid>
 
                 <!-- Tabel med linjer -->
                 <Border Grid.Row="4" CornerRadius="18" BorderBrush="#E5E7EB" BorderThickness="1" Padding="8">
                     <DataGrid x:Name="LinesGrid"
-                              AutoGenerateColumns="False"
-                              HeadersVisibility="Column"
-                              CanUserAddRows="False" CanUserDeleteRows="False"
-                              IsReadOnly="True"
-                              GridLinesVisibility="Horizontal"
-                              BorderThickness="0" RowHeaderWidth="0">
+          ItemsSource="{Binding Sale}"
+          AutoGenerateColumns="False"
+          HeadersVisibility="Column"
+          CanUserAddRows="False" CanUserDeleteRows="False"
+          IsReadOnly="True"
+          GridLinesVisibility="Horizontal"
+          BorderThickness="0" RowHeaderWidth="0">
+
                         <DataGrid.Resources>
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="FontWeight" Value="SemiBold"/>
@@ -177,27 +187,31 @@
                             </Style>
                         </DataGrid.Resources>
 
-                        <DataGridTextColumn Binding="{Binding RackNo}" Header="Reol" Width="80"/>
-                        <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N2} kr.}" Header="Pris" Width="120"/>
-                        <DataGridTextColumn Binding="{Binding Barcode}" Header="Scan-kode" Width="*"/>
+                        <!-- ⬇️ VIGTIGT: Kolonner skal ligge her -->
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding RackId}" Header="Reol" Width="80"/>
+                            <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N2} kr.}" Header="Pris" Width="120"/>
+                            <DataGridTextColumn Binding="{Binding SaleDate, StringFormat=d}" Header="Dato" Width="120"/>
+                            <DataGridTextColumn Binding="{Binding SaleLineId}" Header="Linje-ID" Width="90"/>
 
-                        <!-- Slet -->
-                        <DataGridTemplateColumn Width="48">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button Style="{StaticResource CircleDeleteButton}"
-                                            Command="{Binding DataContext.RemoveLineCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                            CommandParameter="{Binding}"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                            <!-- Slet-knap -->
+                            <DataGridTemplateColumn Width="48">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Style="{StaticResource CircleDeleteButton}"
+                            Command="{Binding DataContext.RemoveSaleLineCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                            CommandParameter="{Binding}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
                     </DataGrid>
                 </Border>
 
                 <!-- Ryd kurv -->
                 <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Content="Ryd kurv"
-                            Command="{Binding ClearCartCommand}"
+                            Command="{Binding ClearSaleBasketCommand}"
                             Height="40" MinWidth="120"
                             BorderBrush="#9CA3AF" BorderThickness="1"
                             Background="White" Foreground="#111827" FontSize="16" Width="144">

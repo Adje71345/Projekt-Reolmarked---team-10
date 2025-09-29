@@ -1,18 +1,23 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Reolmarked.Commands;
 using Reolmarked.Model;
+using ZXing;
+using ZXing.Windows.Compatibility;
 
 namespace Reolmarked.ViewModel
 {
     internal class SaleViewModel : ViewModelBase
     {
-        // Liste der bindes til DataGrid
+        // Liste til DataGrid
         public ObservableCollection<SaleLine> Sale { get; } = new();
 
-        // Simpelt inputfelt (stregkode)
+        // Inputfelt (scanner skriver her)
         private string _barCode = "";
         public string BarCode
         {
@@ -20,11 +25,22 @@ namespace Reolmarked.ViewModel
             set
             {
                 if (SetProperty(ref _barCode, value))
+                {
                     (AddSaleLineCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                    UpdateBarcodePreview(_barCode); // live preview
+                }
             }
         }
 
-        // Afledte (bind OneWay i XAML)
+        // Live "for udskrift" af stregkodebilledet
+        private ImageSource _barcodePreview;
+        public ImageSource BarcodePreview
+        {
+            get => _barcodePreview;
+            set => SetProperty(ref _barcodePreview, value);
+        }
+
+        // Afledte værdier
         public int DisplayQuantity => Sale.Count;
         public decimal DisplayTotalPrice => Sale.Sum(x => x.Price);
 
@@ -36,12 +52,6 @@ namespace Reolmarked.ViewModel
 
         public SaleViewModel()
         {
-            // Dummy-data — rækkefølge: rackId, date, price, quantity
-            Sale.Add(new SaleLine(1, new DateTime(2025, 9, 25), 25m, 10));
-            Sale.Add(new SaleLine(2, new DateTime(2025, 9, 25), 100m, 5));
-            Sale.Add(new SaleLine(3, new DateTime(2025, 9, 25), 5m, 7));
-            Sale.Add(new SaleLine(4, new DateTime(2025, 9, 25), 80m, 10));
-
             // Opdater afledte når listen ændres
             Sale.CollectionChanged += (_, __) =>
             {
@@ -51,26 +61,53 @@ namespace Reolmarked.ViewModel
                 (ClearSaleBasketCommand as RelayCommand)?.RaiseCanExecuteChanged();
             };
 
-            // Commands
             AddSaleLineCommand = new RelayCommand(AddSaleLine, () => !string.IsNullOrWhiteSpace(BarCode));
             RemoveSaleLineCommand = new RelayCommand<SaleLine>(RemoveSaleLine);
             ClearSaleBasketCommand = new RelayCommand(ClearSaleBasket, () => Sale.Any());
             PayCommand = new RelayCommand(Pay, () => Sale.Any());
         }
 
+        /// <summary>
+        /// Der bør komme samme format (samme som i LabelView): "rackId;price" – evt. "rackId;price;quantity"
+        /// Eksempler: "12;49,95" eller "12;49.95;2"
+        /// </summary>
         private void AddSaleLine()
         {
-            // For enkelhed:format "rackId;price;quantity"
-            int rackId = 0, quantity = 1;
+            var txt = (BarCode ?? "").Trim();
+            if (txt.Length == 0) return;
+
+            int rackId = 0;
             decimal price = 0m;
 
-            var parts = (BarCode ?? "").Split(';');
-            if (parts.Length >= 1 && int.TryParse(parts[0], out var r)) rackId = r;
-            if (parts.Length >= 2 && decimal.TryParse(parts[1], out var p)) price = p;
-            if (parts.Length >= 3 && int.TryParse(parts[2], out var q)) quantity = q;
+            var parts = txt.Split(';');
 
-            Sale.Add(new SaleLine(rackId, DateTime.Today, price, quantity));
+            // rackId
+            if (parts.Length >= 1)
+                int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out rackId);
+
+            // price – prøv både invariant (.) og dansk (,)
+            if (parts.Length >= 2)
+            {
+                if (!decimal.TryParse(parts[1], NumberStyles.Number, CultureInfo.InvariantCulture, out price))
+                    decimal.TryParse(parts[1], NumberStyles.Number, CultureInfo.GetCultureInfo("da-DK"), out price);
+            }
+
+            // simpelt løbenummer til SaleLineId
+            var nextId = (Sale.LastOrDefault()?.SaleLineId ?? 0) + 1;
+
+            var line = new SaleLine
+            {
+                SaleLineId = nextId,
+                SaleDate = DateTime.Today,
+                Price = price,
+                RackId = rackId
+            };
+
+            Sale.Add(line);
+
+            // ryd input + preview
             BarCode = string.Empty;
+            UpdateBarcodePreview(null);
         }
 
         private void RemoveSaleLine(SaleLine? line)
@@ -85,8 +122,47 @@ namespace Reolmarked.ViewModel
 
         private void Pay()
         {
-            // Hvis det ikke skal gemmes i DB/kvittering – lige nu bare ryd
+            // Kan godt gemmmes i DB/kvittering; men lige nu blot ryd
             Sale.Clear();
+        }
+
+        // === ZXing preview (samme princip som i (Sabines) LabelViewModel) ===
+        private void UpdateBarcodePreview(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                BarcodePreview = null;
+                return;
+            }
+
+            var writer = new BarcodeWriter
+            {
+                Format = BarcodeFormat.CODE_128,
+                Options = new ZXing.Common.EncodingOptions
+                {
+                    Width = 260,
+                    Height = 80,
+                    Margin = 2,
+                    PureBarcode = true
+                }
+            };
+
+            using var bmp = writer.Write(text);
+            BarcodePreview = ConvertBitmapToImageSource(bmp);
+        }
+
+        private static ImageSource ConvertBitmapToImageSource(System.Drawing.Bitmap bmp)
+        {
+            var hBitmap = bmp.GetHbitmap();
+            try
+            {
+                return System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+                    hBitmap, IntPtr.Zero, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            }
+            finally
+            {
+                // GDI handle frigives automatisk ved GC; ved vores simpelt preview er det ok.
+            }
         }
     }
 }
