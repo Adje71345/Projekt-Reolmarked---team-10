@@ -5,241 +5,248 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              d:DesignWidth="1200" d:DesignHeight="700"
-             Background="#F9F9F9">
+             Background="#F7F8FB">
 
+    <!-- ======= Styles ======= -->
     <UserControl.Resources>
-        <!-- Card container -->
-        <Style x:Key="CardBorder" TargetType="Border">
-            <Setter Property="CornerRadius" Value="24"/>
+
+        <!-- Kort-container -->
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="CornerRadius" Value="20"/>
             <Setter Property="Background" Value="White"/>
             <Setter Property="BorderBrush" Value="#E5E7EB"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="36"/>
+            <Setter Property="Padding" Value="28"/>
             <Setter Property="Effect">
                 <Setter.Value>
-                    <DropShadowEffect Color="#000000" Opacity="0.10" BlurRadius="12" ShadowDepth="2"/>
+                    <DropShadowEffect Color="#000" Opacity="0.08" BlurRadius="12" ShadowDepth="1"/>
                 </Setter.Value>
             </Setter>
         </Style>
 
-        <!-- Labels (År:, Måned:) -->
-        <Style x:Key="LabelText" TargetType="TextBlock">
-            <Setter Property="FontFamily" Value="Arial"/>
-            <Setter Property="FontSize" Value="18"/>
-            <Setter Property="Foreground" Value="#111827"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
+        <!-- Titel -->
+        <Style x:Key="H1" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="36"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#0F172A"/>
+            <Setter Property="TextWrapping" Value="NoWrap"/>
         </Style>
 
-        <!-- Base pill dropdown -->
-        <Style x:Key="PillComboBoxBase" TargetType="ComboBox">
-            <Setter Property="FontFamily" Value="Arial"/>
-            <Setter Property="FontSize" Value="18"/>
-            <Setter Property="Height" Value="42"/>
-            <Setter Property="Padding" Value="12,6"/>
-            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+        <!-- Label i filterbar -->
+        <Style x:Key="FilterLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="#111827"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+        </Style>
+
+        <!-- Base: firkantet, lysegrå -->
+        <Style x:Key="PillCombo" TargetType="ComboBox">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Padding" Value="12,4"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Foreground" Value="#4B5563"/>
+            <Setter Property="Background" Value="#F3F4F6"/>
+            <Setter Property="BorderBrush" Value="#E5E7EB"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Background" Value="White"/>
             <Setter Property="SnapsToDevicePixels" Value="True"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ComboBox">
                         <Grid>
-                            <Border CornerRadius="16"
-                                    Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"/>
-                            <DockPanel LastChildFill="True">
-                                <ContentPresenter Margin="12,4,28,4" VerticalAlignment="Center"/>
-                                <!-- lille caret -->
-                                <Path Width="10" Height="6" Stretch="Fill" Fill="#111827"
-                                      HorizontalAlignment="Right" Margin="0,0,12,0"
-                                      Data="M 0 0 L 10 0 L 5 6 Z"/>
+                            <Border x:Name="Bd" CornerRadius="8"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"/>
+                            <DockPanel LastChildFill="True" Margin="6,0">
+                                <ContentPresenter Margin="8,4,26,4" VerticalAlignment="Center"/>
+                                <Path Width="12" Height="7" Stretch="Fill" Fill="#475569"
+                              HorizontalAlignment="Right" Margin="0,0,10,0"
+                              Data="M 0 0 L 12 0 L 6 7 Z"/>
                             </DockPanel>
                         </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="BorderBrush" Value="#BFC5CD"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Opacity" Value="0.6"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
 
-        <!-- Bredde -->
-        <Style x:Key="YearCombo" BasedOn="{StaticResource PillComboBoxBase}" TargetType="ComboBox">
-            <Setter Property="Width" Value="120"/>
-        </Style>
-        <Style x:Key="MonthCombo" BasedOn="{StaticResource PillComboBoxBase}" TargetType="ComboBox">
-            <Setter Property="Width" Value="190"/>
+        <!-- Str. til ÅR-box -->
+        <Style x:Key="YearCombo" BasedOn="{StaticResource PillCombo}" TargetType="ComboBox">
+            <Setter Property="Width" Value="110"/>
         </Style>
 
-        <!-- DataGrid base -->
+        <!-- Str. til MÅNED-box -->
+        <Style x:Key="MonthCombo" BasedOn="{StaticResource PillCombo}" TargetType="ComboBox">
+            <Setter Property="Width" Value="180"/>
+        </Style>
+
+        <!-- DataGrid -->
         <Style TargetType="DataGrid">
             <Setter Property="AutoGenerateColumns" Value="False"/>
             <Setter Property="IsReadOnly" Value="True"/>
             <Setter Property="CanUserAddRows" Value="False"/>
             <Setter Property="CanUserDeleteRows" Value="False"/>
             <Setter Property="CanUserResizeRows" Value="False"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="RowHeight" Value="56"/>
+            <Setter Property="RowHeight" Value="44"/>
             <Setter Property="HeadersVisibility" Value="Column"/>
             <Setter Property="GridLinesVisibility" Value="None"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="RowBackground" Value="White"/>
-            <Setter Property="AlternatingRowBackground" Value="White"/>
+            <Setter Property="AlternatingRowBackground" Value="#FAFAFA"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#EEF2F7"/>
+            <Setter Property="VerticalGridLinesBrush" Value="#EEF2F7"/>
         </Style>
 
-        <!-- Header (stor, semibold, lys grå) -->
+        <!-- Header -->
         <Style TargetType="DataGridColumnHeader">
-            <Setter Property="FontFamily" Value="Arial"/>
-            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontSize" Value="18"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Foreground" Value="#1F2937"/>
-            <Setter Property="Background" Value="#EEEEEE"/>
-            <Setter Property="Height" Value="56"/>
+            <Setter Property="Background" Value="#EEF2F7"/>
+            <Setter Property="Height" Value="48"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="BorderBrush" Value="#E5E7EB"/>
             <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="Padding" Value="8,0"/>
         </Style>
 
-        <!-- Nederste kant på hver række -->
-        <Style TargetType="DataGridRow">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="DataGridRow">
-                        <Border Background="{TemplateBinding Background}">
-                            <Grid>
-                                <DataGridCellsPresenter/>
-                                <Border Height="1" Background="#E5E7EB" VerticalAlignment="Bottom"/>
-                            </Grid>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+        <!-- Celler: centrer tal, venstrejuster tekst -->
+        <Style x:Key="CellCenter" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
+        <Style x:Key="CellLeft" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="14,0,0,0"/>
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        </Style>
+
     </UserControl.Resources>
 
-    <!-- Layout -->
-    <Grid Margin="28">
-        <Border Style="{StaticResource CardBorder}">
+    <!-- Layout  -->
+    <Grid Margin="24">
+        <Border Style="{StaticResource Card}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="28"/>
+                    <!-- header linje -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- undertekst -->
                     <RowDefinition Height="*"/>
+                    <!-- tabel -->
                 </Grid.RowDefinitions>
 
-                <!-- Header -->
-                <Grid Grid.Row="0">
+
+                <!-- HEADER: Titel (venstre) + År/Måned (højre) på en linje -->
+                <Grid Grid.Row="0" Margin="0,0,0,4">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Titel -->
+                    <!-- Tiltel -->
                     <TextBlock Text="Månedsopgørelse"
-                               FontFamily="Arial"
-                               FontSize="40"
-                               FontWeight="Bold"
-                               Foreground="#111827"
-                               VerticalAlignment="Center"/>
+               FontSize="26"
+               FontWeight="SemiBold"
+               Foreground="#0F172A"
+               VerticalAlignment="Center"/>
 
-                    <!-- Periodevælger -->
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <!-- ÅR -->
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="År:" Style="{StaticResource LabelText}" Margin="0,0,10,0"/>
-                            <ComboBox Style="{StaticResource YearCombo}"
-                                      ItemsSource="{Binding Years}"
-                                      SelectedItem="{Binding SelectedYear, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <!-- År/Måned til højre -->
+                    <StackPanel Grid.Column="1"
+                Orientation="Horizontal"
+                VerticalAlignment="Center"
+                Margin="16,0,0,0">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,16,0">
+                            <TextBlock Text="År:" Style="{StaticResource FilterLabel}"/>
+                            <ComboBox Style="{StaticResource PillCombo}"
+                             ItemsSource="{Binding Years}"
+                             SelectedItem="{Binding SelectedYear, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
 
-                        <Border Width="14"/>
-
-                        <!-- MÅNED -->
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="Måned:" Style="{StaticResource LabelText}" Margin="0,0,10,0"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Måned:" Style="{StaticResource FilterLabel}"/>
                             <ComboBox Style="{StaticResource MonthCombo}"
-                                      ItemsSource="{Binding Months}"
-                                      SelectedItem="{Binding SelectedMonth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                             ItemsSource="{Binding Months}"
+                             SelectedItem="{Binding SelectedMonth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
                     </StackPanel>
                 </Grid>
 
-                <!-- Tabel -->
-                <DataGrid Grid.Row="2" ItemsSource="{Binding Rows}">
-                    <DataGrid.Columns>
+                <!-- UNDERTEKST: “Afregning · {Måned} {År}” -->
+                <TextBlock Grid.Row="1"
+           Margin="0,0,0,8"
+           Foreground="#6B7280"
+           FontSize="14">
+    <Run Text="Afregning · "/>
+    <Run Text="{Binding PeriodText, Mode=OneWay}"/>
+                </TextBlock>
 
-                        <!-- Lejer med truncation + tooltip -->
-                        <DataGridTextColumn Header="Lejer" Width="3.4*" Binding="{Binding LejerNavn}">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="FontSize" Value="20"/>
-                                    <Setter Property="HorizontalAlignment" Value="Left"/>
-                                    <Setter Property="Margin" Value="14,0,0,0"/>
-                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
-                                    <Setter Property="ToolTipService.ShowDuration" Value="20000"/>
-                                    <Setter Property="ToolTip">
-                                        <Setter.Value>
-                                            <ToolTip Content="{Binding LejerNavn}"/>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
 
-                        <!-- Fem tal-kolonner med ens bredde 1.8 -->
-                        <DataGridTextColumn Header="Antal reoler" Width="1.8*" Binding="{Binding AntalReoler}">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="FontSize" Value="20"/>
-                                    <Setter Property="HorizontalAlignment" Value="Center"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
+                <!-- Tabel (i ScrollViewer så alt kan ses) -->
+                <Border Grid.Row="2" CornerRadius="12" BorderBrush="#E5E7EB" BorderThickness="1" Padding="0" Margin="0,27,0,0">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,-1,0,0">
+                        <DataGrid ItemsSource="{Binding Rows}" Height="500">
+                            <DataGrid.Columns>
 
-                        <DataGridTextColumn Header="TotalSalg" Width="1.8*" Binding="{Binding TotalSalg, StringFormat={}{0:N0}}">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="FontSize" Value="20"/>
-                                    <Setter Property="HorizontalAlignment" Value="Center"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
+                                <!-- Lejer (ellipsis + tooltip) -->
+                                <DataGridTextColumn Header="Lejer" Width="3*"
+                    Binding="{Binding LejerNavn}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock" BasedOn="{StaticResource CellCenter}">
+                                            <Setter Property="TextAlignment" Value="Center"/>
+                                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                                            <Setter Property="Margin" Value="0"/>
+                                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                            <Setter Property="ToolTipService.ShowDuration" Value="15000"/>
+                                            <Setter Property="ToolTip" Value="{Binding LejerNavn}"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
 
-                        <DataGridTextColumn Header="Kommission" Width="1.8*" Binding="{Binding Kommission, StringFormat={}{0:N0}}">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="FontSize" Value="20"/>
-                                    <Setter Property="HorizontalAlignment" Value="Center"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
+                                <!-- Tal-kolonner -->
+                                <DataGridTextColumn Header="Antal reoler" Width="1.2*"
+                                                    Binding="{Binding AntalReoler}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock" BasedOn="{StaticResource CellCenter}"/>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
 
-                        <DataGridTextColumn Header="ReolLeje" Width="1.8*" Binding="{Binding ReolLeje, StringFormat={}{0:N0}}">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="FontSize" Value="20"/>
-                                    <Setter Property="HorizontalAlignment" Value="Center"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
+                                <DataGridTextColumn Header="TotalSalg" Width="1.4*"
+                                                    Binding="{Binding TotalSalg, StringFormat={}{0:N0}}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock" BasedOn="{StaticResource CellCenter}"/>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
 
-                        <DataGridTextColumn Header="Nettoresultat" Width="1.8*" Binding="{Binding Nettoresultat, StringFormat={}{0:N0}}">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="FontSize" Value="20"/>
-                                    <Setter Property="HorizontalAlignment" Value="Center"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
+                                <DataGridTextColumn Header="Kommission" Width="1.4*"
+                                                    Binding="{Binding Kommission, StringFormat={}{0:N0}}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock" BasedOn="{StaticResource CellCenter}"/>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
 
-                    </DataGrid.Columns>
-                </DataGrid>
+                                <DataGridTextColumn Header="ReolLeje" Width="1.4*"
+                                                    Binding="{Binding ReolLeje, StringFormat={}{0:N0}}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock" BasedOn="{StaticResource CellCenter}"/>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <DataGridTextColumn Header="Nettoresultat" Width="1.6*"
+                                                    Binding="{Binding Nettoresultat, StringFormat={}{0:N0}}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock" BasedOn="{StaticResource CellCenter}"/>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </ScrollViewer>
+                </Border>
+
             </Grid>
         </Border>
     </Grid>
