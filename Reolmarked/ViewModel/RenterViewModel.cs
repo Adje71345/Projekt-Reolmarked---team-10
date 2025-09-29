@@ -18,6 +18,8 @@ namespace Reolmarked.ViewModel
         // Repository til kommunikation med databasen
         private readonly IRenterRepository _renterRepository;
         private readonly IRepository<PaymentMethod> _paymentMethodRepository;
+        private readonly IRentalContractRepository _rentalContractRepository;
+        private readonly ISaleLineRepository _saleLineRepository;
 
 
         // Samling af alle lejere hentet fra databasen
@@ -94,10 +96,12 @@ namespace Reolmarked.ViewModel
 
 
         // Constructor hvor repository injiceres og data initialiseres
-        public RenterViewModel(IRenterRepository renterRepository, IRepository<PaymentMethod> paymentMethodRepository)
+        public RenterViewModel(IRenterRepository renterRepository, IRepository<PaymentMethod> paymentMethodRepository, IRentalContractRepository rentalContractRepository, ISaleLineRepository saleLineRepository)
         {
             _renterRepository = renterRepository;
             _paymentMethodRepository = paymentMethodRepository;
+            _rentalContractRepository = rentalContractRepository;
+            _saleLineRepository = saleLineRepository;
 
             // Hent alle lejere fra databasen og opret ObservableCollection
             Renters = new ObservableCollection<Renter>(_renterRepository.GetAll());
@@ -112,7 +116,7 @@ namespace Reolmarked.ViewModel
                 IsAddPanelOpen = true;
                 IsInfoPanelOpen = true;
             });
-            RenterInfo = new RenterInfoViewModel(() => IsInfoPanelOpen = false, EditRenter);
+            RenterInfo = new RenterInfoViewModel(() => IsInfoPanelOpen = false, EditRenter, _rentalContractRepository, _saleLineRepository);
             AddRenter = new AddRenterViewModel(_renterRepository, _paymentMethodRepository);
             AddRenter.RequestClose += (s, e) =>
             {

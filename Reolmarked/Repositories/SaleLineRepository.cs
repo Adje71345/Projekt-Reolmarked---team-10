@@ -23,8 +23,8 @@ namespace Reolmarked.Repositories
             connection.Open();
 
             string query = @"
-                INSERT INTO SaleLine (SaleDate, Price, RackID)
-                VALUES (@SaleDate, @Price, @RackID);
+                INSERT INTO SaleLine (SaleDate, Price, RackId)
+                VALUES (@SaleDate, @Price, @RackId);
                 SELECT SCOPE_IDENTITY();";
 
             var command = new SqlCommand(query, connection);
@@ -40,22 +40,22 @@ namespace Reolmarked.Repositories
                 UPDATE SaleLine
                 SET SaleDate = @SaleDate,
                     Price = @Price,
-                    RackID = @RackID
-                WHERE SaleLineID = @SaleLineID";
+                    RackID = @RackId
+                WHERE SaleLineID = @SaleLineId";
 
             var command = new SqlCommand(query, connection);
             command.Parameters.AddWithValue("@SaleDate", saleLine.SaleDate);
             command.Parameters.AddWithValue("@Price", saleLine.Price);
-            command.Parameters.AddWithValue("@RackID", saleLine.RackId);
+            command.Parameters.AddWithValue("@RackId", saleLine.RackId);
         }
 
         public void Delete(int id)
         {
             using var connection = new SqlConnection(_connectionString);
             connection.Open();
-            string query = "DELETE FROM SaleLine WHERE SaleLineID = @SaleLineID";
+            string query = "DELETE FROM SaleLine WHERE SaleLineId = @SaleLineId";
             var command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@SaleLineID", id);
+            command.Parameters.AddWithValue("@SaleLineId", id);
             command.ExecuteNonQuery();
         }
 
@@ -63,7 +63,7 @@ namespace Reolmarked.Repositories
         {
             var saleLines = new List<SaleLine>();
             string query = @"
-                    SELECT SaleLineID, SaleDate, Price, RackID 
+                    SELECT SaleLineId, SaleDate, Price, RackId 
                     FROM SaleLine sl";
 
             using var connection = new SqlConnection(_connectionString);
@@ -74,10 +74,10 @@ namespace Reolmarked.Repositories
                 {
                     saleLines.Add(new SaleLine
                     {
-                        SaleLineId = (int)reader["SaleLineID"],
+                        SaleLineId = (int)reader["SaleLineId"],
                         SaleDate = (DateTime)reader["SaleDate"],
                         Price = (decimal)reader["Price"],
-                        RackId = (int)reader["RackID"]
+                        RackId = (int)reader["RackId"]
                     });
                 }
             }
@@ -87,10 +87,10 @@ namespace Reolmarked.Repositories
         public SaleLine GetById(int id)
         {
             SaleLine saleLine = null;
-            string query = "SELECT SaleLineID, SaleDate, Price, RackID FROM SaleLine WHERE SaleLineID = @SaleLineID";   
+            string query = "SELECT SaleLineId, SaleDate, Price, RackId FROM SaleLine WHERE SaleLineId = @SaleLineId";   
             using var connection = new SqlConnection(_connectionString);
             var command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@SaleLineID", id);
+            command.Parameters.AddWithValue("@SaleLineId", id);
             connection.Open();
             using var reader = command.ExecuteReader();
             if (reader.Read())

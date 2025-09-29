@@ -58,17 +58,17 @@
                         <TextBlock Text="Statistik" FontWeight="Bold" Margin="0,0,0,8" />
                         <StackPanel Orientation="Horizontal" Margin="0,4">
                             <TextBlock Text="Aktive reoler:" Width="110" Foreground="#555"/>
-                            <TextBlock Text="{Binding DummyStats.ActiveShelves}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding ActiveShelvesCount}" FontWeight="SemiBold"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="0,4">
                             <TextBlock Text="Solgt (md.):" Width="110" Foreground="#555"/>
-                            <TextBlock Text="{Binding DummyStats.SoldThisMonth}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding SoldThisMonth}" FontWeight="SemiBold"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="0,4">
                             <TextBlock Text="Omsætning (md.):" Width="110" Foreground="#555"/>
-                            <TextBlock Text="{Binding DummyStats.RevenueThisMonth, StringFormat='DKK {0:N0}'}"
+                            <TextBlock Text="{Binding RevenueThisMonth, StringFormat='DKK {0:N0}'}"
                          FontWeight="SemiBold" TextWrapping="Wrap" Width="90"/>
                         </StackPanel>
                     </StackPanel>
