@@ -185,37 +185,73 @@
                             <Style TargetType="DataGridRow">
                                 <Setter Property="Padding" Value="4"/>
                             </Style>
+                            <Style x:Key="CellPadRight24" TargetType="DataGridCell">
+                                <!-- ekstra højre-padding -->
+                                <Setter Property="Padding" Value="6,0,24,0"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            </Style>
                         </DataGrid.Resources>
 
-                        <!-- ⬇️ VIGTIGT: Kolonner skal ligge her -->
+                        <!-- Kolonner -->
                         <DataGrid.Columns>
-                            <DataGridTextColumn Binding="{Binding RackId}" Header="Reol" Width="80"/>
-                            <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N0}}" Header="Pris" Width="90"/>
+                            <!-- Reol -->
+                            <DataGridTextColumn Header="Reol"
+                        Binding="{Binding RackId}"
+                        Width="100"
+                        CellStyle="{StaticResource CellPadRight24}"/>
 
-                            <!-- Scan-kode (tekst) -->
-                            <DataGridTextColumn Binding="{Binding ScanCode}" Header="Scan-kode" Width="*"/>
+                            <!-- Pris -->
+                            <DataGridTextColumn Header="Pris"
+                        Binding="{Binding Price, StringFormat={}{0:N0}}"
+                        Width="120"
+                        CellStyle="{StaticResource CellPadRight24}"/>
 
-                            <!-- Scan-kode (billede) -->
-                            <DataGridTemplateColumn Header="" Width="160">
+                            <!-- Scan-kode: tekst + billede + slet-knap i samme kolonne -->
+                            <DataGridTemplateColumn Header="Scan-kode" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Image Source="{Binding BarcodeImage}"
-                       Stretch="Uniform"
-                       Height="28" Margin="6,0"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <!-- 0: tekst -->
+                                                <ColumnDefinition Width="Auto"/>
+                                                <!-- 1: spacer tekst->billede -->
+                                                <ColumnDefinition Width="Auto"/>
+                                                <!-- 2: billede -->
+                                                <ColumnDefinition Width="Auto"/>
+                                                <!-- 3: spacer billede->kryds -->
+                                                <ColumnDefinition Width="Auto"/>
+                                                <!-- 4: kryds-knap -->
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- scankode-tekst -->
+                                            <TextBlock Grid.Column="0"
+                                                Text="{Binding ScanCode}"
+                                                VerticalAlignment="Center"/>
+
+                                            <!-- ⬇️ afstand KUN mellem tekst og billede -->
+                                            <Rectangle Grid.Column="1" Width="40" Height="1" Fill="Transparent"/>
+
+                                            <!-- stregkode-billed-->
+                                            <Image Grid.Column="2"
+                                                Source="{Binding BarcodeImage}"
+                                                Height="20"
+                                                Stretch="None"
+                                                HorizontalAlignment="Left"/>
+
+                                            <!-- ⬇️ afstand mellem billede og kryds -->
+                                            <Rectangle Grid.Column="3" Width="320" Height="1" Fill="Transparent"/>
+
+                                            <!-- slet-knap -->
+                                            <Button Grid.Column="4"
+                                                Style="{StaticResource CircleDeleteButton}"
+                                                Command="{Binding DataContext.RemoveSaleLineCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                CommandParameter="{Binding}"/>
+                                        </Grid>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <!-- Slet helt ude til højre -->
-                            <DataGridTemplateColumn Header="" Width="48">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Button Style="{StaticResource CircleDeleteButton}"
-                        Command="{Binding DataContext.RemoveSaleLineCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                        CommandParameter="{Binding}"/>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
 
                     </DataGrid>

@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Reolmarked.Commands;
+using Reolmarked.Model;
+using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Reolmarked.Commands;
-using Reolmarked.Model;
 using ZXing;
 using ZXing.Windows.Compatibility;
 
@@ -86,16 +87,29 @@ namespace Reolmarked.ViewModel
             if (parts.Length >= 1)
                 int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out rackId);
 
-            // price – prøv både invariant (.) og dansk (,)
+            // price – har både invariant (.) og dansk (,)
             if (parts.Length >= 2)
             {
                 if (!decimal.TryParse(parts[1], NumberStyles.Number, CultureInfo.InvariantCulture, out price))
                     decimal.TryParse(parts[1], NumberStyles.Number, CultureInfo.GetCultureInfo("da-DK"), out price);
             }
+            // Valider reolnummer (1..80)
+            if (rackId < 1 || rackId > 80)
+            {
+                System.Windows.MessageBox.Show(
+                    "Reolnummer skal være mellem 1 og 80.",
+                    "Ugyldigt reolnummer",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
 
-            // simpelt løbenummer til SaleLineId
+                // ryd input og stop
+                BarCode = string.Empty;
+                UpdateBarcodePreview(null);
+                return;
+            }
+            // Løbenummer til SaleLineId
             var nextId = (Sale.LastOrDefault()?.SaleLineId ?? 0) + 1;
-            var scanTxt = txt; // hele input bruges som scankode
+            var scanTxt = txt.Replace(";", string.Empty); // fjern ';' fra scankode
 
             var line = new SaleLine
             {
@@ -183,7 +197,7 @@ namespace Reolmarked.ViewModel
             }
             finally
             {
-                // GDI handle frigives automatisk ved GC; ved vores simpelt preview er det ok.
+                // GDI handle frigives automatisk ved GC, men ved vores simpelt preview er det nok ok.
             }
         }
     }
