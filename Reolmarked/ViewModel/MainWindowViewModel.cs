@@ -59,6 +59,9 @@ namespace Reolmarked.ViewModel
                 case ViewType.Salg:
                     CurrentViewModel = new SaleViewModel();
                     break;
+                case ViewType.Afregning:
+                    CurrentViewModel = new MonthlyStatementViewModel();
+                    break;
 
                     // Tilføj flere cases her
             }

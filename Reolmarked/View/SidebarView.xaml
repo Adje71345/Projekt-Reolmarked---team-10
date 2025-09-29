@@ -39,7 +39,10 @@
                          GroupName="SidebarGroup"
                          IsChecked="{Binding SelectedView, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Salg}"/>
 
-            <RadioButton Content="Afregning" Style="{StaticResource SidebarButtonStyle}" GroupName="SidebarGroup"/>
+            <RadioButton Content="Afregning"
+                        Style="{StaticResource SidebarButtonStyle}"
+                        GroupName="SidebarGroup"
+                        IsChecked="{Binding SelectedView, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Afregning}"/>
         </StackPanel>
     </Border>
 </UserControl>

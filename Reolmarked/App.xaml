@@ -47,6 +47,11 @@
                 <view:SaleView/>
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type vm:MonthlyStatementViewModel}">
+                <view:MonthlyStatementView/>
+            </DataTemplate>
+
+
 
             <!-- Converters -->
             <vm:EnumToBoolConverter x:Key="EnumToBoolConverter" />
