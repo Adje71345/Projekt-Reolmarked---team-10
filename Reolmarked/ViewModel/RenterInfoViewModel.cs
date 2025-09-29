@@ -7,11 +7,15 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Reolmarked.Commands;
 using Reolmarked.Model;
+using Reolmarked.Repositories;
 
 namespace Reolmarked.ViewModel
 {
     public class RenterInfoViewModel : ViewModelBase
     {     
+        private readonly IRentalContractRepository _rentalContractRepository;
+        private readonly ISaleLineRepository _saleLineRepository;
+
         private Renter _selectedRenter;
         public Renter SelectedRenter
         {
@@ -19,7 +23,27 @@ namespace Reolmarked.ViewModel
             set => SetProperty(ref _selectedRenter, value);
         }
 
-        public DummyStats DummyStats { get; private set; } = new DummyStats();
+        private int _activeShelvesCount;
+        public int ActiveShelvesCount
+        {
+            get => _activeShelvesCount;
+            set => SetProperty(ref _activeShelvesCount, value);
+        }
+
+        private decimal _soldThisMonth;
+        public decimal SoldThisMonth
+        {
+            get => _soldThisMonth;
+            set => SetProperty(ref _soldThisMonth, value);
+        }
+
+        private decimal _revenueThisMonth;
+        public decimal RevenueThisMonth
+        {
+            get => _revenueThisMonth;
+            set => SetProperty(ref _revenueThisMonth, value);
+        }
+
         public ObservableCollection<RentalContract> ActiveContracts { get; } = new ObservableCollection<RentalContract>();
 
         public ICommand CloseCommand { get; }
@@ -31,58 +55,50 @@ namespace Reolmarked.ViewModel
         private readonly Action _closeAction;
         private readonly Action<Renter> _editAction;
 
-        public RenterInfoViewModel(Action closeAction, Action<Renter> editAction)
+        public RenterInfoViewModel(Action closeAction, Action<Renter> editAction, IRentalContractRepository rentalContractRepository, 
+            ISaleLineRepository saleLineRepository)
         {
             _closeAction = closeAction ?? throw new ArgumentNullException(nameof(closeAction));
             _editAction = editAction ?? throw new ArgumentNullException(nameof(editAction));
+            _rentalContractRepository = rentalContractRepository ?? throw new ArgumentNullException(nameof(rentalContractRepository));
+            _saleLineRepository = saleLineRepository ?? throw new ArgumentNullException(nameof(saleLineRepository));
 
             CloseCommand = new RelayCommand(() => _closeAction());
             EditCommand = new RelayCommand(() => _editAction(SelectedRenter), () => SelectedRenter != null);
 
             TerminateCommand = new RelayCommand<RentalContract>(c => Terminate(c));
-
-            // Dummy initial data so UI shows something. Replace when real data is available.
-            SeedDummyData();
         }
 
         public void LoadRenter(Renter renter)
         {
             SelectedRenter = renter;
-            // update dummy stats if you want to derive from renter; kept static here
-            CommandManager.InvalidateRequerySuggested();
-        }
 
-        private void SeedDummyData()
-        {
-            // Stats
-            DummyStats.ActiveShelves = 2;
-            DummyStats.SoldThisMonth = 19;
-            DummyStats.RevenueThisMonth = 2340;
-
-            // Contracts
+            // Hent aktive kontrakter
+            var contracts = _rentalContractRepository.GetActiveContractsByRenter(renter.RenterId).ToList();
             ActiveContracts.Clear();
-            ActiveContracts.Add(new RentalContract { ShelfName = "Reol 12", Period = "1. sep - 30. sep" });
-            ActiveContracts.Add(new RentalContract { ShelfName = "Reol 13", Period = "1. sep - 30. sep" });
+            contracts.ForEach(c => ActiveContracts.Add(c));
+
+            // Beregn antal aktive reoler
+            var rackIds = contracts.Select(c => c.RackId).Distinct().ToList();
+            ActiveShelvesCount = rackIds.Count;
+
+            // Hent salg for denne måned
+            var today = DateTime.Today;
+            var sales = _saleLineRepository.GetAll()
+                .Where(sl => rackIds.Contains(sl.RackId) &&
+                            sl.SaleDate.Year == today.Year &&
+                            sl.SaleDate.Month == today.Month)
+                .ToList();
+
+            SoldThisMonth = sales.Count;
+            RevenueThisMonth = sales.Sum(sl => sl.Price);
+
+            CommandManager.InvalidateRequerySuggested();
         }
 
         private void Terminate(RentalContract contract)
         {
             ActiveContracts.Remove(contract);
         }
-    }
-
-    // Simple support classes for dummy data
-    public class DummyStats
-    {
-        public int ActiveShelves { get; set; }
-        public int ItemsForSale { get; set; }
-        public int SoldThisMonth { get; set; }
-        public decimal RevenueThisMonth { get; set; }
-    }
-
-    public class RentalContract
-    {
-        public string ShelfName { get; set; }
-        public string Period { get; set; }
     }
 }
