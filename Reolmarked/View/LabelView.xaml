@@ -7,7 +7,7 @@
         
         <Border Style="{StaticResource WhitePanel}"
                 VerticalAlignment="Center" HorizontalAlignment="Center"
-                Width="450" Height="400">
+                Width="450" Height="450">
 
         <Grid Margin="30">
             <Grid.RowDefinitions>
@@ -50,7 +50,7 @@
 
                 <!-- Preview -->
                 <Border Grid.Row="2" BorderBrush="LightGray" BorderThickness="1" Padding="5"
-                        Width="300" Height="150" 
+                        Width="300" Height="200"
                         HorizontalAlignment="Center" VerticalAlignment="Top">
                     <Image Source="{Binding BarcodeImage}" Stretch="None"/>
                 </Border>

@@ -35,6 +35,13 @@ namespace Reolmarked.ViewModel
             set => SetProperty(ref _barcodeImage, value);
         }
 
+        private string _barcodeText;
+        public string BarcodeText
+        {
+            get => _barcodeText;
+            set => SetProperty(ref _barcodeText, value);
+        }
+
         //Commands
         public ICommand GenerateCommand { get; }
         public ICommand PrintCommand { get; }
@@ -78,25 +85,34 @@ namespace Reolmarked.ViewModel
 
             using (var barcodeBitmap = writer.Write(barcodeData))
             {
-                // laver label billedet, med ekstra plads til at tilføje tekst.
-                _labelBitmap = new Bitmap(barcodeBitmap.Width, barcodeBitmap.Height + 22);
+                // laver label billedet, med ekstra plads til at tilføje tekst over og under stregkoden.
+                int extraHeight = 80;
+                _labelBitmap = new Bitmap(barcodeBitmap.Width, barcodeBitmap.Height + extraHeight);
 
                 using (var graphics = Graphics.FromImage(_labelBitmap))
                 {
                     graphics.Clear(System.Drawing.Color.White);
-                    graphics.DrawImage(barcodeBitmap, 0, 0);
 
-                    using var font = new Font("Arial", 8f);
+                    using var font = new Font("Arial", 10f);
                     using var brush = new SolidBrush(System.Drawing.Color.Black);
 
-                    string text = $"Reol: {rackId}   Pris: {price} kr";
+                    // Header tekst øverst
+                    string headerText = $"Reol: {rackId}\nPris: {price} kr.\n";
+                    var headerSize = graphics.MeasureString(headerText, font);
+                    float headerX = (_labelBitmap.Width - headerSize.Width) / 2f;
+                    graphics.DrawString(headerText, font, brush, headerX, 5);
 
-                    // måler tekstbredde og centrerer det under stregkoden
-                    var size = graphics.MeasureString(text, font);
-                    float x = (barcodeBitmap.Width - size.Width) / 2f;
-                    float y = barcodeBitmap.Height + 2f;
+                    //Stregkoden midt i 
+                    int barcodeY = (int)headerSize.Height + 10;
+                    graphics.DrawImage(barcodeBitmap, 0, barcodeY);
 
-                    graphics.DrawString(text, font, brush, x, y);
+                    // Footer
+                    string footerText = barcodeData;
+                    var footerSize = graphics.MeasureString(footerText, font);
+                    float footerX = (_labelBitmap.Width - footerSize.Width) / 2f;
+                    float footerY = barcodeY + barcodeBitmap.Height + 5;
+                    graphics.DrawString(footerText, font, brush, footerX, footerY);
+
                 }
 
                 // konverter bitmap til imagesource og vis i UI
