@@ -8,6 +8,7 @@ using System.Windows.Input;
 using Reolmarked.Commands;
 using Reolmarked.Model;
 using Reolmarked.Repositories;
+using Reolmarked.ViewModel.Helpers;
 
 namespace Reolmarked.ViewModel
 {
@@ -44,7 +45,7 @@ namespace Reolmarked.ViewModel
             set => SetProperty(ref _revenueThisMonth, value);
         }
 
-        public ObservableCollection<RentalContract> ActiveContracts { get; } = new ObservableCollection<RentalContract>();
+        public ObservableCollection<RentalContractDisplayModel> ActiveContracts { get; } = new();
 
         public ICommand CloseCommand { get; }
         public ICommand EditCommand { get; }
@@ -66,7 +67,7 @@ namespace Reolmarked.ViewModel
             CloseCommand = new RelayCommand(() => _closeAction());
             EditCommand = new RelayCommand(() => _editAction(SelectedRenter), () => SelectedRenter != null);
 
-            TerminateCommand = new RelayCommand<RentalContract>(c => Terminate(c));
+            /*TerminateCommand = new RelayCommand<RentalContract>(c => Terminate(c));*/
         }
 
         public void LoadRenter(Renter renter)
@@ -76,7 +77,7 @@ namespace Reolmarked.ViewModel
             // Hent aktive kontrakter
             var contracts = _rentalContractRepository.GetActiveContractsByRenter(renter.RenterId).ToList();
             ActiveContracts.Clear();
-            contracts.ForEach(c => ActiveContracts.Add(c));
+            contracts.ForEach(c => ActiveContracts.Add(new RentalContractDisplayModel(c)));
 
             // Beregn antal aktive reoler
             var rackIds = contracts.Select(c => c.RackId).Distinct().ToList();
@@ -96,9 +97,9 @@ namespace Reolmarked.ViewModel
             CommandManager.InvalidateRequerySuggested();
         }
 
-        private void Terminate(RentalContract contract)
+        /*private void Terminate(RentalContract contract)
         {
             ActiveContracts.Remove(contract);
-        }
+        }*/
     }
 }
