@@ -56,6 +56,9 @@ namespace Reolmarked.ViewModel
                 case ViewType.Labels:
                     CurrentViewModel = new LabelViewModel();
                     break;
+                case ViewType.Salg:
+                    CurrentViewModel = new SaleViewModel();
+                    break;
 
                     // Tilføj flere cases her
             }

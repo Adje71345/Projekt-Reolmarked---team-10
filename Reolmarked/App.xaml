@@ -43,6 +43,11 @@
                 <view:LabelView/>
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type vm:SaleViewModel}">
+                <view:SaleView/>
+            </DataTemplate>
+
+
             <!-- Converters -->
             <vm:EnumToBoolConverter x:Key="EnumToBoolConverter" />
             <converters:MultiplyDoubleConverter x:Key="MultiplyDoubleConverter" />

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Reolmarked.View.SalgView"
+﻿<UserControl x:Class="Reolmarked.View.SaleView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -75,16 +75,12 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <!-- Scan + Tilføj -->
                     <RowDefinition Height="16"/>
                     <RowDefinition Height="Auto"/>
-                    <!-- Antal/Samlet + Betal -->
                     <RowDefinition Height="16"/>
                     <RowDefinition Height="*"/>
-                    <!-- Grid -->
                     <RowDefinition Height="16"/>
                     <RowDefinition Height="Auto"/>
-                    <!-- Ryd kurv -->
                 </Grid.RowDefinitions>
 
                 <!-- Scan-linje -->
@@ -93,34 +89,34 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="280"/>
+                            <!-- plads til live preview -->
                         </Grid.ColumnDefinitions>
 
-                        <!-- TextBox med placeholder via triggers (behøver ikke converter) -->
                         <TextBox Grid.Column="0" Margin="0,0,10,0"
-                                 Text="{Binding BarcodeInput, UpdateSourceTrigger=PropertyChanged}"
-                                 Padding="10" FontSize="15"
-                                 Background="White" BorderBrush="#E5E7EB" BorderThickness="1">
+                 Text="{Binding BarCode, UpdateSourceTrigger=PropertyChanged}"
+                 Padding="10" FontSize="15"
+                 Background="White" BorderBrush="#E5E7EB" BorderThickness="1">
                             <TextBox.InputBindings>
-                                <KeyBinding Key="Enter" Command="{Binding ScanCommand}"/>
+                                <KeyBinding Key="Enter" Command="{Binding AddSaleLineCommand}"/>
                             </TextBox.InputBindings>
 
                             <TextBox.Template>
                                 <ControlTemplate TargetType="TextBox">
                                     <Grid>
                                         <Border Background="{TemplateBinding Background}"
-                                                BorderBrush="{TemplateBinding BorderBrush}"
-                                                BorderThickness="{TemplateBinding BorderThickness}"
-                                                CornerRadius="10"/>
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10"/>
                                         <ScrollViewer Margin="8,6" x:Name="PART_ContentHost"/>
                                         <TextBlock x:Name="Watermark"
-                                                   Text="Scan eller indtast stregkode…"
-                                                   Foreground="#9CA3AF"
-                                                   Margin="14,8,0,0"
-                                                   IsHitTestVisible="False"
-                                                   Visibility="Collapsed"/>
+                                   Text="Scan eller indtast stregkode…"
+                                   Foreground="#9CA3AF"
+                                   Margin="14,8,0,0"
+                                   IsHitTestVisible="False"
+                                   Visibility="Collapsed"/>
                                     </Grid>
                                     <ControlTemplate.Triggers>
-                                        <!-- Vis placeholder når Text == tom -->
                                         <Trigger Property="Text" Value="">
                                             <Setter TargetName="Watermark" Property="Visibility" Value="Visible"/>
                                         </Trigger>
@@ -130,12 +126,18 @@
                         </TextBox>
 
                         <Button Grid.Column="1"
-                                Style="{StaticResource PrimaryButton}"
-                                MinWidth="90" Height="40"
-                                Command="{Binding ScanCommand}"
-                                Content="Tilføj" FontSize="16"/>
+                Style="{StaticResource PrimaryButton}"
+                MinWidth="90" Height="40"
+                Command="{Binding AddSaleLineCommand}"
+                Content="Tilføj" FontSize="16"/>
+
+                        <!-- Live stregkode-preview af den indtastede/scannede tekst -->
+                        <Border Grid.Column="2" CornerRadius="10" BorderBrush="#E5E7EB" BorderThickness="1" Padding="6" Background="White" Margin="10,0,0,0">
+                            <Image Source="{Binding BarcodePreview}" Stretch="Uniform" />
+                        </Border>
                     </Grid>
                 </Border>
+
 
                 <!-- Antal/Samlet pris + Betal -->
                 <Grid Grid.Row="2">
@@ -147,28 +149,33 @@
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock FontSize="16" Margin="0,0,24,0">
                             <Run Text="Antal: " FontWeight="SemiBold"/>
-                            <Run Text="{Binding ItemCount}"/>
+                            <Run Text="{Binding DisplayQuantity, Mode=OneWay}"/>
                         </TextBlock>
-                        <TextBlock FontSize="16" RenderTransformOrigin="0.655,0.454"><Run Text="Samlet pris: " FontWeight="SemiBold"/><Run Text=" "/><Run Text="{Binding Total, StringFormat=\{0:N2\} kr.}"/></TextBlock>
+                        <TextBlock FontSize="16">
+                            <Run Text="Samlet pris: " FontWeight="SemiBold"/>
+                            <Run Text="{Binding DisplayTotalPrice, Mode=OneWay, StringFormat={}{0:N2} kr.}"/>
+                        </TextBlock>
                     </StackPanel>
 
                     <Button Grid.Column="1" Height="40"
                             Style="{StaticResource PrimaryButton}"
                             Content="Betal"
-                            Command="{Binding CheckoutCommand}"
-                            IsEnabled="{Binding CanCheckout}" Click="Button_Click" Margin="116,0,0,0" FontSize="16"/>
+                            Command="{Binding PayCommand}"
+                            Margin="116,0,0,0" FontSize="16"/>
+
                 </Grid>
 
                 <!-- Tabel med linjer -->
                 <Border Grid.Row="4" CornerRadius="18" BorderBrush="#E5E7EB" BorderThickness="1" Padding="8">
                     <DataGrid x:Name="LinesGrid"
-                              ItemsSource="{Binding Lines}"
-                              AutoGenerateColumns="False"
-                              HeadersVisibility="Column"
-                              CanUserAddRows="False" CanUserDeleteRows="False"
-                              IsReadOnly="True"
-                              GridLinesVisibility="Horizontal"
-                              BorderThickness="0" RowHeaderWidth="0">
+          ItemsSource="{Binding Sale}"
+          AutoGenerateColumns="False"
+          HeadersVisibility="Column"
+          CanUserAddRows="False" CanUserDeleteRows="False"
+          IsReadOnly="True"
+          GridLinesVisibility="Horizontal"
+          BorderThickness="0" RowHeaderWidth="0">
+
                         <DataGrid.Resources>
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="FontWeight" Value="SemiBold"/>
@@ -178,29 +185,82 @@
                             <Style TargetType="DataGridRow">
                                 <Setter Property="Padding" Value="4"/>
                             </Style>
+                            <Style x:Key="CellPadRight24" TargetType="DataGridCell">
+                                <!-- ekstra højre-padding -->
+                                <Setter Property="Padding" Value="6,0,24,0"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            </Style>
                         </DataGrid.Resources>
 
-                        <DataGridTextColumn Binding="{Binding RackNo}" Header="Reol" Width="80"/>
-                        <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N2} kr.}" Header="Pris" Width="120"/>
-                        <DataGridTextColumn Binding="{Binding Barcode}" Header="Scan-kode" Width="*"/>
+                        <!-- Kolonner -->
+                        <DataGrid.Columns>
+                            <!-- Reol -->
+                            <DataGridTextColumn Header="Reol"
+                        Binding="{Binding RackId}"
+                        Width="100"
+                        CellStyle="{StaticResource CellPadRight24}"/>
 
-                        <!-- Slet -->
-                        <DataGridTemplateColumn Width="48">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button Style="{StaticResource CircleDeleteButton}"
-                                            Command="{Binding DataContext.RemoveLineCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                            CommandParameter="{Binding}"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                            <!-- Pris -->
+                            <DataGridTextColumn Header="Pris"
+                        Binding="{Binding Price, StringFormat={}{0:N0}}"
+                        Width="120"
+                        CellStyle="{StaticResource CellPadRight24}"/>
+
+                            <!-- Scan-kode: tekst + billede + slet-knap i samme kolonne -->
+                            <DataGridTemplateColumn Header="Scan-kode" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <!-- 0: tekst -->
+                                                <ColumnDefinition Width="Auto"/>
+                                                <!-- 1: spacer tekst->billede -->
+                                                <ColumnDefinition Width="Auto"/>
+                                                <!-- 2: billede -->
+                                                <ColumnDefinition Width="Auto"/>
+                                                <!-- 3: spacer billede->kryds -->
+                                                <ColumnDefinition Width="Auto"/>
+                                                <!-- 4: kryds-knap -->
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- scankode-tekst -->
+                                            <TextBlock Grid.Column="0"
+                                                Text="{Binding ScanCode}"
+                                                VerticalAlignment="Center"/>
+
+                                            <!-- ⬇️ afstand KUN mellem tekst og billede -->
+                                            <Rectangle Grid.Column="1" Width="40" Height="1" Fill="Transparent"/>
+
+                                            <!-- stregkode-billed-->
+                                            <Image Grid.Column="2"
+                                                Source="{Binding BarcodeImage}"
+                                                Height="20"
+                                                Stretch="None"
+                                                HorizontalAlignment="Left"/>
+
+                                            <!-- ⬇️ afstand mellem billede og kryds -->
+                                            <Rectangle Grid.Column="3" Width="320" Height="1" Fill="Transparent"/>
+
+                                            <!-- slet-knap -->
+                                            <Button Grid.Column="4"
+                                                Style="{StaticResource CircleDeleteButton}"
+                                                Command="{Binding DataContext.RemoveSaleLineCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                CommandParameter="{Binding}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                        </DataGrid.Columns>
+
                     </DataGrid>
                 </Border>
 
                 <!-- Ryd kurv -->
                 <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Content="Ryd kurv"
-                            Command="{Binding ClearCartCommand}"
+                            Command="{Binding ClearSaleBasketCommand}"
                             Height="40" MinWidth="120"
                             BorderBrush="#9CA3AF" BorderThickness="1"
                             Background="White" Foreground="#111827" FontSize="16" Width="144">
