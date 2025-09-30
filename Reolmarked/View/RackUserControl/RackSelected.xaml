@@ -140,11 +140,7 @@
         </Style>
     </UserControl.Resources>
 
-    <Border CornerRadius="24"
-          Background="#FFFFFF"
-          BorderBrush="#E0E0E0"
-          BorderThickness="1"
-          Padding="16">
+    <Border Style="{StaticResource WhitePanel}">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel>
 

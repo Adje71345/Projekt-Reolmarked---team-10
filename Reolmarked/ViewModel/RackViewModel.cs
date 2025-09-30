@@ -38,6 +38,7 @@ namespace Reolmarked.ViewModel
         }
 
 
+
         public ObservableCollection<Rack> Racks { get; }
         public ObservableCollection<RackSlot> RackSlots { get; } = new();
 
@@ -59,6 +60,14 @@ namespace Reolmarked.ViewModel
             private set => SetProperty(ref _currentRackPanel, value);
         }
 
+        private bool _isOverlayOpen;
+        public bool IsOverlayOpen
+        {
+            get => _isOverlayOpen;
+            set => SetProperty(ref _isOverlayOpen, value);
+        }
+
+        public ICommand CloseOverlayCommand { get; }
         public ICommand SelectRackCommand { get; }
         public ICommand SelectRackByIdCommand { get; }
 
@@ -86,6 +95,7 @@ namespace Reolmarked.ViewModel
             );
 
             BuildSlots();
+            CloseOverlayCommand = new RelayCommand(() => IsOverlayOpen = false);
         }
 
         private void SelectAndShow(Rack r)
@@ -96,6 +106,7 @@ namespace Reolmarked.ViewModel
                 goToAddContract: () => ShowAddRentContract(),
                 goToEndContract: () => ShowEndRentContract()
             );
+            IsOverlayOpen = true; // Dette aktiverer overlayet
         }
 
         private Rack FindRack(int id) =>
@@ -135,6 +146,7 @@ namespace Reolmarked.ViewModel
                     if (target != null) SelectedRack = target;
                 }
             );
+            IsOverlayOpen = true;
         }
 
         private void ShowEndRentContract()
@@ -167,6 +179,7 @@ namespace Reolmarked.ViewModel
                     );
                 }
             );
+            IsOverlayOpen = true;
         }
 
         // ---------- Tais eksisterende LAYOUT-KODE (placeringer) ----------
