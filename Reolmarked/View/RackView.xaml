@@ -17,18 +17,9 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid Margin="16">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <!-- reoler -->
-            <ColumnDefinition Width="24" />
-            <!-- skillelinje -->
-            <ColumnDefinition Width="420" />
-            <!-- højre panel -->
-        </Grid.ColumnDefinitions>
-
-        <!-- Venstre: kort / reoler -->
-        <Border Grid.Column="0"
+    <Grid x:Name="LayoutRoot" Margin="16">
+        <!-- kort / reoler -->
+        <Border
             CornerRadius="36"
             Background="#FFFFFF"
             BorderBrush="#E0E0E0"
@@ -100,10 +91,31 @@
             </Viewbox>
         </Border>
 
-        <!-- Separator -->
-        <Separator Grid.Column="1" VerticalAlignment="Stretch"/>
+        <!-- Semi-transparent baggrund -->
+        <Rectangle 
+               Fill="#80000000"
+               Visibility="{Binding IsOverlayOpen, Converter={StaticResource BoolToVisibilityConverter}}"
+               Panel.ZIndex="90"
+               Focusable="True"
+               Cursor="Hand">
+            <Rectangle.InputBindings>
+                <MouseBinding MouseAction="LeftClick" Command="{Binding CloseOverlayCommand}" />
+            </Rectangle.InputBindings>
+        </Rectangle>
 
-        <!-- Højre panel (der hvor DataTemplates styrer indholdet) -->
-        <ContentControl Grid.Column="2" Content="{Binding CurrentRackPanel}"/>
+        <!-- Overlay panel -->
+        <Border 
+            Background="White"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Stretch"
+            Visibility="{Binding IsOverlayOpen, Converter={StaticResource BoolToVisibilityConverter}}"
+            Panel.ZIndex="100"
+            BorderBrush="#DDD"
+            BorderThickness="1"
+            Padding="8"
+            Width="{Binding ActualWidth, ElementName=LayoutRoot, Converter={StaticResource MultiplyDoubleConverter}, ConverterParameter=0.5}"
+            MaxWidth="900">
+            <ContentControl Content="{Binding CurrentRackPanel}" />
+        </Border>
     </Grid>
 </UserControl>
