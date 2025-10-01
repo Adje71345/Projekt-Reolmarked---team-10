@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Reolmarked.ViewModel
 {
@@ -21,6 +22,12 @@ namespace Reolmarked.ViewModel
 
         // Tabel
         public ObservableCollection<MonthlyStatementRow> Rows { get; } = new();
+
+        // Totals til footer
+        public decimal SumTotalSalg => Rows?.Sum(r => r.TotalSalg) ?? 0m;
+        public decimal SumKommission => Rows?.Sum(r => r.Kommission) ?? 0m;
+        public decimal SumReolLeje => Rows?.Sum(r => r.ReolLeje) ?? 0m;
+        public decimal SumNettoresultat => Rows?.Sum(r => r.Nettoresultat) ?? 0m;
 
         // Valgt år
         private int _selectedYear;
@@ -110,6 +117,16 @@ namespace Reolmarked.ViewModel
                 r.Nettoresultat = r.TotalSalg - r.Kommission - r.ReolLeje;
                 Rows.Add(r);
             }
+
+            // signaler at totals er ændret
+            RaiseSumChanges();
+        }
+        private void RaiseSumChanges()
+        {
+            OnPropertyChanged(nameof(SumTotalSalg));
+            OnPropertyChanged(nameof(SumKommission));
+            OnPropertyChanged(nameof(SumReolLeje));
+            OnPropertyChanged(nameof(SumNettoresultat));
         }
     }
 }

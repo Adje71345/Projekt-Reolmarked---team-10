@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:helpers="clr-namespace:Reolmarked.ViewModel.Helpers"
              mc:Ignorable="d"
              d:DesignWidth="1200" d:DesignHeight="700"
              Background="#F7F8FB">
@@ -125,7 +126,38 @@
             <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
         </Style>
 
+        <!-- ===== Converter ===== -->
+        <helpers:NegativeToBrushConverter x:Key="NegativeToBrushConverter"/>
+
+        <!-- ===== Totals bar styles ===== -->
+        <Style x:Key="TotalsBarBorder" TargetType="Border">
+            <Setter Property="Background" Value="#F9FAFB"/>
+            <Setter Property="BorderBrush" Value="#E5E7EB"/>
+            <Setter Property="BorderThickness" Value="0,1,0,0"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+
+        <Style x:Key="TotalsLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#0F172A"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="10,0,0,0"/>
+        </Style>
+
+        <Style x:Key="TotalsValue" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#111827"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="TotalsMuted" TargetType="TextBlock" BasedOn="{StaticResource TotalsValue}">
+            <Setter Property="Foreground" Value="#9CA3AF"/>
+        </Style>
     </UserControl.Resources>
+    
     <Grid Margin="24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -182,68 +214,122 @@
 
 
         <Border Grid.Row="2"
-        CornerRadius="12"
-        BorderBrush="#E5E7EB"
-        BorderThickness="1"
-        Padding="0"
-        Margin="0,16,0,0">
-            <DataGrid ItemsSource="{Binding Rows}"
-              HorizontalAlignment="Stretch"
-              VerticalAlignment="Stretch"
-              ScrollViewer.VerticalScrollBarVisibility="Auto"
-              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-              ScrollViewer.CanContentScroll="True"
-              EnableRowVirtualization="True"
-              MinRowHeight="32">
-                <DataGrid.Columns>
+                CornerRadius="12"
+                BorderBrush="#E5E7EB"
+                BorderThickness="1"
+                Padding="0,0,0,12"
+                Margin="0,16,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <!-- DataGrid (rækker scroller) -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Totals footer (fast) -->
+                </Grid.RowDefinitions>
 
-                    <DataGridTextColumn Header="Lejer" Width="3*"
-                                Binding="{Binding LejerNavn}">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource CellLeft}">
-                                <Setter Property="ToolTipService.ShowDuration" Value="15000"/>
-                                <Setter Property="ToolTip" Value="{Binding LejerNavn}"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+                <!-- DataGrid -->
+                <DataGrid Grid.Row="0"
+                          ItemsSource="{Binding Rows}"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch"
+                          MaxHeight="420"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                          ScrollViewer.CanContentScroll="True"
+                          EnableRowVirtualization="True"
+                          MinRowHeight="32">
+                    <DataGrid.Columns>
 
-                    <DataGridTextColumn Header="Antal reoler" Width="1.8*"
-                                Binding="{Binding AntalReoler}">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource CellCenter}"/>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+                        <DataGridTextColumn Header="Lejer" Width="3*"
+                                            Binding="{Binding LejerNavn}">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource CellLeft}">
+                                    <Setter Property="ToolTipService.ShowDuration" Value="15000"/>
+                                    <Setter Property="ToolTip" Value="{Binding LejerNavn}"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="TotalSalg" Width="1.8*"
-                                Binding="{Binding TotalSalg, StringFormat={}{0:N0}}">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource CellCenter}"/>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+                        <DataGridTextColumn Header="Antal reoler" Width="1.8*"
+                                            Binding="{Binding AntalReoler}">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource CellCenter}"/>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="Kommission" Width="1.8*"
-                                Binding="{Binding Kommission, StringFormat={}{0:N0}}">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource CellCenter}"/>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+                        <DataGridTextColumn Header="TotalSalg" Width="1.8*"
+                                            Binding="{Binding TotalSalg, StringFormat={}{0:N0}}">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource CellCenter}"/>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="ReolLeje" Width="1.8*"
-                                Binding="{Binding ReolLeje, StringFormat={}{0:N0}}">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource CellCenter}"/>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+                        <DataGridTextColumn Header="Kommission" Width="1.8*"
+                                            Binding="{Binding Kommission, StringFormat={}{0:N0}}">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource CellCenter}"/>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="Nettoresultat" Width="1.8*"
-                                Binding="{Binding Nettoresultat, StringFormat={}{0:N0}}">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource CellCenter}"/>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+                        <DataGridTextColumn Header="ReolLeje" Width="1.8*"
+                                            Binding="{Binding ReolLeje, StringFormat={}{0:N0}}">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource CellCenter}"/>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
 
-                </DataGrid.Columns>
-            </DataGrid>
+                        <DataGridTextColumn Header="Nettoresultat" Width="1.8*"
+                                            Binding="{Binding Nettoresultat, StringFormat={}{0:N0}}">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource CellCenter}"/>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!-- Totals footer (matcher kolonnebredder) -->
+                <Border Grid.Row="1" Style="{StaticResource TotalsBarBorder}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="1.8*"/>
+                            <ColumnDefinition Width="1.8*"/>
+                            <ColumnDefinition Width="1.8*"/>
+                            <ColumnDefinition Width="1.8*"/>
+                            <ColumnDefinition Width="1.8*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Label -->
+                        <TextBlock Grid.Column="0" Text="Total" Style="{StaticResource TotalsLabel}"/>
+
+                        <!-- Antal reoler: muted dash -->
+                        <TextBlock Grid.Column="1" Text="—" Style="{StaticResource TotalsMuted}"/>
+
+                        <!-- TotalSalg -->
+                        <TextBlock Grid.Column="2"
+                                   Style="{StaticResource TotalsValue}"
+                                   Text="{Binding SumTotalSalg, StringFormat={}{0:N0}}"/>
+
+                        <!-- Kommission -->
+                        <TextBlock Grid.Column="3"
+                                   Style="{StaticResource TotalsValue}"
+                                   Text="{Binding SumKommission, StringFormat={}{0:N0}}"/>
+
+                        <!-- ReolLeje -->
+                        <TextBlock Grid.Column="4"
+                                   Style="{StaticResource TotalsValue}"
+                                   Text="{Binding SumReolLeje, StringFormat={}{0:N0}}"/>
+
+                        <!-- Nettoresultat (rød ved negativ) -->
+                        <TextBlock Grid.Column="5"
+                                   Style="{StaticResource TotalsValue}"
+                                   Foreground="{Binding SumNettoresultat, Converter={StaticResource NegativeToBrushConverter}}"
+                                   Text="{Binding SumNettoresultat, StringFormat={}{0:N0}}"/>
+                    </Grid>
+                </Border>
+            </Grid>
         </Border>
+
     </Grid>
 </UserControl>
