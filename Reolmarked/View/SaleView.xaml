@@ -167,95 +167,134 @@
 
                 <!-- Tabel med linjer -->
                 <Border Grid.Row="4" CornerRadius="18" BorderBrush="#E5E7EB" BorderThickness="1" Padding="8">
-                    <DataGrid x:Name="LinesGrid"
-          ItemsSource="{Binding Sale}"
-          AutoGenerateColumns="False"
-          HeadersVisibility="Column"
-          CanUserAddRows="False" CanUserDeleteRows="False"
-          IsReadOnly="True"
-          GridLinesVisibility="Horizontal"
-          BorderThickness="0" RowHeaderWidth="0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <!-- søgefelt -->
+                            <RowDefinition Height="8"/>
+                            <!-- lille spacer -->
+                            <RowDefinition Height="*"/>
+                            <!-- tabellen -->
+                        </Grid.RowDefinitions>
 
-                        <DataGrid.Resources>
-                            <Style TargetType="DataGridColumnHeader">
-                                <Setter Property="FontWeight" Value="SemiBold"/>
-                                <Setter Property="Foreground" Value="#4B5563"/>
-                                <Setter Property="Padding" Value="8,6"/>
-                            </Style>
-                            <Style TargetType="DataGridRow">
-                                <Setter Property="Padding" Value="4"/>
-                            </Style>
-                            <Style x:Key="CellPadRight24" TargetType="DataGridCell">
-                                <!-- ekstra højre-padding -->
-                                <Setter Property="Padding" Value="6,0,24,0"/>
-                                <Setter Property="VerticalContentAlignment" Value="Center"/>
-                            </Style>
-                        </DataGrid.Resources>
+                        <!-- Søgefelt: binder til SaleViewModel.SearchText -->
+                   <TextBox Grid.Row="0"
+                            Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="0,0,0,0"
+                            Padding="8"
+                            FontSize="14"
+                            Background="White"
+                            BorderBrush="#E5E7EB"
+                            BorderThickness="1">
+                       <TextBox.Template>
+                          <ControlTemplate TargetType="TextBox">
+                             <Grid>
+                                <Border Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        CornerRadius="8"/>
+                                <ScrollViewer Margin="8,4" x:Name="PART_ContentHost"/>
+                                <TextBlock x:Name="Watermark"
+                                          Text="Søg i linjer…"
+                                          Foreground="#9CA3AF"
+                                          Margin="12,6,0,0"
+                                          IsHitTestVisible="False"
+                                          Visibility="Collapsed"/>
+                             </Grid>
+                             <ControlTemplate.Triggers>
+                                <Trigger Property="Text" Value="">
+                                    <Setter TargetName="Watermark" Property="Visibility" Value="Visible"/>
+                                </Trigger>
+                             </ControlTemplate.Triggers>
+                          </ControlTemplate>
+                       </TextBox.Template>
+                   </TextBox>
 
-                        <!-- Kolonner -->
-                        <DataGrid.Columns>
+                   <!-- Eksisterende DataGrid -->
+                   <DataGrid Grid.Row="2" x:Name="LinesGrid"
+                             ItemsSource="{Binding SalesView}"
+                             AutoGenerateColumns="False"
+                             HeadersVisibility="Column"
+                             CanUserAddRows="False" CanUserDeleteRows="False"
+                             IsReadOnly="True"
+                             GridLinesVisibility="Horizontal"
+                             BorderThickness="0" RowHeaderWidth="0">
+
+                   <DataGrid.Resources>
+                          <Style TargetType="DataGridColumnHeader">
+                              <Setter Property="FontWeight" Value="SemiBold"/>
+                              <Setter Property="Foreground" Value="#4B5563"/>
+                              <Setter Property="Padding" Value="8,6"/>
+                          </Style>
+                          <Style TargetType="DataGridRow">
+                              <Setter Property="Padding" Value="4"/>
+                          </Style>
+                          <Style x:Key="CellPadRight24" TargetType="DataGridCell">
+                             <Setter Property="Padding" Value="6,0,24,0"/>
+                             <Setter Property="VerticalContentAlignment" Value="Center"/>
+                          </Style>
+                   </DataGrid.Resources>
+
+                   <!-- Kolonner -->
+                   <DataGrid.Columns>
                             <!-- Reol -->
-                            <DataGridTextColumn Header="Reol"
-                        Binding="{Binding RackId}"
-                        Width="100"
-                        CellStyle="{StaticResource CellPadRight24}"/>
+                          <DataGridTextColumn Header="Reol"
+                                              Binding="{Binding RackId}"
+                                              Width="100"
+                                              CellStyle="{StaticResource CellPadRight24}"/>
 
-                            <!-- Pris -->
-                            <DataGridTextColumn Header="Pris"
-                        Binding="{Binding Price, StringFormat={}{0:N0}}"
-                        Width="120"
-                        CellStyle="{StaticResource CellPadRight24}"/>
+                             <!-- Pris -->
+                          <DataGridTextColumn Header="Pris"
+                                              Binding="{Binding Price, StringFormat={}{0:N0}}"
+                                              Width="120"
+                                              CellStyle="{StaticResource CellPadRight24}"/>
 
-                            <!-- Scan-kode: tekst + billede + slet-knap i samme kolonne -->
-                            <DataGridTemplateColumn Header="Scan-kode" Width="*">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <!-- 0: tekst -->
-                                                <ColumnDefinition Width="Auto"/>
-                                                <!-- 1: spacer tekst->billede -->
-                                                <ColumnDefinition Width="Auto"/>
-                                                <!-- 2: billede -->
-                                                <ColumnDefinition Width="Auto"/>
-                                                <!-- 3: spacer billede->kryds -->
-                                                <ColumnDefinition Width="Auto"/>
-                                                <!-- 4: kryds-knap -->
-                                            </Grid.ColumnDefinitions>
+                          <!-- Scan-kode: tekst + billede + slet-knap i samme kolonne -->
+                          <DataGridTemplateColumn Header="Scan-kode" Width="*">
+                             <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                   <Grid>
+                                      <Grid.ColumnDefinitions>
+                                          <ColumnDefinition Width="Auto"/>
+                                          <ColumnDefinition Width="Auto"/>
+                                          <ColumnDefinition Width="Auto"/>
+                                          <ColumnDefinition Width="Auto"/>
+                                          <ColumnDefinition Width="Auto"/>
+                                      </Grid.ColumnDefinitions>
 
-                                            <!-- scankode-tekst -->
-                                            <TextBlock Grid.Column="0"
-                                                Text="{Binding ScanCode}"
-                                                VerticalAlignment="Center"/>
+                                      <!-- scankode-tekst -->
+                                      <TextBlock Grid.Column="0"
+                                           Text="{Binding ScanCode}"
+                                           VerticalAlignment="Center"/>
 
-                                            <!-- ⬇️ afstand KUN mellem tekst og billede -->
-                                            <Rectangle Grid.Column="1" Width="40" Height="1" Fill="Transparent"/>
+                                      <!-- afstand tekst->billede -->
+                                      <Rectangle Grid.Column="1" Width="40" Height="1" Fill="Transparent"/>
 
-                                            <!-- stregkode-billed-->
-                                            <Image Grid.Column="2"
-                                                Source="{Binding BarcodeImage}"
-                                                Height="20"
-                                                Stretch="None"
-                                                HorizontalAlignment="Left"/>
+                                      <!-- stregkode-billede -->
+                                      <Image Grid.Column="2"
+                                           Source="{Binding BarcodeImage}"
+                                           Height="20"
+                                           Stretch="None"
+                                           HorizontalAlignment="Left"/>
 
-                                            <!-- ⬇️ afstand mellem billede og kryds -->
-                                            <Rectangle Grid.Column="3" Width="320" Height="1" Fill="Transparent"/>
+                                      <!-- afstand billede->kryds -->
+                                      <Rectangle Grid.Column="3" Width="320" Height="1" Fill="Transparent"/>
 
-                                            <!-- slet-knap -->
-                                            <Button Grid.Column="4"
-                                                Style="{StaticResource CircleDeleteButton}"
-                                                Command="{Binding DataContext.RemoveSaleLineCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                CommandParameter="{Binding}"/>
-                                        </Grid>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
+                                      <!-- slet-knap -->
+                                      <Button Grid.Column="4"
+                                           Style="{StaticResource CircleDeleteButton}"
+                                           Command="{Binding DataContext.RemoveSaleLineCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                           CommandParameter="{Binding}"/>
+                                   </Grid>
+                                </DataTemplate>
+                             </DataGridTemplateColumn.CellTemplate>
+                          </DataGridTemplateColumn>
+                     </DataGrid.Columns>
 
-                        </DataGrid.Columns>
+                   </DataGrid>
+                </Grid>
+            </Border>
 
-                    </DataGrid>
-                </Border>
 
                 <!-- Ryd kurv -->
                 <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right">

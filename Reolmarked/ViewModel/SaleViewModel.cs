@@ -1,10 +1,13 @@
 ﻿using Reolmarked.Commands;
 using Reolmarked.Model;
+using Reolmarked.Repositories;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -15,8 +18,25 @@ namespace Reolmarked.ViewModel
 {
     internal class SaleViewModel : ViewModelBase
     {
+        private readonly ISaleLineRepository _saleLineRepository;
+
         // Liste til DataGrid
         public ObservableCollection<SaleLine> Sale { get; } = new();
+
+        // View-lag ovenpå Sale (til filter/sort og binding i XAML)
+        public ICollectionView SalesView { get; private set; }
+
+        // Søgning (bindes fra TextBox i XAML)
+        private string _searchText;
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                if (SetProperty(ref _searchText, value))
+                    SalesView?.Refresh();
+            }
+        }
 
         // Inputfelt (scanner skriver her)
         private string _barCode = "";
@@ -69,10 +89,23 @@ namespace Reolmarked.ViewModel
             PayCommand = new RelayCommand(Pay, () => Sale.Any());
         }
 
-        /// <summary>
-        /// Lavet efter samme format (samme som i LabelView): "rackId;price" – evt. "rackId;price;quantity"
-        /// Eksempler: "12;49,95" eller "12;49.95;2"
-        /// </summary>
+        // Runtime-konstruktør med repository. Kalder eksisterende ctor via ": this()".
+        public SaleViewModel(ISaleLineRepository saleLineRepository) : this()
+        {
+            _saleLineRepository = saleLineRepository ?? throw new ArgumentNullException(nameof(saleLineRepository));
+
+            // 1) Hent rækker fra DB ned i eksisterende liste "Sale"
+            LoadSalesFromDb();
+
+            // 2) Initialiser CollectionView (3 vigtige linjer + en valgfri 4.)
+            SalesView = CollectionViewSource.GetDefaultView(Sale);                 // (1)
+            SalesView.Filter = FilterSales;                                        // (2)
+            SalesView.SortDescriptions.Clear();                                    // (3)
+            SalesView.SortDescriptions.Add(new SortDescription(nameof(SaleLine.SaleDate), ListSortDirection.Descending)); // (4 - valgfri)
+        }
+
+
+        // Lavet efter samme format (samme som i LabelView): "rackId;price" – evt. "rackId;price;quantity"
         private void AddSaleLine()
         {
             var txt = (BarCode ?? "").Trim();
@@ -186,6 +219,51 @@ namespace Reolmarked.ViewModel
 
             using var bmp = writer.Write(text);
             return ConvertBitmapToImageSource(bmp);
+        }
+
+        private void LoadSalesFromDb()
+        {
+            if (_saleLineRepository == null) return;
+            var rows = _saleLineRepository.GetAll().OrderBy(s => s.SaleDate);
+
+            Sale.Clear();
+            foreach (var s in rows)
+            {
+                // Tilføj billede til rækker fra DB, så "Scan-kode"-kolonnen kan vise stregkoden
+                if (s.BarcodeImage == null && !string.IsNullOrWhiteSpace(s.ScanCode))
+                    s.BarcodeImage = GenerateBarcodeImage(s.ScanCode);
+
+                Sale.Add(s);
+            }
+        }
+
+        private bool FilterSales(object obj)
+        {
+            if (obj is not SaleLine s) return false;
+            if (string.IsNullOrWhiteSpace(SearchText)) return true;
+
+            var needle = SearchText.Trim().ToLowerInvariant();
+            var culture = System.Globalization.CultureInfo.CurrentCulture;
+
+            // Samler aller public properties på SaleLine som tekst (datoer, tal m.m. konverteres pænt)
+            // Det gør det muligt at søge på alle felter uden at specificere dem enkeltvis, ligemget om de er tekst, tal eller datoer.
+            var hay = string.Join(" | ",
+                s.GetType().GetProperties().Select(pi =>
+                {
+                    var v = pi.GetValue(s);
+                    if (v is null) return "";
+                    if (v is DateTime dt) return dt.ToString("yyyy-MM-dd", culture);
+                    if (v is DateOnly d) return d.ToString("yyyy-MM-dd", culture);
+                    if (v is decimal dec) return dec.ToString(culture);
+                    if (v is double db) return db.ToString(culture);
+                    if (v is float fl) return fl.ToString(culture);
+                    return v.ToString();
+                })
+            ).ToLowerInvariant();
+
+            return hay.Contains(needle);
+
+
         }
         private static ImageSource ConvertBitmapToImageSource(System.Drawing.Bitmap bmp)
         {
