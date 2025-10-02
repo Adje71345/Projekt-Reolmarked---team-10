@@ -4,11 +4,15 @@ using System.Globalization;
 using System.Windows.Input;
 using Reolmarked.Commands;
 using Reolmarked.Model;
+using Reolmarked.Repositories;
 
 namespace Reolmarked.ViewModel
 {
     public class RackSelectedViewModel : ViewModelBase
     {
+        private readonly IRentalContractRepository _rentalContractRepository;
+        private readonly IRenterRepository _renterRepository;
+
         public Rack Rack { get; }
 
         private bool _isOccupied;
@@ -60,40 +64,38 @@ namespace Reolmarked.ViewModel
         private readonly Action _goToEndContract;
 
         public RackSelectedViewModel(
-            Rack rack,
+            Rack rack, IRentalContractRepository rentalContractRepository,
+            IRenterRepository renterRepository,
             Action goToAddContract,
             Action goToEndContract)
         {
             Rack = rack ?? throw new ArgumentNullException(nameof(rack));
+            _rentalContractRepository = rentalContractRepository;
+            _renterRepository = renterRepository;
             _goToAddContract = goToAddContract ?? (() => { });
             _goToEndContract = goToEndContract ?? (() => { });
 
-            LoadDetails(rack);
+            LoadDetails(rack.RackId);
 
             AddContractCommand = new RelayCommand(() => _goToAddContract());
             EndContractCommand = new RelayCommand(() => _goToEndContract());
         }
 
-        // Demo-data indtil DB
-        private static readonly HashSet<int> _occupiedIds =
-            new HashSet<int>(new[] { 12, 28, 43, 56, 61, 63, 65, 68, 70, 71, 73, 75, 78, 80 });
-
-        private static readonly Dictionary<int, (string renter, DateOnly start, DateOnly? end)> _fake =
-            new Dictionary<int, (string renter, DateOnly start, DateOnly? end)>
-            {
-                { 12, ("Anna Pyjamas", new DateOnly(DateTime.Now.Year, 9, 1), new DateOnly(DateTime.Now.Year, 9, 30)) },
-                { 28, ("Niels Ninja", new DateOnly(DateTime.Now.Year, 9, 3), null) },
-                { 43, ("Peter Edderkop", new DateOnly(DateTime.Now.Year, 8, 15), new DateOnly(DateTime.Now.Year, 12, 31)) },
-            };
-
-        private void LoadDetails(Rack rack)
+        private void LoadDetails(int rackId)
         {
-            if (_occupiedIds.Contains(rack.RackId) && _fake.TryGetValue(rack.RackId, out var c))
+            var contract = _rentalContractRepository.GetActiveContractByRack(rackId);
+
+            if (contract != null)
             {
                 IsOccupied = true;
-                RenterName = c.renter;
-                PeriodStart = c.start;
-                PeriodEnd = c.end;
+
+                var renter = _renterRepository.GetById(contract.RenterId);
+                RenterName = renter != null
+                    ? $"{renter.FirstName} {renter.LastName}"
+                    : $"Lejer #{contract.RenterId}";
+
+                PeriodStart = contract.StartDate;
+                PeriodEnd = contract.EndDate;
             }
             else
             {
