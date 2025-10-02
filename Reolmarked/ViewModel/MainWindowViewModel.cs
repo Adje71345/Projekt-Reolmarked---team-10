@@ -63,6 +63,8 @@ namespace Reolmarked.ViewModel
                     CurrentViewModel = new MonthlyStatementViewModel();
                     break;
                 case ViewType.AddRenter:
+                    _selectedView = ViewType.Renter;
+                    OnPropertyChanged(nameof(SelectedView));
                     CurrentViewModel = new AddRenterViewModel(_renterRepository, _paymentMethodRepository);
                     break;
 
