@@ -4,11 +4,6 @@
                     xmlns:vu="clr-namespace:Reolmarked.View.RackUserControl"
                     xmlns:vp="clr-namespace:Reolmarked.View.RackPanels">
 
-    <!-- Start / tomt panel -->
-    <DataTemplate DataType="{x:Type vm:RackHomeViewModel}">
-        <vu:RackHome/>
-    </DataTemplate>
-
     <!-- Detalje-panel for valgt reol -->
     <DataTemplate DataType="{x:Type vm:RackSelectedViewModel}">
         <vu:RackSelected/>

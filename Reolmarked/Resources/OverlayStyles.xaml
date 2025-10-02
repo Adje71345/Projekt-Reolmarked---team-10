@@ -160,4 +160,27 @@
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
+
+    <!-- Rød knap -->
+    <Style x:Key="BtnDangerOutlinePill" TargetType="Button">
+        <Setter Property="Foreground" Value="{StaticResource Danger}"/>
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderBrush" Value="{StaticResource DangerLight}"/>
+        <Setter Property="BorderThickness" Value="1.5"/>
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="Padding" Value="20,14"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border CornerRadius="{StaticResource BtnRadius}" Background="{TemplateBinding Background}"
+            BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>
