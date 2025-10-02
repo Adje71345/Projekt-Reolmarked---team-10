@@ -94,7 +94,7 @@
                                 Content="Månedopgørelse" 
                                 Style="{StaticResource GrayRoundedButton}"
                                 Command="{Binding NavigateCommand}" 
-                                CommandParameter="{x:Static vm:ViewType.Afregning }"/>
+                                CommandParameter="{x:Static vm:ViewType.Månedopgørelse }"/>
                     </Grid>
                 </StackPanel>
             </Border>

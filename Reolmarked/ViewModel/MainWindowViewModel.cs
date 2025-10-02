@@ -59,7 +59,7 @@ namespace Reolmarked.ViewModel
                 case ViewType.Salg:
                     CurrentViewModel = new SaleViewModel(_saleLineRepository);
                     break;
-                case ViewType.Afregning:
+                case ViewType.Månedopgørelse:
                     CurrentViewModel = new MonthlyStatementViewModel();
                     break;
                 case ViewType.AddRenter:
