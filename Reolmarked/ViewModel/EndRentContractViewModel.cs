@@ -128,10 +128,6 @@ namespace Reolmarked.ViewModel
         }
 
         // Data der sendes ved submit
-        public record SubmitData(DateTime TerminationDate);
-
-        
-
-        
+        public record SubmitData(DateTime TerminationDate);            
     }
 }

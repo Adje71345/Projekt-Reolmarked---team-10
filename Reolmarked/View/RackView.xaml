@@ -9,7 +9,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- mapper med nubærende RackPanel (Home/Selected/Add/End) -->
+                <!-- mapper med nuværende RackPanel (Home/Selected/Add/End) -->
                 <ResourceDictionary Source="/Reolmarked;component/Resources/RackPanelsViewLocators.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <sys:Double x:Key="DesignWidth">1200</sys:Double>
