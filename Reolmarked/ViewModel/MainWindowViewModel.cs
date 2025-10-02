@@ -62,6 +62,9 @@ namespace Reolmarked.ViewModel
                 case ViewType.Afregning:
                     CurrentViewModel = new MonthlyStatementViewModel();
                     break;
+                case ViewType.AddRenter:
+                    CurrentViewModel = new AddRenterViewModel(_renterRepository, _paymentMethodRepository);
+                    break;
 
                     // Tilføj flere cases her
             }

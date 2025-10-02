@@ -36,6 +36,6 @@ namespace Reolmarked.ViewModel
         Labels,
         Salg,
         Afregning,
-        OpretLejer
+        AddRenter
     }
 }
