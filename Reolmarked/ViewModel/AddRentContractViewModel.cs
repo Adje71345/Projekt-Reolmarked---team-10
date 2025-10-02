@@ -1,7 +1,4 @@
-﻿// Formål: ViewModel til "Opret lejekontrakt"-panelet.
-// Bruger WRAPPERS i stedet for converters (EndDateEnabled => !NoEnd). Kunne ikke få converters til at virke!
-
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -16,19 +13,51 @@ namespace Reolmarked.ViewModel
     {
         // Lister leveres fra parent
         public ObservableCollection<Renter> Renters { get; }
-
         private readonly List<PaymentMethod> _paymentMethods;
-        private Renter? Renter => Renters.FirstOrDefault(r => r.RenterId == RenterId);
 
-        // Reol-id (kan tastes/ændres)
+        // Callbacks til parent
+        private readonly Action<SubmitData> _onSubmit;
+        private readonly Action _onClose;
+        private readonly Action<int>? _onChangeRackId;
+
+        // Commands
+        public ICommand SubmitCommand { get; }
+        public ICommand CloseCommand { get; }
+
+        //Properties til binding
+        // Reol-id
         private int _rackId;
         public int RackId
         {
             get => _rackId;
-            set { if (SetProperty(ref _rackId, value)) _onChangeRackId?.Invoke(_rackId); } // sync med grid-valg
+            set
+            {
+                if (SetProperty(ref _rackId, value))
+                {
+                    _onChangeRackId?.Invoke(_rackId);
+                }
+            }
         }
 
-        // Lejer-id (kan vælges via navneforslag)
+        // Valgt lejer (ComboBox)
+        private Renter? _selectedRenter;
+        public Renter? SelectedRenter
+        {
+            get => _selectedRenter;
+            set
+            {
+                if (SetProperty(ref _selectedRenter, value) && value != null)
+                {
+                    RenterId = value.RenterId;
+                    OnPropertyChanged(nameof(PaymentMethodName));
+                    OnPropertyChanged(nameof(CanSubmit));
+                    RaiseSubmitCanExecute();
+                }
+            }
+        }
+
+
+        // Lejer-id (synkroniseres med SelectedRenter)
         private int _renterId;
         public int RenterId
         {
@@ -38,90 +67,114 @@ namespace Reolmarked.ViewModel
                 if (SetProperty(ref _renterId, value))
                 {
                     var r = Renters.FirstOrDefault(x => x.RenterId == _renterId);
-                    RenterNameQuery = r == null ? "" : $"{r.FirstName} {r.LastName}";
                     OnPropertyChanged(nameof(PaymentMethodName));
                 }
             }
         }
 
-        // Søgetekst til navneforslag
-        private string _renterNameQuery = "";
-        public string RenterNameQuery
-        {
-            get => _renterNameQuery;
-            set
-            {
-                if (SetProperty(ref _renterNameQuery, value))
-                {
-                    SuggestionsVisible = string.IsNullOrWhiteSpace(value) ? Visibility.Collapsed : Visibility.Visible;
-                    OnPropertyChanged(nameof(NameSuggestions)); // opdater liste
-                }
-            }
-        }
-
-        // Model for forslag
-        public class NameSuggestion { public int RenterId { get; set; } public string Display { get; set; } = ""; }
-
-        // Filtrerede forslag
-        public System.Collections.Generic.List<NameSuggestion> NameSuggestions =>
-            Renters
-                .Where(r => string.IsNullOrWhiteSpace(RenterNameQuery)
-                         || ($"{r.FirstName} {r.LastName}".ToLower().Contains(RenterNameQuery.Trim().ToLower())))
-                .Select(r => new NameSuggestion { RenterId = r.RenterId, Display = $"{r.FirstName} {r.LastName} (ID {r.RenterId})" })
-                .ToList();
-
-        // Wrapper, gør det synligt for forslag (slipper for BoolToVisibilityConverter)
-        private Visibility _suggestionsVisible = Visibility.Collapsed;
-        public Visibility SuggestionsVisible
-        {
-            get => _suggestionsVisible;
-            set => SetProperty(ref _suggestionsVisible, value);
-        }
-
-        // Datoer (DatePicker binder til DateTime)
-        private DateTime? _startDateTime = DateTime.Today;
-        public DateTime? StartDateTime
-        {
-            get => _startDateTime;
-            set => SetProperty(ref _startDateTime, value);
-        }
-
-        private DateTime? _endDateTime = DateTime.Today.AddMonths(1);
-        public DateTime? EndDateTime
-        {
-            get => _endDateTime;
-            set => SetProperty(ref _endDateTime, value);
-        }
-
-        // Vores checkbox"Ingen slutdato" - slår EndDateEnable fra og til og nustiller EndDateTime
-        private bool _noEnd = false;
-        public bool NoEnd
-        {
-            get => _noEnd;
-            set { if (SetProperty(ref _noEnd, value)) OnPropertyChanged(nameof(EndDateEnabled)); } 
-        }
-
-        // Wrapper, som bliver brugt direkte i XAML
-        public bool EndDateEnabled => !NoEnd;
-
-        // Betalingsmetode
+        // Hjælpeproperty til at finde valgt lejer ud fra RenterId
+        private Renter? Renter => Renters.FirstOrDefault(r => r.RenterId == RenterId);
+        // Betalingsmetode(Visning af betalingsmetode for valgt lejer)
         public string? PaymentMethodName =>
         _paymentMethods.FirstOrDefault(p => p.PaymentMethodId == Renter?.PaymentMethodId)?.Name;
 
 
-        // Commands
-        public ICommand PickRenterCommand { get; }
-        public ICommand SubmitCommand { get; }
-        public ICommand CloseCommand { get; }
+        // Startdato (default i dag)
+        private DateTime? _startDateTime = DateTime.Today;
+        public DateTime? StartDateTime
+        {
+            get => _startDateTime;
+            set
+            {
+                if (SetProperty(ref _startDateTime, value))
+                {
+                    OnPropertyChanged(nameof(CanSubmit));
+                    RaiseSubmitCanExecute();
+                }
+            }
+        }
 
-        // Callbacks til parent
-        private readonly Action<SubmitData> _onSubmit;
-        private readonly Action _onClose;
-        private readonly Action<int>? _onChangeRackId;
+        // Slutdato (default null og justeres til sidste dag i måneden)
+        private DateTime? _endDateTime = null;
+        public DateTime? EndDateTime
+        {
+            get => _endDateTime;
+            set
+            {
+                if (SetProperty(ref _endDateTime, value))
+                {
+                    if (_endDateTime.HasValue)
+                    {
+                        var dt = _endDateTime.Value;
+                        var lastDay = DateTime.DaysInMonth(dt.Year, dt.Month);
+                        var corrected = new DateTime(dt.Year, dt.Month, lastDay);
+                        if (corrected != dt)
+                        {
+                            _endDateTime = corrected;
+                            OnPropertyChanged(nameof(EndDateTime));
+                        }
+                    }
 
-        // Internt payload til submit 
-        public record SubmitData(int RackId, int RenterId, DateTime? StartDateTime, DateTime? EndDateTime, bool NoEnd);
+                    OnPropertyChanged(nameof(CanSubmit));
+                    RaiseSubmitCanExecute();
+                }
+            }
+        }
 
+
+        // Checkbox "Ingen slutdato" (nustiller samtidigt EndDateTime)
+        private bool _noEnd = false;
+        public bool NoEnd
+        {
+            get => _noEnd;
+            set
+            {
+                if (SetProperty(ref _noEnd, value))
+                {
+                    OnPropertyChanged(nameof(EndDateEnabled));
+                    OnPropertyChanged(nameof(CanSubmit));
+
+                    if (_noEnd)
+                    {
+                        EndDateTime = null;
+                    }
+
+                    RaiseSubmitCanExecute();
+                }
+            }
+        }
+        // Wrapper til binding (Slutdato er kun aktiv hvis NoEnd er false)
+        public bool EndDateEnabled => !NoEnd;
+
+       
+        //Submit logik
+        //Submit
+        private void Submit()
+        {
+            if (!NoEnd && EndDateTime.HasValue && EndDateTime < StartDateTime)
+            {
+                MessageBox.Show("Slutdato må ikke være før startdato.");
+                return;
+            }
+
+            _onSubmit(new SubmitData(RackId, RenterId, StartDateTime, EndDateTime, NoEnd));
+        }
+        // CanSubmit (bruges til at enable/disable Submit-knap)
+        public bool CanSubmit =>
+            SelectedRenter != null &&
+            StartDateTime.HasValue &&
+            (
+                NoEnd ||
+                (EndDateTime.HasValue && EndDateTime >= StartDateTime)
+            );
+        // Metode til at opdatere CanExecute på SubmitCommand
+        private void RaiseSubmitCanExecute()
+        {
+            (SubmitCommand as RelayCommand)?.RaiseCanExecuteChanged();
+        }
+
+
+        // Constructor
         public AddRentContractViewModel(int rackId, IEnumerable<Renter> renters, IEnumerable<PaymentMethod> paymentMethods,
             Action<SubmitData> onSubmit, Action onClose, Action<int>? onChangeRackId)
         {
@@ -133,25 +186,13 @@ namespace Reolmarked.ViewModel
             _onClose = onClose;
             _onChangeRackId = onChangeRackId;
 
-            PickRenterCommand = new RelayCommand<int>(rid =>
-            {
-                RenterId = rid;
-                SuggestionsVisible = Visibility.Collapsed;
-            });
-
-            SubmitCommand = new RelayCommand(() =>
-            {
-                if (RenterId <= 0 || RackId <= 0 || !StartDateTime.HasValue)
-                {
-                    MessageBox.Show("Udfyld mindst: Reol, Lejer og Startdato.");
-                    return;
-                }
-
-                _onSubmit(new SubmitData(RackId, RenterId, StartDateTime, EndDateTime, NoEnd));
-            });
+            SubmitCommand = new RelayCommand(Submit, () => CanSubmit);
 
             CloseCommand = new RelayCommand(_onClose);
         }
 
+
+        // Payload til parent ved oprettelse af lejekontrakt
+        public record SubmitData(int RackId, int RenterId, DateTime? StartDateTime, DateTime? EndDateTime, bool NoEnd);
     }
 }
