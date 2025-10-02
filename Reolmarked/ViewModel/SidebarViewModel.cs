@@ -35,6 +35,7 @@ namespace Reolmarked.ViewModel
         Rack,
         Labels,
         Salg,
-        Afregning
+        Afregning,
+        OpretLejer
     }
 }
