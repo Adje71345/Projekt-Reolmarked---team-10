@@ -12,7 +12,7 @@
 
             <!-- Overskrift -->
             <DockPanel Grid.Row="0" Margin="0,0,0,16">
-                <TextBlock Text="Opret lejekontrakt" FontSize="20" FontWeight="SemiBold"/>
+                <TextBlock Text="Opret lejekontrakt" Style="{DynamicResource BigTitle}"/>
                 <Button Content="&#x2715;" FontSize="16" Command="{Binding CloseCommand}"
                         DockPanel.Dock="Right" Style="{StaticResource BtnGhostPill}"/>
             </DockPanel>

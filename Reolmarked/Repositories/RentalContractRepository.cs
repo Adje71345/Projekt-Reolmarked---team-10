@@ -99,7 +99,6 @@ namespace Reolmarked.Repositories
                         : DateOnly.FromDateTime((DateTime)reader["EndDate"])
                 };
             }
-
             return contract;
         }
 
@@ -132,7 +131,7 @@ namespace Reolmarked.Repositories
             return contracts;
         }
 
-        
+
 
         // Finder aktiv kontrakt for en bestemt reol
         public RentalContract GetActiveContractByRack(int rackId)
@@ -141,11 +140,13 @@ namespace Reolmarked.Repositories
             string query = @"
                 SELECT RentalContractId, RenterId, RackId, StartDate, EndDate
                 FROM RentalContract
-                WHERE RackId = @RackId AND EndDate IS NULL";
+                WHERE RackId = @RackId
+                AND (EndDate IS NULL OR EndDate >= @Today)";
 
             using var connection = new SqlConnection(_connectionString);
             var command = new SqlCommand(query, connection);
             command.Parameters.AddWithValue("@RackId", rackId);
+            command.Parameters.AddWithValue("@Today", DateTime.Today);
 
             connection.Open();
             using var reader = command.ExecuteReader();
@@ -156,12 +157,12 @@ namespace Reolmarked.Repositories
                     RentalId = (int)reader["RentalContractId"],
                     RenterId = (int)reader["RenterId"],
                     RackId = (int)reader["RackId"],
-
                     StartDate = DateOnly.FromDateTime((DateTime)reader["StartDate"]),
-                    EndDate = null
+                    EndDate = reader["EndDate"] == DBNull.Value
+                        ? null
+                        : DateOnly.FromDateTime((DateTime)reader["EndDate"])
                 };
             }
-
             return contract;
         }
 

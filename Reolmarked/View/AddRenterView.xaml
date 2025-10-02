@@ -7,41 +7,47 @@
              d:DesignHeight="400" d:DesignWidth="360">
 
     <Border Style="{StaticResource WhitePanel}">
-        <StackPanel>
+        <Grid Margin="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>  <!-- Overskrift -->
+                <RowDefinition Height="*"/>     <!-- Form -->
+                <RowDefinition Height="Auto"/>  <!-- Knapper -->
+            </Grid.RowDefinitions>
 
             <!-- Overskrift -->
-            <TextBlock Text="Opret ny lejer" FontWeight="Bold" FontSize="16" Margin="0,0,0,12" Foreground="{DynamicResource TextBrush}"/>
+            <DockPanel Grid.Row="0" Margin="0,0,0,16">
+                <TextBlock Text="Opret ny lejer" Style="{StaticResource BigTitle}" DockPanel.Dock="Left"/>
+                <Button Content="&#x2715;" Command="{Binding CancelCommand}" Style="{StaticResource BtnGhostPill}" DockPanel.Dock="Right"/>
+            </DockPanel>
 
-            <!-- Fornavn -->
-            <TextBlock Text="Fornavn" FontSize="12" Foreground="{DynamicResource TextBrush}"/>
-            <TextBox Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,12"/>
+            <!-- Formular -->
+            <StackPanel Grid.Row="1">
 
-            <!-- Efternavn -->
-            <TextBlock Text="Efternavn" FontSize="12" Foreground="{DynamicResource TextBrush}"/>
-            <TextBox Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,12"/>
+                <TextBlock Style="{StaticResource FormLabel}" Text="Fornavn"/>
+                <TextBox Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InputPill}" Margin="0,4,0,12"/>
 
-            <!-- Telefon -->
-            <TextBlock Text="Telefonnummer" FontSize="12" Foreground="{DynamicResource TextBrush}"/>
-            <TextBox Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,12"/>
+                <TextBlock Style="{StaticResource FormLabel}" Text="Efternavn"/>
+                <TextBox Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InputPill}" Margin="0,4,0,12"/>
 
-            <!-- Email -->
-            <TextBlock Text="Email" FontSize="12" Foreground="{DynamicResource TextBrush}"/>
-            <TextBox Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,12"/>
+                <TextBlock Style="{StaticResource FormLabel}" Text="Telefonnummer"/>
+                <TextBox Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InputPill}" Margin="0,4,0,12"/>
 
-            <!-- Betalingsmetode -->
-            <TextBlock Text="Betalingsmetode" FontSize="12" Foreground="{DynamicResource TextBrush}"/>
-            <ComboBox ItemsSource="{Binding PaymentMethods}"
-                SelectedValue="{Binding PaymentMethodId, UpdateSourceTrigger=PropertyChanged}"
-                SelectedValuePath="PaymentMethodId"
-                DisplayMemberPath="Name"
-                Margin="0,4,0,12"/>
+                <TextBlock Style="{StaticResource FormLabel}" Text="Email"/>
+                <TextBox Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InputPill}" Margin="0,4,0,12"/>
 
-            <!-- Knapper -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
-                <Button Content="Annuller" Width="90" Margin="0,0,8,0" Command="{Binding CancelCommand}" />
-                <Button Content="Opret lejer" Width="110" Command="{Binding AddRenterCommand}" />
+                <TextBlock Style="{StaticResource FormLabel}" Text="Betalingsmetode"/>
+                <Border Style="{StaticResource Pill}">
+                    <ComboBox ItemsSource="{Binding PaymentMethods}" SelectedValue="{Binding PaymentMethodId}"
+                              SelectedValuePath="PaymentMethodId" DisplayMemberPath="Name" 
+                              Background="Transparent" BorderThickness="0"
+                              FontSize="{StaticResource FormFontSize}" FontFamily="{StaticResource FormFont}" Padding="0"/>
+                </Border>
             </StackPanel>
 
-        </StackPanel>
+            <!-- opret lejer knap -->
+            <Button Grid.Row="2" Content="Opret lejer" Command="{Binding AddRenterCommand}"
+                    Style="{StaticResource BtnPrimaryPill}" Margin="0,12,0,0" HorizontalAlignment="Stretch"/>
+        </Grid>
     </Border>
 </UserControl>
+

@@ -3,199 +3,64 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:helpers="clr-namespace:Reolmarked.ViewModel.Helpers">
 
-    <UserControl.Resources>
-        <!-- Converters -->
-        <helpers:BoolToTextConverter x:Key="BoolToText" TrueText="Optaget" FalseText="Ledig"/>
-        <helpers:BoolNotConverter x:Key="BoolNot"/>
-        <helpers:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
-
-        <!-- Pill style -->
-        <Style x:Key="Pill" TargetType="Border">
-            <Setter Property="CornerRadius" Value="16"/>
-            <Setter Property="Background" Value="#FFFFFF"/>
-            <Setter Property="BorderBrush" Value="#E0E0E0"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="8,6"/>
-        </Style>
-
-        <Style x:Key="BigTitle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="22"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
-        </Style>
-
-        <Style x:Key="Label" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#616161"/>
-            <Setter Property="Margin" Value="0,8,0,4"/>
-            <Setter Property="FontSize" Value="12"/>
-        </Style>
-
-        <!-- Primær knap (Opret) med hover/pressed kun når IsEnabled=True -->
-        <Style x:Key="PrimaryBtn" TargetType="Button">
-            <Setter Property="Height" Value="36"/>
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Background" Value="#F5F5F5"/>
-            <Setter Property="BorderBrush" Value="#E0E0E0"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Foreground" Value="#444"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="Box"
-                    CornerRadius="18"
-                    Background="{TemplateBinding Background}"
-                    BorderBrush="{TemplateBinding BorderBrush}"
-                    BorderThickness="{TemplateBinding BorderThickness}">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Margin="6,0"/>
-                        </Border>
-
-                        <!-- Template-triggers for hover/pressed når IsEnabled=True -->
-                        <ControlTemplate.Triggers>
-                            <!-- Disabled-look -->
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Box" Property="Opacity" Value="0.55"/>
-                            </Trigger>
-
-                            <!-- Hover (kun hvis enabled) -->
-                            <MultiTrigger>
-                                <MultiTrigger.Conditions>
-                                    <Condition Property="IsEnabled" Value="True"/>
-                                    <Condition Property="IsMouseOver" Value="True"/>
-                                </MultiTrigger.Conditions>
-                                <Setter TargetName="Box" Property="Background"   Value="#FFFFFF"/>
-                                <Setter TargetName="Box" Property="BorderBrush"  Value="#C0C0C0"/>
-                                <Setter Property="Foreground" Value="#222"/>
-                            </MultiTrigger>
-
-                            <!-- Pressed (kun hvis enabled) -->
-                            <MultiTrigger>
-                                <MultiTrigger.Conditions>
-                                    <Condition Property="IsEnabled" Value="True"/>
-                                    <Condition Property="IsPressed" Value="True"/>
-                                </MultiTrigger.Conditions>
-                                <Setter TargetName="Box" Property="Background"  Value="#EDEDED"/>
-                                <Setter TargetName="Box" Property="BorderBrush" Value="#9E9E9E"/>
-                            </MultiTrigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- Fare/secondary (Opsig) med egne hover/pressed farver -->
-        <Style x:Key="DangerBtn" TargetType="Button">
-            <Setter Property="Height" Value="36"/>
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Background" Value="#FFE9E9"/>
-            <Setter Property="BorderBrush" Value="#FFBDBD"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Foreground" Value="#C62828"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="Box"
-                    CornerRadius="18"
-                    Background="{TemplateBinding Background}"
-                    BorderBrush="{TemplateBinding BorderBrush}"
-                    BorderThickness="{TemplateBinding BorderThickness}">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Margin="6,0"/>
-                        </Border>
-
-                        <ControlTemplate.Triggers>
-                            <!-- Disabled-look -->
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Box" Property="Opacity" Value="0.55"/>
-                            </Trigger>
-
-                            <!-- Hover (kun hvis enabled) -->
-                            <MultiTrigger>
-                                <MultiTrigger.Conditions>
-                                    <Condition Property="IsEnabled" Value="True"/>
-                                    <Condition Property="IsMouseOver" Value="True"/>
-                                </MultiTrigger.Conditions>
-                                <Setter TargetName="Box" Property="Background"  Value="#FFDCDC"/>
-                                <Setter TargetName="Box" Property="BorderBrush" Value="#FFA4A4"/>
-                                <Setter Property="Foreground" Value="#B71C1C"/>
-                            </MultiTrigger>
-
-                            <!-- Pressed (kun hvis enabled) -->
-                            <MultiTrigger>
-                                <MultiTrigger.Conditions>
-                                    <Condition Property="IsEnabled" Value="True"/>
-                                    <Condition Property="IsPressed" Value="True"/>
-                                </MultiTrigger.Conditions>
-                                <Setter TargetName="Box" Property="Background"  Value="#FFCFCF"/>
-                                <Setter TargetName="Box" Property="BorderBrush" Value="#FF8C8C"/>
-                            </MultiTrigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </UserControl.Resources>
-
     <Border Style="{StaticResource WhitePanel}">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>     <!-- Indhold -->
+                <RowDefinition Height="Auto"/>  <!-- Knapper -->
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Margin="0,0,0,12">
 
                 <!-- Titel -->
                 <TextBlock Style="{StaticResource BigTitle}"
                    Text="{Binding Rack.RackId, StringFormat=Reol {0}}"/>
 
                 <!-- Status -->
-                <TextBlock Style="{StaticResource Label}" Text="Status"/>
+                <TextBlock Style="{StaticResource FormLabel}" Text="Status"/>
                 <Border Style="{StaticResource Pill}">
                     <TextBlock Text="{Binding IsOccupied, Converter={StaticResource BoolToText}}"
-                     FontWeight="SemiBold"
-                     HorizontalAlignment="Center"/>
+                               FontSize="{StaticResource FormFontSize}" FontFamily="{StaticResource FormFont}" 
+                               HorizontalAlignment="Center"/>
                 </Border>
 
                 <!-- Lejer -->
-                <TextBlock Style="{StaticResource Label}" Text="Lejer"/>
+                <TextBlock Style="{StaticResource FormLabel}" Text="Lejer"/>
                 <Border Style="{StaticResource Pill}">
-                    <TextBlock Text="{Binding RenterName}"
-                     FontWeight="SemiBold"
-                     TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding RenterName}" FontSize="{StaticResource FormFontSize}" 
+                               FontFamily="{StaticResource FormFont}" HorizontalAlignment="Center"/>
                 </Border>
 
                 <!-- Periode -->
-                <TextBlock Style="{StaticResource Label}" Text="Periode"/>
+                <TextBlock Style="{StaticResource FormLabel}" Text="Periode"/>
                 <Border Style="{StaticResource Pill}">
-                    <TextBlock Text="{Binding PeriodText}" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding PeriodText}" FontSize="{StaticResource FormFontSize}"
+                               FontFamily="{StaticResource FormFont}" HorizontalAlignment="Center"/>
                 </Border>
 
                 <!-- Dage tilbage (vises kun hvis der er en slutdato) -->
-                <TextBlock Style="{StaticResource Label}" Text="Dage tilbage"
-                   Visibility="{Binding DaysLeft, Converter={StaticResource NullToVisibilityConverter}}"/>
+                <TextBlock Style="{StaticResource FormLabel}" Text="Dage tilbage"
+                   Visibility="{Binding DaysLeft, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=Invert}"/>
                 <Border Style="{StaticResource Pill}"
-                Visibility="{Binding DaysLeft, Converter={StaticResource NullToVisibilityConverter}}">
-                    <TextBlock Text="{Binding DaysLeft}" FontWeight="SemiBold"/>
+                Visibility="{Binding DaysLeft, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=Invert}">
+                    <TextBlock Text="{Binding DaysLeft}" FontSize="{StaticResource FormFontSize}"
+                               FontFamily="{StaticResource FormFont}" HorizontalAlignment="Center"/>
                 </Border>
-
-                <!-- Knapper -->
-                <Border Height="12" Background="Transparent"/>
-
-                <!-- Opret lejekontrakt (kun enabled når reolen er ledig) -->
-                <Button Style="{StaticResource PrimaryBtn}"
-                Content="Opret lejekontrakt"
-                IsEnabled="{Binding IsOccupied, Converter={StaticResource BoolNot}}"
-                Command="{Binding AddContractCommand}"/>
+            </StackPanel>
+            
+            <!-- Knapper nederst-->
+            <StackPanel Grid.Row="1">
+                <Button Style="{StaticResource BtnPrimaryPill}"
+                    Content="Opret lejekontrakt"
+                    IsEnabled="{Binding IsOccupied, Converter={StaticResource BoolNot}}"
+                    Command="{Binding AddContractCommand}"/>
 
                 <Border Height="6" Background="Transparent"/>
 
-                <!-- Opsig lejekontrakt (kun enabled når reolen er optaget) -->
-                <Button Style="{StaticResource DangerBtn}"
-                Content="Opsig lejekontrakt"
-                IsEnabled="{Binding IsOccupied}"
-                Command="{Binding EndContractCommand}"/>
-
+                <Button Style="{DynamicResource BtnDangerOutlinePill}"
+                    Content="Opsig lejekontrakt"
+                    IsEnabled="{Binding IsOccupied}"
+                    Command="{Binding EndContractCommand}"/>
             </StackPanel>
-        </ScrollViewer>
+        </Grid>
     </Border>
 </UserControl>

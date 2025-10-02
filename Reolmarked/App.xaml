@@ -63,7 +63,9 @@
             <vm:EnumToBoolConverter x:Key="EnumToBoolConverter" />
             <converters:MultiplyDoubleConverter x:Key="MultiplyDoubleConverter" />
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-
+            <converters:BoolToTextConverter x:Key="BoolToText" TrueText="Optaget" FalseText="Ledig"/>
+            <converters:BoolNotConverter x:Key="BoolNot"/>
+            <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 

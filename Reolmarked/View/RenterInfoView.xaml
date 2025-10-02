@@ -9,13 +9,13 @@
     <Border Style="{StaticResource WhitePanel}">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/> <!-- header -->
+                <RowDefinition Height="Auto"/> <!-- Overskrift -->
                 <RowDefinition Height="Auto"/> <!-- person + statistik -->
                 <RowDefinition Height="*"/> <!-- aktive aftaler -->
                 <RowDefinition Height="Auto"/> <!-- handlinger -->
             </Grid.RowDefinitions>
 
-            <!-- Header -->
+            <!-- Overskrift -->
             <StackPanel Orientation="Horizontal" Grid.Row="0" VerticalAlignment="Center" Margin="0,0,0,8">
                 <TextBlock Text="{Binding SelectedRenter.FirstName}" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource TextBrush}" />
                 <TextBlock Text=" " FontSize="16"/>
