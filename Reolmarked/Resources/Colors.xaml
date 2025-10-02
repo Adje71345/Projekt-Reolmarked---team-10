@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- Neutrale farver -->
+    <!-- Farver -->
     <Color x:Key="BackgroundColor">#F0F2F5</Color>
     <Color x:Key="LightBackground">#F5F7FA</Color>
     <Color x:Key="DarkBackground">#DDE3EC</Color>
@@ -11,6 +11,8 @@
     <Color x:Key="SoftBorderColor">#D0D5DD</Color>
     <Color x:Key="PrimaryBlueColor">#1976D2</Color>
     <Color x:Key="PrimaryBlueLightColor">#3399FF</Color>
+    <Color x:Key="Red">#DC2626</Color>
+    <Color x:Key="LightRed">#FCA5A5</Color>
 
     <!-- Brushes -->
     <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}" />
@@ -22,5 +24,7 @@
     <SolidColorBrush x:Key="SoftBorderBrush" Color="{StaticResource SoftBorderColor}" />
     <SolidColorBrush x:Key="PrimaryBlueBrush" Color="{StaticResource PrimaryBlueColor}" />
     <SolidColorBrush x:Key="PrimaryBlueLightBrush" Color="{StaticResource PrimaryBlueLightColor}" />
+    <SolidColorBrush x:Key="Danger" Color="{StaticResource Red}"/>
+    <SolidColorBrush x:Key="DangerLight" Color="{StaticResource LightRed}"/>
 
 </ResourceDictionary>

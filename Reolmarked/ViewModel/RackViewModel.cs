@@ -1,12 +1,13 @@
 ﻿using System.Collections.ObjectModel;
-using System.Windows.Media;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Media;
 using ControlzEx.Standard;
 using Reolmarked.Commands;
 using Reolmarked.Model;
 using Reolmarked.Repositories;
+using Reolmarked.ViewModel.Helpers;
 
 
 namespace Reolmarked.ViewModel
@@ -24,6 +25,9 @@ namespace Reolmarked.ViewModel
 
     {
         private readonly IRackRepository _repo;
+        private readonly IRentalContractRepository _rentalContractRepository;
+        private readonly IRenterRepository _renterRepository;
+        private readonly IRepository<PaymentMethod> _paymentMethodRepository;
         private System.Collections.Generic.HashSet<int> _occupiedIds = new();
 
         private Brush rackBackGround = Brushes.Green;
@@ -78,12 +82,20 @@ namespace Reolmarked.ViewModel
         private const double H_V = 44;  // lodret højde
         private const double GAP = 10;
 
-        public RackViewModel(IRackRepository repo)
+        public RackViewModel(IRackRepository repo, IRentalContractRepository rentalContractRepository, IRenterRepository renterRepository, IRepository<PaymentMethod> paymentMethodRepository)
         {
             _repo = repo;
-            Racks = new ObservableCollection<Rack>(_repo.GetAll());
-            CurrentRackPanel = new RackHomeViewModel();
+            _rentalContractRepository = rentalContractRepository;
+            _renterRepository = renterRepository;
+            _paymentMethodRepository = paymentMethodRepository;
 
+            // Hent racks fra DB
+            Racks = new ObservableCollection<Rack>(_repo.GetAll());
+
+            // Opdater rackstatus baseret på kontrakter
+            RefreshRackSlots();
+
+            // Kommandoer
             SelectRackCommand = new DelegateCommand<Rack>(
                 r => { if (r != null) SelectAndShow(r); },
                 r => r != null
@@ -94,7 +106,6 @@ namespace Reolmarked.ViewModel
                 id => id > 0
             );
 
-            BuildSlots();
             CloseOverlayCommand = new RelayCommand(() => IsOverlayOpen = false);
         }
 
@@ -103,6 +114,8 @@ namespace Reolmarked.ViewModel
             SelectedRack = r;
             CurrentRackPanel = new RackSelectedViewModel(
                 r,
+                _rentalContractRepository,
+                _renterRepository,
                 goToAddContract: () => ShowAddRentContract(),
                 goToEndContract: () => ShowEndRentContract()
             );
@@ -116,18 +129,31 @@ namespace Reolmarked.ViewModel
 
         private void ShowAddRentContract()
         {
-            var rack = SelectedRack;
-            if (rack == null) return;
+            var renters = _renterRepository.GetAll();
+            var paymentMethods = _paymentMethodRepository.GetAll();
 
             CurrentRackPanel = new AddRentContractViewModel(
-                rackId: rack.RackId,
-                renters: Renters,
-                paymentMethods: PaymentMethods,
+                SelectedRack.RackId,
+                renters,
+                paymentMethods,
                 onSubmit: data =>
                 {
-                    // TODO: Persistér kontrakten i DB (data.RackId, data.RenterId, data.StartDateTime, data.EndDateTime, data.NoEnd, data.SelectedPaymentMethod)
+                    var contract = new RentalContract
+                    {
+                        RackId = data.RackId,
+                        RenterId = data.RenterId,
+                        StartDate = DateOnly.FromDateTime(data.StartDateTime ?? DateTime.Today),
+                        EndDate = data.NoEnd ? null : DateOnly.FromDateTime(data.EndDateTime ?? DateTime.Today),
+                    };
+
+                    _rentalContractRepository.Add(contract);
+                    RefreshRackSlots(); // opdater status og visning
+
+                    // Gå tilbage til rackvisning
                     CurrentRackPanel = new RackSelectedViewModel(
-                        rack,
+                        SelectedRack,
+                        _rentalContractRepository,
+                        _renterRepository,
                         () => ShowAddRentContract(),
                         () => ShowEndRentContract()
                     );
@@ -135,16 +161,14 @@ namespace Reolmarked.ViewModel
                 onClose: () =>
                 {
                     CurrentRackPanel = new RackSelectedViewModel(
-                        rack,
+                        SelectedRack,
+                        _rentalContractRepository,
+                        _renterRepository,
                         () => ShowAddRentContract(),
                         () => ShowEndRentContract()
                     );
                 },
-                onChangeRackId: rid =>
-                {
-                    var target = Racks.FirstOrDefault(x => x.RackId == rid);
-                    if (target != null) SelectedRack = target;
-                }
+                onChangeRackId: null
             );
             IsOverlayOpen = true;
         }
@@ -154,31 +178,23 @@ namespace Reolmarked.ViewModel
             var rack = SelectedRack;
             if (rack == null) return;
 
-            string renterDisplay = "-";
-            System.DateOnly? currentEnd = null;
-
             CurrentRackPanel = new EndRentContractViewModel(
                 rack.RackId,
-                renterDisplay,
-                currentEnd,
-                onSubmit: data =>
-                {
-                    // TODO: Gem opsigelsen i DB (data.TerminationDate, data.Reason)
-                    CurrentRackPanel = new RackSelectedViewModel(
-                        rack,
-                        () => ShowAddRentContract(),
-                        () => ShowEndRentContract()
-                    );
-                },
+                _rentalContractRepository,
+                _renterRepository,
                 onClose: () =>
                 {
                     CurrentRackPanel = new RackSelectedViewModel(
                         rack,
+                        _rentalContractRepository,
+                        _renterRepository,
                         () => ShowAddRentContract(),
                         () => ShowEndRentContract()
                     );
-                }
+                },
+                onRefreshRackSlots: RefreshRackSlots
             );
+
             IsOverlayOpen = true;
         }
 
@@ -274,6 +290,17 @@ namespace Reolmarked.ViewModel
                 int id = 13 - i;
                 AddSlot(id, i, 0, true, OX_LEFT + 120, OY_BOTTOM);
             }
+        }
+        public void RefreshRackSlots()
+        {
+            RackStatusHelper.UpdateRackStatusesBasedOnContracts(_repo, _rentalContractRepository);
+
+            // Genindlæs racks fra databasen
+            Racks.Clear();
+            foreach (var rack in _repo.GetAll())
+                Racks.Add(rack);
+
+            BuildSlots();
         }
     }
 }

@@ -60,6 +60,7 @@
             <Setter Property="Margin" Value="0,0,6,0"/>
         </Style>
 
+
         <!-- Standard-stil for “pilleformet” ComboBox (uden custom template) -->
         <Style x:Key="PillCombo" TargetType="ComboBox">
             <Setter Property="Height" Value="29"/>
@@ -377,6 +378,6 @@
                 </Border>
             </Grid>
         </Border>
-
     </Grid>
 </UserControl>
+

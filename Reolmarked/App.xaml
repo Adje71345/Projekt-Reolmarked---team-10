@@ -5,6 +5,7 @@
              xmlns:vm="clr-namespace:Reolmarked.ViewModel"
              xmlns:view="clr-namespace:Reolmarked.View"   
              xmlns:converters="clr-namespace:Reolmarked.ViewModel.Helpers"
+             xmlns:ruc="clr-namespace:Reolmarked.View.RackUserControl"
              StartupUri="MainWindow.xaml">
 
     <Application.Resources>
@@ -30,6 +31,10 @@
 
             <DataTemplate DataType="{x:Type vm:RackViewModel}">
                 <view:RackView />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:RackSelectedViewModel}">
+                <ruc:RackSelected/>
             </DataTemplate>
 
             <DataTemplate DataType="{x:Type vm:RenterInfoViewModel}">

@@ -8,21 +8,24 @@ using System.Windows;
 using System.Windows.Input;
 using Reolmarked.Commands;
 using Reolmarked.Model;
+using Reolmarked.Repositories;
 
 namespace Reolmarked.ViewModel
 {
     public class AddRentContractViewModel : ViewModelBase
     {
-        // Lister leveres fra parent (Tais RackViewModel)
+        // Lister leveres fra parent
         public ObservableCollection<Renter> Renters { get; }
-        public ObservableCollection<PaymentMethod> PaymentMethods { get; }
+
+        private readonly List<PaymentMethod> _paymentMethods;
+        private Renter? Renter => Renters.FirstOrDefault(r => r.RenterId == RenterId);
 
         // Reol-id (kan tastes/ændres)
         private int _rackId;
         public int RackId
         {
             get => _rackId;
-            set { if (SetProperty(ref _rackId, value)) _onChangeRackId?.Invoke(_rackId); } // Lui: sync med grid-valg
+            set { if (SetProperty(ref _rackId, value)) _onChangeRackId?.Invoke(_rackId); } // sync med grid-valg
         }
 
         // Lejer-id (kan vælges via navneforslag)
@@ -36,6 +39,7 @@ namespace Reolmarked.ViewModel
                 {
                     var r = Renters.FirstOrDefault(x => x.RenterId == _renterId);
                     RenterNameQuery = r == null ? "" : $"{r.FirstName} {r.LastName}";
+                    OnPropertyChanged(nameof(PaymentMethodName));
                 }
             }
         }
@@ -94,19 +98,16 @@ namespace Reolmarked.ViewModel
         public bool NoEnd
         {
             get => _noEnd;
-            set { if (SetProperty(ref _noEnd, value)) OnPropertyChanged(nameof(EndDateEnabled)); } // Lui
+            set { if (SetProperty(ref _noEnd, value)) OnPropertyChanged(nameof(EndDateEnabled)); } 
         }
 
         // Wrapper, som bliver brugt direkte i XAML
         public bool EndDateEnabled => !NoEnd;
 
         // Betalingsmetode
-        private PaymentMethod? _selectedPaymentMethod;
-        public PaymentMethod? SelectedPaymentMethod
-        {
-            get => _selectedPaymentMethod;
-            set => SetProperty(ref _selectedPaymentMethod, value);
-        }
+        public string? PaymentMethodName =>
+        _paymentMethods.FirstOrDefault(p => p.PaymentMethodId == Renter?.PaymentMethodId)?.Name;
+
 
         // Commands
         public ICommand PickRenterCommand { get; }
@@ -119,40 +120,25 @@ namespace Reolmarked.ViewModel
         private readonly Action<int>? _onChangeRackId;
 
         // Internt payload til submit 
-        public record SubmitData(int RackId, int RenterId, DateTime? StartDateTime, DateTime? EndDateTime, bool NoEnd, PaymentMethod? SelectedPaymentMethod);
+        public record SubmitData(int RackId, int RenterId, DateTime? StartDateTime, DateTime? EndDateTime, bool NoEnd);
 
-        public AddRentContractViewModel(
-            int rackId,
-            System.Collections.Generic.IEnumerable<Renter> renters,
-            System.Collections.Generic.IEnumerable<PaymentMethod> paymentMethods,
-            Action<SubmitData> onSubmit,
-            Action onClose,
-            Action<int>? onChangeRackId)
+        public AddRentContractViewModel(int rackId, IEnumerable<Renter> renters, IEnumerable<PaymentMethod> paymentMethods,
+            Action<SubmitData> onSubmit, Action onClose, Action<int>? onChangeRackId)
         {
             _rackId = rackId;
             Renters = new ObservableCollection<Renter>(renters);
-            PaymentMethods = new ObservableCollection<PaymentMethod>(paymentMethods);
+            _paymentMethods = paymentMethods.ToList();
+
             _onSubmit = onSubmit;
             _onClose = onClose;
             _onChangeRackId = onChangeRackId;
 
-            // Defaults
-            var first = Renters.FirstOrDefault();
-            if (first != null)
-            {
-                RenterId = first.RenterId;
-                RenterNameQuery = $"{first.FirstName} {first.LastName}";
-            }
-            SelectedPaymentMethod = PaymentMethods.FirstOrDefault();
-
-            // Vælg lejer fra forslag
             PickRenterCommand = new RelayCommand<int>(rid =>
             {
                 RenterId = rid;
                 SuggestionsVisible = Visibility.Collapsed;
             });
 
-            // Gem (let validering)
             SubmitCommand = new RelayCommand(() =>
             {
                 if (RenterId <= 0 || RackId <= 0 || !StartDateTime.HasValue)
@@ -161,10 +147,11 @@ namespace Reolmarked.ViewModel
                     return;
                 }
 
-                _onSubmit(new SubmitData(RackId, RenterId, StartDateTime, EndDateTime, NoEnd, SelectedPaymentMethod));
+                _onSubmit(new SubmitData(RackId, RenterId, StartDateTime, EndDateTime, NoEnd));
             });
 
             CloseCommand = new RelayCommand(_onClose);
         }
+
     }
 }
