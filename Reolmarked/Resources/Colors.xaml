@@ -26,5 +26,6 @@
     <SolidColorBrush x:Key="PrimaryBlueLightBrush" Color="{StaticResource PrimaryBlueLightColor}" />
     <SolidColorBrush x:Key="Danger" Color="{StaticResource Red}"/>
     <SolidColorBrush x:Key="DangerLight" Color="{StaticResource LightRed}"/>
+    
 
 </ResourceDictionary>

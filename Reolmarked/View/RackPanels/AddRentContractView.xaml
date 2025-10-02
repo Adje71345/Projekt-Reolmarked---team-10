@@ -10,7 +10,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Header -->
+            <!-- Overskrift -->
             <DockPanel Grid.Row="0" Margin="0,0,0,16">
                 <TextBlock Text="Opret lejekontrakt" FontSize="20" FontWeight="SemiBold"/>
                 <Button Content="&#x2715;" FontSize="16" Command="{Binding CloseCommand}"
@@ -29,50 +29,26 @@
                     <TextBox Grid.Column="1" Text="{Binding RackId}" IsReadOnly="True" Style="{StaticResource InputPill}" />
                 </Grid>
 
-                <!-- Lejer (navn) + forslag (vis KUN ved fokus + tekst + forslag) -->
+                <!-- Lejer (vælg fra liste) -->
                 <Grid Margin="0,0,0,14">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="140"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Lejer (navn)" Style="{StaticResource FormLabel}"/>
-                    <StackPanel Grid.Column="1">
-                        <TextBox x:Name="NameBox" Text="{Binding RenterNameQuery, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InputPill}"/>
-                        <Border CornerRadius="12" Background="White"
-                                BorderBrush="{DynamicResource SoftBorderBrush}" BorderThickness="1" Margin="0,8,0,0" Padding="4">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                    <Style.Triggers>
-                                        <!-- Vis når feltet har fokus -->
-                                        <DataTrigger Binding="{Binding ElementName=NameBox, Path=IsKeyboardFocusWithin}" Value="True">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                        </DataTrigger>
-                                        <!-- Skjul hvis ingen forslag -->
-                                        <DataTrigger Binding="{Binding NameSuggestions.Count}" Value="0">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                        <!-- Skjul hvis tomt -->
-                                        <DataTrigger Binding="{Binding ElementName=NameBox, Path=Text}" Value="">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-                            <ItemsControl ItemsSource="{Binding NameSuggestions}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Button Content="{Binding Display}"
-                                                Command="{Binding DataContext.PickRenterCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
-                                                CommandParameter="{Binding RenterId}"
-                                                HorizontalContentAlignment="Left"
-                                                BorderThickness="0" Background="Transparent" Padding="10,6"/>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-
-                        </Border>
-                    </StackPanel>
+                    <TextBlock Text="Lejer" Style="{StaticResource FormLabel}"/>
+                    <ComboBox Grid.Column="1"
+                        ItemsSource="{Binding Renters}"
+                        SelectedItem="{Binding SelectedRenter, Mode=TwoWay}"
+                        Style="{StaticResource ComboPill}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <Run Text="{Binding FirstName}" />
+                                    <Run Text="{Binding LastName}" />
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                 </Grid>
 
                 <!-- Lejer-ID -->
@@ -92,7 +68,7 @@
                         <ColumnDefinition Width="160.18"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Startdato" Style="{StaticResource FormLabel}"/>
-                    <DatePicker Grid.Column="1" SelectedDate="{Binding StartDateTime}" Style="{StaticResource DatePill}"/>
+                    <DatePicker Grid.Column="1" SelectedDate="{Binding StartDateTime, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DatePill}"/>
                 </Grid>
 
                 <!-- Slutdato + Ingen slutdato -->
@@ -103,7 +79,8 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Slutdato" Style="{StaticResource FormLabel}"/>
                     <StackPanel Grid.Column="1">
-                        <DatePicker SelectedDate="{Binding EndDateTime}" IsEnabled="{Binding EndDateEnabled}" Style="{StaticResource DatePill}"/>
+                        <DatePicker SelectedDate="{Binding EndDateTime, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding EndDateEnabled}" Style="{StaticResource DatePill}"/>
+                        <TextBlock Text="Justeres automatisk til sidste dag i måneden" FontSize="11" Foreground="{DynamicResource TextBrush}" Margin="12,4,0,0"/>
                         <CheckBox Content="Ingen slutdato" IsChecked="{Binding NoEnd}" Margin="12,8,0,0" Foreground="{DynamicResource TextBrush}" FontSize="14"/>
                     </StackPanel>
                 </Grid>
