@@ -63,7 +63,7 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Slutdato" Style="{StaticResource FormLabel}" Margin="0,8,0,0"/>
-                    <TextBox Grid.Column="1" Text="{Binding CurrentEndDateText, Mode=OneWay}" IsReadOnly="True" Style="{StaticResource InputPill}"/>
+                    <TextBox Grid.Column="1" Text="{Binding CalculatedEndDateText, Mode=OneWay}" IsReadOnly="True" Style="{StaticResource InputPill}"/>
                 </Grid>
             </StackPanel>
 
