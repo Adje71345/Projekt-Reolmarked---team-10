@@ -1,6 +1,7 @@
 ﻿using Reolmarked.Commands;
 using Reolmarked.Model;
 using Reolmarked.Repositories;
+using Reolmarked.ViewModel.Helpers;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -173,9 +174,33 @@ namespace Reolmarked.ViewModel
 
         private void Pay()
         {
-            // Kan godt gemmmes i DB/kvittering; men lige nu blot ryd
+            // Hvis der ikke er noget at gemme, ryd og returner
+            if (Sale.Count == 0)
+            {
+                Sale.Clear();
+                return;
+            }
+
+            // Gem hver linje i DB og fortæl resten af appen (Afregning) at der er kommet et nyt salg
+            foreach (var line in Sale.ToList())
+            {
+                // Sæt tidspunkt hvis ikke sat (sikkerhed)
+                if (line.SaleDate == default) line.SaleDate = DateTime.Now;
+
+                // Gem i DB
+                _saleLineRepository?.Add(line);
+
+                // Rejs globalt event så MonthlyStatementViewModel kan opdatere sig selv
+                AppEvents.RaiseSaleCommitted(line);
+            }
+
+            // Tøm kurv efter vellykket betaling
             Sale.Clear();
+
+            // Opdater visning / afledte felter
+            SalesView?.Refresh();
         }
+
 
         // === ZXing preview (samme princip som i (Sabines) LabelViewModel) ===
         private void UpdateBarcodePreview(string text)
