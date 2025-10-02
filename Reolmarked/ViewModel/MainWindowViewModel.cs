@@ -60,7 +60,7 @@ namespace Reolmarked.ViewModel
                     CurrentViewModel = new SaleViewModel(_saleLineRepository);
                     break;
                 case ViewType.Afregning:
-                    CurrentViewModel = new MonthlyStatementViewModel();
+                    CurrentViewModel = new MonthlyStatementViewModel(_renterRepository, _rentalContractRepository, _saleLineRepository);
                     break;
 
                     // Tilføj flere cases her
