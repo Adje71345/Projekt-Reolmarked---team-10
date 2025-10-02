@@ -17,8 +17,15 @@ namespace Reolmarked.ViewModel
         public SidebarViewModel(MainWindowViewModel main)
         {
             _main = main;
+
+            _main.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(MainWindowViewModel.SelectedView))
+                    OnPropertyChanged(nameof(SelectedView));
+            };
         }
 
+        
 
         public ViewType SelectedView
         {
@@ -35,6 +42,7 @@ namespace Reolmarked.ViewModel
         Rack,
         Labels,
         Salg,
-        Afregning
+        Månedopgørelse,
+        AddRenter
     }
 }

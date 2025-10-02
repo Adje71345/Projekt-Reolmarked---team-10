@@ -48,7 +48,7 @@ namespace Reolmarked.ViewModel
                     CurrentViewModel = new RenterViewModel(_renterRepository, _paymentMethodRepository, _rentalContractRepository, _saleLineRepository);
                     break;
                 case ViewType.DashBoard:
-                    CurrentViewModel = new DashBoardViewModel(_renterRepository, _rackRepository, _rentalContractRepository, _saleLineRepository);
+                    CurrentViewModel = new DashBoardViewModel(this, _renterRepository, _rackRepository, _rentalContractRepository, _saleLineRepository);
                     break;
                 case ViewType.Rack:
                     CurrentViewModel = new RackViewModel(_rackRepository, _rentalContractRepository, _renterRepository, _paymentMethodRepository);
@@ -59,8 +59,13 @@ namespace Reolmarked.ViewModel
                 case ViewType.Salg:
                     CurrentViewModel = new SaleViewModel(_saleLineRepository);
                     break;
-                case ViewType.Afregning:
-                    CurrentViewModel = new MonthlyStatementViewModel(_renterRepository, _rentalContractRepository, _saleLineRepository);
+                case ViewType.Månedopgørelse:
+                    CurrentViewModel = new MonthlyStatementViewModel();
+                    break;
+                case ViewType.AddRenter:
+                    _selectedView = ViewType.Renter;
+                    OnPropertyChanged(nameof(SelectedView));
+                    CurrentViewModel = new AddRenterViewModel(_renterRepository, _paymentMethodRepository);
                     break;
 
                     // Tilføj flere cases her

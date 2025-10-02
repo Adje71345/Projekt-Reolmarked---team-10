@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
+using Reolmarked.Commands;
 using Reolmarked.Repositories;
 
 namespace Reolmarked.ViewModel
@@ -15,6 +17,7 @@ namespace Reolmarked.ViewModel
         private readonly IRackRepository _rackRepository;
         private readonly IRentalContractRepository _rentalContractRepository;
         private readonly ISaleLineRepository _saleLineRepository;
+        private readonly MainWindowViewModel _main;
 
         private decimal _salesToday;
         public decimal SalesToday
@@ -36,14 +39,18 @@ namespace Reolmarked.ViewModel
             set => SetProperty(ref _renterCount, value);
         }
 
+        public ICommand NavigateCommand { get; }
         public ObservableCollection<object> Events { get; } = new();
 
-        public DashBoardViewModel(IRenterRepository renterRepository, IRackRepository rackRepository, IRentalContractRepository rentalContractRepository, ISaleLineRepository saleLineRepository)
+        public DashBoardViewModel(MainWindowViewModel main, IRenterRepository renterRepository, IRackRepository rackRepository, IRentalContractRepository rentalContractRepository, ISaleLineRepository saleLineRepository)
         {
+            _main = main;
             _renterRepository = renterRepository;
             _rackRepository = rackRepository;
             _rentalContractRepository = rentalContractRepository;
             _saleLineRepository = saleLineRepository;
+
+            NavigateCommand = new RelayCommand<ViewType>(view => _main.SelectedView = view);
 
             //Starter indlæsning af data som en baggrundsopgave med Task.Run
             StartLoadCounts();
