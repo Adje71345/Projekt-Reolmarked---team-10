@@ -48,7 +48,7 @@ namespace Reolmarked.ViewModel
                     CurrentViewModel = new RenterViewModel(_renterRepository, _paymentMethodRepository, _rentalContractRepository, _saleLineRepository);
                     break;
                 case ViewType.DashBoard:
-                    CurrentViewModel = new DashBoardViewModel(_renterRepository, _rackRepository, _rentalContractRepository, _saleLineRepository);
+                    CurrentViewModel = new DashBoardViewModel(this, _renterRepository, _rackRepository, _rentalContractRepository, _saleLineRepository);
                     break;
                 case ViewType.Rack:
                     CurrentViewModel = new RackViewModel(_rackRepository, _rentalContractRepository, _renterRepository, _paymentMethodRepository);
