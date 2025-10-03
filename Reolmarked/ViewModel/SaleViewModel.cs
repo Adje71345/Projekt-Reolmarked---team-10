@@ -20,6 +20,7 @@ namespace Reolmarked.ViewModel
     internal class SaleViewModel : ViewModelBase
     {
         private readonly ISaleLineRepository _saleLineRepository;
+        private readonly IRackRepository _rackRepo;
 
         // Liste til DataGrid
         public ObservableCollection<SaleLine> Sale { get; } = new();
@@ -91,9 +92,12 @@ namespace Reolmarked.ViewModel
         }
 
         // Runtime-konstruktør med repository. Kalder eksisterende ctor via ": this()".
-        public SaleViewModel(ISaleLineRepository saleLineRepository) : this()
+        public SaleViewModel(ISaleLineRepository saleLineRepository, IRackRepository rackRepository) : this()
         {
             _saleLineRepository = saleLineRepository ?? throw new ArgumentNullException(nameof(saleLineRepository));
+            _rackRepo = rackRepository ?? throw new ArgumentNullException(nameof(rackRepository));
+
+
 
             // Initialiser CollectionView
             SalesView = CollectionViewSource.GetDefaultView(Sale);     
@@ -137,6 +141,24 @@ namespace Reolmarked.ViewModel
                 UpdateBarcodePreview(null);
                 return;
             }
+
+            Rack rack = _rackRepo.GetById(rackId);
+
+            // Valider reol status, hvis ledig (1)=> stop methoden
+            if (rack.RackStatusId == 1)
+            {
+                System.Windows.MessageBox.Show(
+                    "Reolen er ikke lejet ud",
+                    "Ugyldigt reolnummer",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                // ryd input og stop
+                BarCode = string.Empty;
+                UpdateBarcodePreview(null);
+                return;
+            }
+
             // Løbenummer til SaleLineId
             var nextId = (Sale.LastOrDefault()?.SaleLineId ?? 0) + 1;
             var scanTxt = txt.Replace(";", string.Empty); // fjern ';' fra scankode
