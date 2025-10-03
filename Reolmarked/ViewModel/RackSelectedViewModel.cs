@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Windows.Input;
 using Reolmarked.Commands;
@@ -10,11 +11,15 @@ namespace Reolmarked.ViewModel
 {
     public class RackSelectedViewModel : ViewModelBase
     {
+        // Repositories
         private readonly IRentalContractRepository _rentalContractRepository;
         private readonly IRenterRepository _renterRepository;
 
+        // Reolen der vises detaljer for
         public Rack Rack { get; }
 
+        //Properties til binding
+        // Kontrakt status
         private bool _isOccupied;
         public bool IsOccupied
         {
@@ -22,6 +27,7 @@ namespace Reolmarked.ViewModel
             private set => SetProperty(ref _isOccupied, value);
         }
 
+        // Lejerens navn
         private string _renterName = "-";
         public string RenterName
         {
@@ -29,6 +35,7 @@ namespace Reolmarked.ViewModel
             private set => SetProperty(ref _renterName, value);
         }
 
+        // Startdato
         private DateOnly? _periodStart;
         public DateOnly? PeriodStart
         {
@@ -36,6 +43,7 @@ namespace Reolmarked.ViewModel
             private set { if (SetProperty(ref _periodStart, value)) UpdateDerived(); }
         }
 
+        // Slutdato
         private DateOnly? _periodEnd;
         public DateOnly? PeriodEnd
         {
@@ -43,6 +51,7 @@ namespace Reolmarked.ViewModel
             private set { if (SetProperty(ref _periodEnd, value)) UpdateDerived(); }
         }
 
+        // UI visning af periode
         private string _periodText = "-";
         public string PeriodText
         {
@@ -50,6 +59,7 @@ namespace Reolmarked.ViewModel
             private set => SetProperty(ref _periodText, value);
         }
 
+        // UI visning af antal dage tilbage
         private int? _daysLeft;
         public int? DaysLeft
         {
@@ -57,12 +67,16 @@ namespace Reolmarked.ViewModel
             private set => SetProperty(ref _daysLeft, value);
         }
 
+        // Hjælpeproperty til at afgøre om der kan opsiges en kontrakt
+        public bool CanTerminate => IsOccupied && PeriodEnd == null;
+
         // Navigation
         public ICommand AddContractCommand { get; }
         public ICommand EndContractCommand { get; }
         private readonly Action _goToAddContract;
         private readonly Action _goToEndContract;
 
+        // Constructor
         public RackSelectedViewModel(
             Rack rack, IRentalContractRepository rentalContractRepository,
             IRenterRepository renterRepository,
@@ -81,6 +95,7 @@ namespace Reolmarked.ViewModel
             EndContractCommand = new RelayCommand(() => _goToEndContract());
         }
 
+        // Henter kontrakt og lejer detaljer for den valgte reol
         private void LoadDetails(int rackId)
         {
             var contract = _rentalContractRepository.GetActiveContractByRack(rackId);
@@ -108,16 +123,18 @@ namespace Reolmarked.ViewModel
             UpdateDerived();
         }
 
+        // Opdaterer afledte properties baseret på start- og slutdato
         private void UpdateDerived()
         {
             var ci = new CultureInfo("da-DK");
+            // Formaterer dato som "d. mmm" eller tom hvis null
             Func<DateOnly?, string> dm = dt =>
             {
                 if (!dt.HasValue) return string.Empty;
                 var m = dt.Value.ToDateTime(TimeOnly.MinValue).ToString("MMM", ci).ToLower();
                 return $"{dt.Value.Day}. {m}";
             };
-
+            // Sætter PeriodText baseret på start- og slutdato
             if (!PeriodStart.HasValue && !PeriodEnd.HasValue)
                 PeriodText = "-";
             else if (PeriodStart.HasValue && !PeriodEnd.HasValue)
@@ -126,7 +143,7 @@ namespace Reolmarked.ViewModel
                 PeriodText = "– " + dm(PeriodEnd);
             else
                 PeriodText = dm(PeriodStart) + " – " + dm(PeriodEnd);
-
+            // Beregner DaysLeft baseret på slutdato
             if (PeriodEnd.HasValue)
             {
                 var today = DateOnly.FromDateTime(DateTime.Today);

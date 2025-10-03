@@ -31,10 +31,12 @@
 
                 <TextBlock Style="{StaticResource FormLabel}" Text="Telefonnummer"/>
                 <TextBox Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InputPill}" Margin="0,4,0,12"/>
+                <TextBlock Text="{Binding PhoneErrorText}" Foreground="Red" FontSize="12" />
 
                 <TextBlock Style="{StaticResource FormLabel}" Text="Email"/>
                 <TextBox Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InputPill}" Margin="0,4,0,12"/>
-
+                <TextBlock Text="{Binding DuplicateErrorText}" Foreground="Red" FontSize="12" />
+                
                 <TextBlock Style="{StaticResource FormLabel}" Text="Betalingsmetode"/>
                 <Border Style="{StaticResource Pill}">
                     <ComboBox ItemsSource="{Binding PaymentMethods}" SelectedValue="{Binding PaymentMethodId}"

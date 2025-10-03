@@ -116,7 +116,7 @@ namespace Reolmarked.ViewModel
                 IsAddPanelOpen = true;
                 IsInfoPanelOpen = true;
             });
-            RenterInfo = new RenterInfoViewModel(() => IsInfoPanelOpen = false, EditRenter, _rentalContractRepository, _saleLineRepository);
+            RenterInfo = new RenterInfoViewModel(() => IsInfoPanelOpen = false, _rentalContractRepository, _saleLineRepository);
             AddRenter = new AddRenterViewModel(_renterRepository, _paymentMethodRepository);
             AddRenter.RequestClose += (s, e) =>
             {

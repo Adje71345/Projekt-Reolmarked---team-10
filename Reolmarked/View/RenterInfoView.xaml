@@ -87,8 +87,8 @@
                                     <TextBlock Text="{Binding ShelfName}" FontWeight="SemiBold"/>
                                     <TextBlock Text="{Binding Period}" Foreground="#666" FontSize="12" Margin="0,4,0,8" TextWrapping="Wrap"/>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                                        <Button Content="Opsig" Command="{Binding DataContext.TerminateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                CommandParameter="{Binding}" Padding="6,2"/>
+                                        <!--Ikke implementeret opsig knap-->
+                                        <Button Content="Opsig" Padding="6,2"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
