@@ -126,16 +126,16 @@ JOIN Randomized RR ON R.RackId = RR.RackId;
 GO
 
 -- Indsæt 43 kontrakter på de optagede reoler
+DECLARE @Occupied TABLE (RowNum INT, RackId INT);
+
+INSERT INTO @Occupied
+SELECT ROW_NUMBER() OVER (ORDER BY NEWID()), RackId
+FROM Rack WHERE RackStatusId = 2;
+
 DECLARE @i INT = 1;
 WHILE @i <= 43
 BEGIN
-    DECLARE @rack INT = (
-        SELECT RackId FROM (
-            SELECT RackId, ROW_NUMBER() OVER (ORDER BY NEWID()) AS rn
-            FROM Rack WHERE RackStatusId = 2
-        ) t WHERE rn = @i
-    );
-
+    DECLARE @rack INT = (SELECT RackId FROM @Occupied WHERE RowNum = @i);
     DECLARE @renter INT = ((@i - 1) % (SELECT COUNT(*) FROM Renter)) + 1;
     DECLARE @startDate DATE = DATEADD(MONTH, ((@i - 1) % 5), '2025-05-01');
 
