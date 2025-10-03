@@ -11,5 +11,8 @@ namespace Reolmarked.Repositories
 
         //Henter dagens samlede salg
         decimal GetTotalSalesToday();
+        // Tilføjer mange salgslinjer på en gang (bruges ved månedsafslutning)
+        void AddMany(IEnumerable<SaleLine> lines);
+
     }
 }
