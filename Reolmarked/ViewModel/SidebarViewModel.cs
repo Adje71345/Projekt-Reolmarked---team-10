@@ -42,7 +42,7 @@ namespace Reolmarked.ViewModel
         Rack,
         Labels,
         Salg,
-        Månedopgørelse,
+        Månedsopgørelse,
         AddRenter
     }
 }
