@@ -55,8 +55,52 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
+            <!-- Sales Graph – dropdown mellem 2 billeder (Sabines metode) -->
             <Border Style="{StaticResource WhitePanel}" Grid.Column="0" Margin="10">
-                <TextBlock Text="Sales Graph (coming soon)" FontWeight="Bold"/>
+                <StackPanel>
+                    <TextBlock Text="Sales Graph" FontWeight="SemiBold" Margin="0,0,0,12"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Text="Vis:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <ComboBox x:Name="ChartPicker" Width="260" SelectedIndex="0">
+                            <ComboBoxItem Content="Ugedagsprofil – gennemsnit"/>
+                            <ComboBoxItem Content="Ugesalg – sidste 8 uger"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <!-- Billede 1 -->
+                    <Image Source="/Assets/Images/reolmarked_ugedagsprofil.png"
+                      Stretch="Uniform" MinHeight="260">
+                        <Image.Style>
+                            <Style TargetType="Image">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <!-- Vis når første valgmulighed er valgt -->
+                                    <DataTrigger Binding="{Binding SelectedIndex, ElementName=ChartPicker}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Image.Style>
+                    </Image>
+
+                    <!-- Billede 2 -->
+                    <Image Source="/Assets/Images/reolmarked_ugesalg_8uger.png"
+                       Stretch="Uniform" MinHeight="260">
+                        <Image.Style>
+                            <Style TargetType="Image">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <!-- Vis når anden valgmulighed er valgt -->
+                                    <DataTrigger Binding="{Binding SelectedIndex, ElementName=ChartPicker}" Value="1">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Image.Style>
+                    </Image>
+
+                </StackPanel>
             </Border>
 
             <Border Style="{StaticResource WhitePanel}" Grid.Column="1" Margin="10">
