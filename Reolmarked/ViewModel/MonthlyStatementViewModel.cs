@@ -112,7 +112,7 @@ namespace Reolmarked.ViewModel
         }
 
         /// <summary>
-        /// Tekst der vises under overskriften "Månedopgørelse".
+        /// Tekst der vises under overskriften "Månedsopgørelse".
         /// </summary>
         public string PeriodText =>
             string.IsNullOrWhiteSpace(SelectedMonth)
