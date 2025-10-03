@@ -1,0 +1,183 @@
+-- Opret database
+CREATE DATABASE ReolmarkedDB;
+GO
+
+USE ReolmarkedDB;
+GO
+
+
+-- Opret PaymentMethod
+CREATE TABLE PaymentMethod (
+    PaymentMethodId INT IDENTITY(1,1) PRIMARY KEY,
+    PaymentMethodName NVARCHAR(30) NOT NULL
+);
+GO
+
+-- Opret RackStatus
+CREATE TABLE RackStatus (
+    RackStatusId INT IDENTITY(1,1) PRIMARY KEY,
+    StatusName NVARCHAR(30) NOT NULL
+);
+GO
+
+-- Opret Rack
+CREATE TABLE Rack (
+    RackId INT PRIMARY KEY,
+    RackStatusId INT NOT NULL,
+    FOREIGN KEY (RackStatusId) REFERENCES RackStatus(RackStatusId)
+);
+GO
+
+-- Opret Renter
+CREATE TABLE Renter (
+    RenterId INT IDENTITY(1,1) PRIMARY KEY,
+    FirstName NVARCHAR(30) NOT NULL,
+    LastName NVARCHAR(30) NOT NULL,
+    Phone NVARCHAR(20) UNIQUE,
+    Email NVARCHAR(50) UNIQUE,
+    PaymentMethodId INT NOT NULL,
+    FOREIGN KEY (PaymentMethodId) REFERENCES PaymentMethod(PaymentMethodId)
+);
+GO
+
+-- Opret RentalContract
+CREATE TABLE RentalContract (
+    RentalContractId INT IDENTITY(1,1) PRIMARY KEY,
+    StartDate DATE NOT NULL,
+    EndDate DATE NULL,
+    RenterId INT NOT NULL,
+    RackId INT NOT NULL,
+    FOREIGN KEY (RenterId) REFERENCES Renter(RenterId),
+    FOREIGN KEY (RackId) REFERENCES Rack(RackId),
+    CHECK (EndDate > StartDate)
+);
+GO
+
+-- Opret SaleLine
+CREATE TABLE SaleLine (
+    SaleLineId INT IDENTITY(1,1) PRIMARY KEY,
+    SaleDate DATE NOT NULL,
+    Price DECIMAL(8,2) NOT NULL CHECK (Price >= 0),
+    RackId INT NOT NULL,
+    FOREIGN KEY (RackId) REFERENCES Rack(RackId)
+);
+GO
+
+-- Indsæt betalingsmetoder
+INSERT INTO PaymentMethod (PaymentMethodName) VALUES
+('MobilePay'), ('Bankoverførsel'), ('Kort');
+GO
+
+-- Indsæt rackstatus
+INSERT INTO RackStatus (StatusName) VALUES
+('Ledig'), ('Optaget');
+GO
+
+-- Indsæt renters
+INSERT INTO Renter (FirstName, LastName, Phone, Email, PaymentMethodId) VALUES
+('Anna', 'Jensen', '11111111', 'anna.jensen@example.com', 1),
+('Bo', 'Hansen', '22222222', 'bo.hansen@example.com', 2),
+('Clara', 'Nielsen', '33333333', 'clara.nielsen@example.com', 3),
+('David', 'Larsen', '44444444', 'david.larsen@example.com', 1),
+('Eva', 'Madsen', '55555555', 'eva.madsen@example.com', 2),
+('Frederik', 'Olsen', '66666666', 'frederik.olsen@example.com', 3),
+('Grethe', 'Thomsen', '77777777', 'grethe.thomsen@example.com', 1),
+('Henrik', 'Christensen', '88888888', 'henrik.christensen@example.com', 2),
+('Ida', 'Andersen', '99999999', 'ida.andersen@example.com', 3),
+('Jakob', 'Mortensen', '10101010', 'jakob.mortensen@example.com', 1),
+('Katrine', 'Poulsen', '12121212', 'katrine.poulsen@example.com', 2),
+('Lars', 'Pedersen', '13131313', 'lars.pedersen@example.com', 3),
+('Maria', 'Knudsen', '14141414', 'maria.knudsen@example.com', 1),
+('Niels', 'Berg', '15151515', 'niels.berg@example.com', 2),
+('Olivia', 'Frandsen', '16161616', 'olivia.frandsen@example.com', 3),
+('Peter', 'Vestergaard', '17171717', 'peter.vestergaard@example.com', 1),
+('Rikke', 'Holm', '18181818', 'rikke.holm@example.com', 2),
+('Søren', 'Winther', '19191919', 'soeren.winther@example.com', 3),
+('Tina', 'Brandt', '20202020', 'tina.brandt@example.com', 1),
+('Ulrik', 'Krogh', '21212121', 'ulrik.krogh@example.com', 2),
+('Vibeke', 'Lund', '22223333', 'vibeke.lund@example.com', 3),
+('William', 'Nørgaard', '23232323', 'william.norgaard@example.com', 1),
+('Xenia', 'Bach', '24242424', 'xenia.bach@example.com', 2),
+('Yvonne', 'Skov', '25252525', 'yvonne.skov@example.com', 3),
+('Zacharias', 'Møller', '26262626', 'zacharias.moeller@example.com', 1);
+GO
+
+-- Opret 80 reoler (hvis de ikke allerede findes)
+DECLARE @rackId INT = 1;
+WHILE @rackId <= 80
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Rack WHERE RackId = @rackId)
+    BEGIN
+        INSERT INTO Rack (RackId, RackStatusId) VALUES (@rackId, 1);
+    END
+    SET @rackId += 1;
+END;
+GO
+
+-- Randomisér 43 reoler som optaget
+;WITH Randomized AS (
+    SELECT RackId, ROW_NUMBER() OVER (ORDER BY NEWID()) AS rn
+    FROM Rack
+)
+UPDATE R
+SET RackStatusId = CASE WHEN rn <= 43 THEN 2 ELSE 1 END
+FROM Rack R
+JOIN Randomized RR ON R.RackId = RR.RackId;
+GO
+
+-- Indsæt 43 kontrakter på de optagede reoler
+DECLARE @i INT = 1;
+WHILE @i <= 43
+BEGIN
+    DECLARE @rack INT = (
+        SELECT RackId FROM (
+            SELECT RackId, ROW_NUMBER() OVER (ORDER BY NEWID()) AS rn
+            FROM Rack WHERE RackStatusId = 2
+        ) t WHERE rn = @i
+    );
+
+    DECLARE @renter INT = ((@i - 1) % (SELECT COUNT(*) FROM Renter)) + 1;
+    DECLARE @startDate DATE = DATEADD(MONTH, ((@i - 1) % 5), '2025-05-01');
+
+    INSERT INTO RentalContract (StartDate, EndDate, RenterId, RackId)
+    VALUES (@startDate, NULL, @renter, @rack);
+
+    SET @i += 1;
+END;
+GO
+
+-- Indsæt 50 salgsdata for september fordelt på optagede reoler
+SET NOCOUNT ON;
+DECLARE @j INT = 1;
+WHILE @j <= 50
+BEGIN
+    DECLARE @rack INT = (
+        SELECT RackId FROM (
+            SELECT RackId, ROW_NUMBER() OVER (ORDER BY NEWID()) AS rn
+            FROM Rack WHERE RackStatusId = 2
+        ) t WHERE rn = ((@j - 1) % 43) + 1
+    );
+
+    DECLARE @day INT = ((@j - 1) % 30) + 1;
+    DECLARE @price DECIMAL(8,2) = ROUND(50 + RAND() * 150, 2);
+
+    INSERT INTO SaleLine (SaleDate, Price, RackId)
+    VALUES (DATEFROMPARTS(2025, 9, @day), @price, @rack);
+
+    SET @j += 1;
+END;
+
+-- Validering
+SELECT RackStatusId, COUNT(*) AS Antal FROM Rack GROUP BY RackStatusId;
+SELECT * FROM RentalContract;
+SELECT COUNT(*) AS Salg FROM SaleLine;
+
+-- Se alle reoler med statusnavn
+SELECT 
+    R.RackId,
+    R.RackStatusId,
+    RS.StatusName
+FROM Rack R
+INNER JOIN RackStatus RS ON R.RackStatusId = RS.RackStatusId
+ORDER BY R.RackId;
+GO
