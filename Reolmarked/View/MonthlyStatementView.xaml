@@ -141,6 +141,10 @@
         <!-- Converter: farver negativt tal rødt i total-linjen -->
         <helpers:NegativeToBrushConverter x:Key="NegativeToBrushConverter"/>
 
+        <!-- Registrer converteren som en ressource med nøglen 'SignFlipConverter', så den kan bruges i bindings -->
+        <helpers:SignFlipConverter x:Key="SignFlipConverter"/>
+
+
         <!-- Total-linje: beholder (øverste kant + padding justeret ift. scrollbar) -->
         <Style x:Key="TotalsBarBorder" TargetType="Border">
             <Setter Property="Background" Value="#F9FAFB"/>
@@ -295,10 +299,11 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
 
-                        <!-- TotalSalg (højrejusteret tal, tusindtals-separator) -->
+                        <!-- TotalSalg (højrejusteret tal, tusindtals-separator) 
+                        SignFlipConverter vender fortegnet, binder til 'TotalSalg' -->
                         <DataGridTextColumn Header="TotalSalg" Width="1.8*"
                                             HeaderStyle="{StaticResource HeaderRight}"
-                                            Binding="{Binding TotalSalg, StringFormat={}{0:N0}}">
+                                            Binding="{Binding TotalSalg, Converter={StaticResource SignFlipConverter}, StringFormat={}{0:N0}}">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock" BasedOn="{StaticResource CellRight}"/>
                             </DataGridTextColumn.ElementStyle>
@@ -322,10 +327,11 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
 
-                        <!-- Nettoresultat (højrejusteret tal) -->
+                        <!-- Nettoresultat (højrejusteret tal)
+                        SignFlipConverter vender fortegnet, binder til 'Nettoresultat-->
                         <DataGridTextColumn Header="Nettoresultat" Width="1.8*"
                                             HeaderStyle="{StaticResource HeaderRight}"
-                                            Binding="{Binding Nettoresultat, StringFormat={}{0:N0}}">
+                                            Binding="{Binding Nettoresultat, Converter={StaticResource SignFlipConverter}, StringFormat={}{0:N0}}">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock" BasedOn="{StaticResource CellRight}"/>
                             </DataGridTextColumn.ElementStyle>
@@ -354,10 +360,10 @@
                                    Style="{StaticResource TotalsValue}"
                                    Text="{Binding SumAntalReoler, StringFormat={}{0:N0}}"/>
 
-                        <!-- Total: TotalSalg -->
-                        <TextBlock Grid.Column="2"
-                                   Style="{StaticResource TotalsValue}"
-                                   Text="{Binding SumTotalSalg, StringFormat={}{0:N0}}"/>
+                        <!-- TotalSalg (beregnet med nye fortegn) -->
+                                   <TextBlock Grid.Column="2"
+                                    Style="{StaticResource TotalsValue}"
+                                    Text="{Binding SumTotalSalgFlipped, StringFormat={}{0:N0}}"/>
 
                         <!-- Total: Kommission -->
                         <TextBlock Grid.Column="3"
@@ -369,11 +375,11 @@
                                    Style="{StaticResource TotalsValue}"
                                    Text="{Binding SumReolLeje, StringFormat={}{0:N0}}"/>
 
-                        <!-- Total: Nettoresultat (farves rød ved negativ via converter) -->
-                        <TextBlock Grid.Column="5"
+                        <!-- Nettoresultat (vend fortegn + farves rød ved negativ via converter) -->
+                                  <TextBlock Grid.Column="5"
                                    Style="{StaticResource TotalsValue}"
-                                   Foreground="{Binding SumNettoresultat, Converter={StaticResource NegativeToBrushConverter}}"
-                                   Text="{Binding SumNettoresultat, StringFormat={}{0:N0}}"/>
+                                   Foreground="{Binding SumNettoresultatFlipped, Converter={StaticResource NegativeToBrushConverter}}"
+                                   Text="{Binding SumNettoresultatFlipped, StringFormat={}{0:N0}}"/>
                     </Grid>
                 </Border>
             </Grid>

@@ -72,6 +72,11 @@ namespace Reolmarked.ViewModel
         // SUM: Nettoresultat
         public decimal SumNettoresultat => Rows?.Sum(r => r.Nettoresultat) ?? 0m;
 
+        // Totals med nye fortegn til visning i footer
+        public decimal SumTotalSalgFlipped => -SumTotalSalg;       // fx -100 + (-200) = -300
+        public decimal SumNettoresultatFlipped => -SumNettoresultat;   // vend fortegn for netto
+
+
         // ========= Valgte filterværdier =========
 
         private int _selectedYear;
@@ -242,6 +247,10 @@ namespace Reolmarked.ViewModel
             OnPropertyChanged(nameof(SumKommission));
             OnPropertyChanged(nameof(SumReolLeje));
             OnPropertyChanged(nameof(SumNettoresultat));
+
+            // nye “flipped” totals
+            OnPropertyChanged(nameof(SumTotalSalgFlipped));
+            OnPropertyChanged(nameof(SumNettoresultatFlipped));
         }
 
         /// <summary>
