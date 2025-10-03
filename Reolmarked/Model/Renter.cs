@@ -28,28 +28,5 @@ namespace Reolmarked.Model
         // Parameterløs constructor til data fra DB
         public Renter() { }
 
-        // --- Operations (fra DCD) ---
-        /*public override string ToString()
-        {
-            // Format: RenterId;FirstName;LastName;Email;Phone;BankInfo
-            return $"{RenterId};{FirstName};{LastName};{Email};{Phone};{BankInfo}";
-        }*/
-
-        /*public static Renter FromString(string data)
-        {
-            if (data == null) throw new ArgumentNullException(nameof(data));
-            var parts = data.Split(';');
-            if (parts.Length < 6) throw new FormatException("Invalid Renter data");
-
-            var renter = new Renter(parts[1], parts[2], parts[3], parts[4])
-            {
-                BankInfo = parts[5]
-            };
-
-            if (int.TryParse(parts[0], out var id))
-                renter.RenterId = id;
-
-            return renter;
-        }*/
     }
 }
