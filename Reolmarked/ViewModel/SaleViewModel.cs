@@ -237,6 +237,7 @@ namespace Reolmarked.ViewModel
             return ConvertBitmapToImageSource(bmp);
         }
 
+        //bruges ikke i SaleView
         private void LoadSalesFromDb()
         {
             if (_saleLineRepository == null) return;

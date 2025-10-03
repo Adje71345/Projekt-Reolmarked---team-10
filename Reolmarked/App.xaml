@@ -60,7 +60,7 @@
 
 
             <!-- Converters -->
-            <vm:EnumToBoolConverter x:Key="EnumToBoolConverter" />
+            <converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
             <converters:MultiplyDoubleConverter x:Key="MultiplyDoubleConverter" />
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
             <converters:BoolToTextConverter x:Key="BoolToText" TrueText="Optaget" FalseText="Ledig"/>

@@ -30,18 +30,7 @@ namespace Reolmarked.ViewModel
         private readonly IRepository<PaymentMethod> _paymentMethodRepository;
         private System.Collections.Generic.HashSet<int> _occupiedIds = new();
 
-        private Brush rackBackGround = Brushes.Green;
-        public Brush RackBackground
-        {
-            get => rackBackGround;
-            set
-            {
-                rackBackGround = value;
-                OnPropertyChanged(nameof(RackBackground));
-            }
-        }
-
-
+        
 
         public ObservableCollection<Rack> Racks { get; }
         public ObservableCollection<RackSlot> RackSlots { get; } = new();
@@ -50,6 +39,7 @@ namespace Reolmarked.ViewModel
         public ObservableCollection<Renter> Renters { get; } = new();
         public ObservableCollection<PaymentMethod> PaymentMethods { get; } = new();
 
+        //Property for når man trykker på en reol
         private Rack _selectedRack;
         public Rack SelectedRack
         {
@@ -57,6 +47,7 @@ namespace Reolmarked.ViewModel
             set => SetProperty(ref _selectedRack, value);
         }
 
+        // RackView UserControl
         private ViewModelBase _currentRackPanel;
         public ViewModelBase CurrentRackPanel
         {
@@ -109,6 +100,7 @@ namespace Reolmarked.ViewModel
             CloseOverlayCommand = new RelayCommand(() => IsOverlayOpen = false);
         }
 
+        
         private void SelectAndShow(Rack r)
         {
             SelectedRack = r;
@@ -291,6 +283,8 @@ namespace Reolmarked.ViewModel
                 AddSlot(id, i, 0, true, OX_LEFT + 120, OY_BOTTOM);
             }
         }
+
+        //Opdaterer reol status
         public void RefreshRackSlots()
         {
             RackStatusHelper.UpdateRackStatusesBasedOnContracts(_repo, _rentalContractRepository);

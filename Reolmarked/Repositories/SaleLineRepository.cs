@@ -10,6 +10,8 @@ namespace Reolmarked.Repositories
     public class SaleLineRepository : ISaleLineRepository
     {
         private readonly string _connectionString;
+
+        // Repository for RentalContract til metoden, der filtrerer salelines med aktive kontakt
         private readonly RentalContractRepository _rentalContractRepository;
 
         public SaleLineRepository(string connectionString, RentalContractRepository rentalContractRepository)

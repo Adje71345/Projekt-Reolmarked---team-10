@@ -138,18 +138,5 @@ namespace Reolmarked.ViewModel
             return config.GetConnectionString("DefaultConnection");
         }
     }
-
-    //Converter til enum bindinger i XAML - bruges i Sidebar. Skal flyttes til et mere passende sted
-    public class EnumToBoolConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return value?.ToString() == parameter?.ToString();
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return (bool)value ? Enum.Parse(targetType, parameter.ToString()) : Binding.DoNothing;
-        }
-    }
+        
 }
