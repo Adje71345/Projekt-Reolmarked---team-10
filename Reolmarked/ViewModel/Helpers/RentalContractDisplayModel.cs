@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace Reolmarked.ViewModel.Helpers
         public RentalContractDisplayModel(RentalContract contract)
         {
             _contract = contract ?? throw new ArgumentNullException(nameof(contract));
+            EndDate = contract.EndDate;
         }
 
         public string ShelfName => $"Reol {_contract.RackId}";
@@ -21,5 +23,9 @@ namespace Reolmarked.ViewModel.Helpers
         public string Period =>
             $"{_contract.StartDate:dd. MMM yyyy}" +
             (_contract.EndDate.HasValue ? $" – {_contract.EndDate:dd. MMM yyyy}" : " – aktiv");
+
+        public DateOnly? EndDate { get; }
+        public bool CanTerminate => EndDate == null;
+
     }
 }

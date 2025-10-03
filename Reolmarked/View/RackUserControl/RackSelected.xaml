@@ -58,7 +58,7 @@
 
                 <Button Style="{DynamicResource BtnDangerOutlinePill}"
                     Content="Opsig lejekontrakt"
-                    IsEnabled="{Binding IsOccupied}"
+                    IsEnabled="{Binding CanTerminate}"
                     Command="{Binding EndContractCommand}"/>
             </StackPanel>
         </Grid>

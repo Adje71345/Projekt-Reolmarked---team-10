@@ -13,10 +13,13 @@ using Reolmarked.ViewModel.Helpers;
 namespace Reolmarked.ViewModel
 {
     public class RenterInfoViewModel : ViewModelBase
-    {     
+    {
+        // Repositories
         private readonly IRentalContractRepository _rentalContractRepository;
         private readonly ISaleLineRepository _saleLineRepository;
 
+        // Properties til binding
+        // Valgt lejer
         private Renter _selectedRenter;
         public Renter SelectedRenter
         {
@@ -24,6 +27,7 @@ namespace Reolmarked.ViewModel
             set => SetProperty(ref _selectedRenter, value);
         }
 
+        // Antal aktive reoler
         private int _activeShelvesCount;
         public int ActiveShelvesCount
         {
@@ -31,6 +35,7 @@ namespace Reolmarked.ViewModel
             set => SetProperty(ref _activeShelvesCount, value);
         }
 
+        // Salg denne måned
         private decimal _soldThisMonth;
         public decimal SoldThisMonth
         {
@@ -38,6 +43,7 @@ namespace Reolmarked.ViewModel
             set => SetProperty(ref _soldThisMonth, value);
         }
 
+        // Omsætning denne måned
         private decimal _revenueThisMonth;
         public decimal RevenueThisMonth
         {
@@ -45,31 +51,27 @@ namespace Reolmarked.ViewModel
             set => SetProperty(ref _revenueThisMonth, value);
         }
 
+        // Liste af aktive kontrakter
         public ObservableCollection<RentalContractDisplayModel> ActiveContracts { get; } = new();
 
+        // Commands
         public ICommand CloseCommand { get; }
-        public ICommand EditCommand { get; }
 
-        // Commands for contract actions
-        public ICommand TerminateCommand { get; }
-
+        // Callbacks til parent
         private readonly Action _closeAction;
-        private readonly Action<Renter> _editAction;
 
-        public RenterInfoViewModel(Action closeAction, Action<Renter> editAction, IRentalContractRepository rentalContractRepository, 
+        // Constructor
+        public RenterInfoViewModel(Action closeAction, IRentalContractRepository rentalContractRepository, 
             ISaleLineRepository saleLineRepository)
         {
             _closeAction = closeAction ?? throw new ArgumentNullException(nameof(closeAction));
-            _editAction = editAction ?? throw new ArgumentNullException(nameof(editAction));
             _rentalContractRepository = rentalContractRepository ?? throw new ArgumentNullException(nameof(rentalContractRepository));
             _saleLineRepository = saleLineRepository ?? throw new ArgumentNullException(nameof(saleLineRepository));
 
             CloseCommand = new RelayCommand(() => _closeAction());
-            EditCommand = new RelayCommand(() => _editAction(SelectedRenter), () => SelectedRenter != null);
-
-            /*TerminateCommand = new RelayCommand<RentalContract>(c => Terminate(c));*/
         }
 
+        // Metode til at loade lejer data
         public void LoadRenter(Renter renter)
         {
             SelectedRenter = renter;
@@ -96,10 +98,5 @@ namespace Reolmarked.ViewModel
 
             CommandManager.InvalidateRequerySuggested();
         }
-
-        /*private void Terminate(RentalContract contract)
-        {
-            ActiveContracts.Remove(contract);
-        }*/
     }
 }
