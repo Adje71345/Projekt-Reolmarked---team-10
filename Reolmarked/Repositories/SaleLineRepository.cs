@@ -3,6 +3,7 @@ using Reolmarked.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Data;
 
 namespace Reolmarked.Repositories
 {
@@ -22,14 +23,48 @@ namespace Reolmarked.Repositories
             using var connection = new SqlConnection(_connectionString);
             connection.Open();
 
-            string query = @"
-                INSERT INTO SaleLine (SaleDate, Price, RackId)
-                VALUES (@SaleDate, @Price, @RackId);
-                SELECT SCOPE_IDENTITY();";
+            const string sql = @"
+             INSERT INTO SaleLine (SaleDate, Price, RackId)
+             VALUES (@SaleDate, @Price, @RackId);
+             SELECT CAST(SCOPE_IDENTITY() AS int);";
 
-            var command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@SaleDate", saleLine.SaleDate);
-            saleLine.SaleLineId = Convert.ToInt32(command.ExecuteScalar());
+            using var cmd = new SqlCommand(sql, connection);
+            cmd.Parameters.AddWithValue("@SaleDate", saleLine.SaleDate);
+            cmd.Parameters.AddWithValue("@Price", saleLine.Price);
+            cmd.Parameters.AddWithValue("@RackId", saleLine.RackId);
+
+            saleLine.SaleLineId = (int)cmd.ExecuteScalar();
+        }
+
+        // Tilføjer mange salgslinjer på en gang (bruges ved månedsafslutning)
+        public void AddMany(IEnumerable<SaleLine> lines)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            connection.Open();
+            using var transaction = connection.BeginTransaction();
+            const string sql = @"
+                INSERT INTO SaleLine (SaleDate, Price, RackId)
+                VALUES (@SaleDate, @Price, @RackId);";
+            using var cmd = new SqlCommand(sql, connection, transaction);
+            cmd.Parameters.Add("@SaleDate", SqlDbType.DateTime);
+            cmd.Parameters.Add("@Price", SqlDbType.Decimal);
+            cmd.Parameters.Add("@RackId", SqlDbType.Int);
+            try
+            {
+                foreach (var line in lines)
+                {
+                    cmd.Parameters["@SaleDate"].Value = line.SaleDate;
+                    cmd.Parameters["@Price"].Value = line.Price;
+                    cmd.Parameters["@RackId"].Value = line.RackId;
+                    cmd.ExecuteNonQuery();
+                }
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
 
         public void Update(SaleLine saleLine)

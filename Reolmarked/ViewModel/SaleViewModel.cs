@@ -95,14 +95,10 @@ namespace Reolmarked.ViewModel
         {
             _saleLineRepository = saleLineRepository ?? throw new ArgumentNullException(nameof(saleLineRepository));
 
-            // 1) Hent rækker fra DB ned i eksisterende liste "Sale"
-            LoadSalesFromDb();
-
-            // 2) Initialiser CollectionView (3 vigtige linjer + en valgfri 4.)
-            SalesView = CollectionViewSource.GetDefaultView(Sale);                 // (1)
-            SalesView.Filter = FilterSales;                                        // (2)
-            SalesView.SortDescriptions.Clear();                                    // (3)
-            SalesView.SortDescriptions.Add(new SortDescription(nameof(SaleLine.SaleDate), ListSortDirection.Descending)); // (4 - valgfri)
+            // Initialiser CollectionView
+            SalesView = CollectionViewSource.GetDefaultView(Sale);     
+            SalesView.Filter = FilterSales;                                
+            SalesView.SortDescriptions.Clear();       
         }
 
 
@@ -181,18 +177,13 @@ namespace Reolmarked.ViewModel
                 return;
             }
 
-            // Gem hver linje i DB og fortæl resten af appen (Afregning) at der er kommet et nyt salg
-            foreach (var line in Sale.ToList())
-            {
-                // Sæt tidspunkt hvis ikke sat (sikkerhed)
-                if (line.SaleDate == default) line.SaleDate = DateTime.Now;
+            // Gem alle linjer på en gang i en transaktion til DB
+            _saleLineRepository?.AddMany(Sale.ToList());
 
-                // Gem i DB
-                _saleLineRepository?.Add(line);
-
-                // Rejs globalt event så MonthlyStatementViewModel kan opdatere sig selv
+            // Send event for hver linje
+            foreach (var line in Sale)
                 AppEvents.RaiseSaleCommitted(line);
-            }
+
 
             // Tøm kurv efter vellykket betaling
             Sale.Clear();
