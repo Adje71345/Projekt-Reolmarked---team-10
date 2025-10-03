@@ -196,18 +196,41 @@ namespace Reolmarked.Repositories
 
             return contracts;
         }
-
-        // Opsiger en enkelt kontrakt med slutdato 
-        public void EndSingleContract(int rentalId, DateOnly endDate)
+        public IEnumerable<RentalContract> GetActiveRentalContractsByMonth(int year, int month)
         {
-            var contract = GetById(rentalId);
-            if (contract == null) return;
+            var contracts = new List<RentalContract>();
 
-            contract.EndDate = endDate;
-            Update(contract);
+            //Beregn start og slut for månede
+            var startOfMonth = new DateTime(year, month, 1);
+            var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
-            // Bemærk: Rack status ændres ikke her
-            // Det håndteres i RackRepository.UpdateStatusesForEndedContracts()
+            string query = @"
+                SELECT RentalContractId, RenterId, RackId, StartDate, EndDate
+                FROM RentalContract
+                WHERE StartDate <= @EndOfMonth
+                    AND (EndDate IS NULL OR EndDate >= @StartOfMonth)";
+
+            using var connection = new SqlConnection(_connectionString);
+            var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@StartOfMonth", startOfMonth);
+            command.Parameters.AddWithValue("@EndOfMonth", endOfMonth);
+
+            connection.Open();
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                contracts.Add(new RentalContract
+                {
+                    RentalId = (int)reader["RentalContractId"],
+                    RenterId = (int)reader["RenterId"],
+                    RackId = (int)reader["RackId"],
+                    StartDate = DateOnly.FromDateTime((DateTime)reader["StartDate"]),
+                    EndDate = reader["EndDate"] == DBNull.Value
+                        ? null
+                        : DateOnly.FromDateTime((DateTime)reader["EndDate"])
+                });
+            }
+            return contracts;
         }
     }
 }

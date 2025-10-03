@@ -11,8 +11,6 @@ namespace Reolmarked.Repositories
 
         // Henter alle aktive kontrakter for en bestemt lejer
         IEnumerable<RentalContract> GetActiveContractsByRenter(int renterId);
-
-        // Opsiger en enkelt kontrakt ved at sætte slutdato
-        void EndSingleContract(int rentalId, DateOnly endDate);
+        IEnumerable<RentalContract> GetActiveRentalContractsByMonth(int year, int month);
     }
 }

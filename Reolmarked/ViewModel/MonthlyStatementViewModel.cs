@@ -250,34 +250,41 @@ namespace Reolmarked.ViewModel
         /// </summary>
         private void LoadRowsFromDb()
         {
-            // Start med at rydde (view opdaterer via ObservableCollection)
+            // Start med at rydde listen (så UI opdateres automatisk)
             Rows.Clear();
 
             // design-time short-circuit: ingen DB-arbejde uden repositories
             if (_renterRepository == null || _rentalContractRepository == null || _saleLineRepository == null)
                 return;
 
+            // Brug GetSelectedMonthBounds i stedet for selv at udregne
+            // Det sikrer at vi altid har en gyldig måned og år
             var (start, end) = GetSelectedMonthBounds();
 
-            // 1) Hent alle lejere
+            // Kald repository-metoden med start.Year og start.Month
+            var monthContracts = _rentalContractRepository
+                .GetActiveRentalContractsByMonth(start.Year, start.Month)
+                .ToList();
+
+            // Hent alle lejere
             var allRenters = _renterRepository.GetAll().ToList();
 
             foreach (var renter in allRenters)
             {
-                // 2) Aktive kontrakter lige nu (samme mønster som i jeres øvrige VM'er)
-                var contractsNow = _rentalContractRepository
-                    .GetActiveContractsByRenter(renter.RenterId)
+                // Find de kontrakter som tilhører denne lejer i den valgte måned
+                var contractsForRenter = monthContracts
+                    .Where(c => c.RenterId == renter.RenterId)
                     .ToList();
 
-                // Udtræk de unikke reol-id'er
-                var rackIds = contractsNow
+                // Udtræk unikke reoler
+                var rackIds = contractsForRenter
                     .Select(c => c.RackId)
                     .Distinct()
                     .ToList();
 
                 int antalReoler = rackIds.Count;
 
-                // 3) Måneds-salg for disse reoler (afgrænset på dato)
+                // Hent salg for disse reoler i den valgte måned
                 var monthSales = _saleLineRepository
                     .GetAll()
                     .Where(sl => rackIds.Contains(sl.RackId)
@@ -285,16 +292,13 @@ namespace Reolmarked.ViewModel
                               && sl.SaleDate <= end)
                     .ToList();
 
-                // Aggregationer
+                // Udregn totals
                 var totalSalg = monthSales.Sum(sl => sl.Price);
                 var kommission = ComputeCommission(totalSalg);
-
-                // Brug “discount”-metoden: vi anvender samletLeje til UI; rabat-info er tilgængelig senere
                 var (_, _, reolLeje, _) = ComputeRackRentWithDiscount(antalReoler);
-
                 var netto = ComputeNet(totalSalg, kommission, reolLeje);
 
-                // Medtag kun rækker hvor der er noget at vise (reoler eller salg)
+                // Tilføj kun en række hvis lejeren havde reoler eller salg i måneden
                 if (antalReoler > 0 || totalSalg > 0)
                 {
                     Rows.Add(new MonthlyStatementRow
@@ -309,9 +313,11 @@ namespace Reolmarked.ViewModel
                 }
             }
 
-            // Sikr at totals også opdateres efter Clear() + bulk-add
+            // Opdater totalfelter i footeren
             RaiseSumChanges();
         }
+
+
 
         /// <summary>
         /// Reagerer på et netop bogført salg.
